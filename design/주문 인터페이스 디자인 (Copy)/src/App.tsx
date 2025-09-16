@@ -1,8 +1,8 @@
-import { Header } from "@/components/Header";
-import { MenuCarousel } from "@/components/MenuCarousel";
-import { OrderHistory } from "@/components/OrderHistory";
+import { Header } from "./components/Header";
+import { MenuCarousel } from "./components/MenuCarousel";
+import { OrderHistory } from "./components/OrderHistory";
 
-export default function HomePage() {
+export default function App() {
   return (
     <div className="min-h-screen bg-white">
       <Header />
