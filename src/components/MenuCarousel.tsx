@@ -1,12 +1,12 @@
+/** @jsxImportSource @emotion/react */
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { css } from "@emotion/react";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
   CarouselApi,
 } from "./ui/carousel";
 import { Card, CardContent } from "./ui/card";
@@ -62,14 +62,156 @@ const menuData: MenuData[] = [
   },
 ];
 
+const sectionStyles = css`
+  width: 100%;
+  padding: 2rem 0;
+`;
+
+const containerStyles = css`
+  width: 100%;
+`;
+
+const headerContainerStyles = css`
+  text-align: center;
+  margin-bottom: 3rem;
+`;
+
+const titleStyles = css`
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #171717;
+  margin-bottom: 1rem;
+`;
+
+const subtitleStyles = css`
+  font-size: 1.125rem;
+  color: #525252;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+`;
+
+const animatedWordContainerStyles = css`
+  position: relative;
+  display: inline-block;
+  min-width: 4rem;
+  height: 1.75rem;
+  overflow: hidden;
+`;
+
+const animatedWordStyles = css`
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  color: #ea580c;
+  font-weight: 700;
+  white-space: nowrap;
+`;
+
+const carouselWrapperStyles = css`
+  width: 100%;
+`;
+
+const carouselContentStyles = css`
+  margin-left: -1rem;
+`;
+
+const carouselItemStyles = css`
+  padding-left: 1rem;
+  
+  @media (min-width: 768px) {
+    flex-basis: 50%;
+  }
+  
+  @media (min-width: 1024px) {
+    flex-basis: 33.333333%;
+  }
+`;
+
+const cardStyles = css`
+  height: 100%;
+  background-color: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border: 0;
+  transition: box-shadow 0.3s;
+
+  &:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+`;
+
+const imageContainerStyles = css`
+  position: relative;
+  height: 16rem;
+`;
+
+const imageStyles = css`
+  width: 100%;
+  height: 100%;
+`;
+
+const overlayStyles = css`
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+`;
+
+const imageTextStyles = css`
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  right: 1rem;
+  color: #ffffff;
+`;
+
+const menuNameStyles = css`
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+`;
+
+const menuEnglishNameStyles = css`
+  font-size: 0.875rem;
+  opacity: 0.9;
+  margin-bottom: 0.5rem;
+`;
+
+const cardContentStyles = css`
+  padding: 1.5rem;
+  padding-top: 0;
+`;
+
+const descriptionStyles = css`
+  color: #525252;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+`;
+
+const priceContainerStyles = css`
+  text-align: center;
+`;
+
+const priceStyles = css`
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #ea580c;
+`;
+
 export function MenuCarousel() {
   const [api, setApi] = React.useState<CarouselApi>();
-  const intervalRef = useRef<NodeJS.Timeout>();
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // 애니메이션 텍스트를 위한 상태
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const words = ["남편", "아내", "엄마", "아버지", "친구"];
-  const textIntervalRef = useRef<NodeJS.Timeout>();
+  const textIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!api) return;
@@ -131,15 +273,15 @@ export function MenuCarousel() {
   };
 
   return (
-    <section className="w-full py-8">
-      <div className="w-full">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+    <section css={sectionStyles}>
+      <div css={containerStyles}>
+        <div css={headerContainerStyles}>
+          <h2 css={titleStyles}>
             특별한 날에 집에서 편안히 보내면서
           </h2>
-          <p className="text-lg text-gray-600 flex items-center justify-center gap-1">
+          <p css={subtitleStyles}>
             <span>당신의</span>
-            <span className="relative inline-block min-w-[4rem] h-7 overflow-hidden">
+            <span css={animatedWordContainerStyles}>
               <AnimatePresence mode="wait">
                 <motion.span
                   key={words[currentWordIndex]}
@@ -150,7 +292,7 @@ export function MenuCarousel() {
                     duration: 0.5,
                     ease: [0.4, 0, 0.2, 1],
                   }}
-                  className="absolute left-1/2 top-0 -translate-x-1/2 text-orange-600 font-bold whitespace-nowrap"
+                  css={animatedWordStyles}
                 >
                   {words[currentWordIndex]}
                 </motion.span>
@@ -162,37 +304,37 @@ export function MenuCarousel() {
 
         <Carousel
           setApi={setApi}
-          className="w-full"
+          customCss={carouselWrapperStyles}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          <CarouselContent className="-ml-4">
+          <CarouselContent customCss={carouselContentStyles}>
             {menuData.map((menu) => (
               <CarouselItem
                 key={menu.id}
-                className="pl-4 md:basis-1/2 lg:basis-1/3"
+                customCss={carouselItemStyles}
               >
-                <Card className="h-full overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 border-0">
-                  <div className="relative h-64">
+                <Card customCss={cardStyles}>
+                  <div css={imageContainerStyles}>
                     <ImageWithFallback
                       src={menu.imageUrl}
                       alt={menu.name}
-                      className="w-full h-full"
+                      customCss={imageStyles}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                    <div className="absolute bottom-4 left-4 right-4 text-white">
-                      <h3 className="text-xl font-bold mb-1">{menu.name}</h3>
-                      <p className="text-sm opacity-90 mb-2">
+                    <div css={overlayStyles} />
+                    <div css={imageTextStyles}>
+                      <h3 css={menuNameStyles}>{menu.name}</h3>
+                      <p css={menuEnglishNameStyles}>
                         {menu.englishName}
                       </p>
                     </div>
                   </div>
-                  <CardContent className="p-6">
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                  <CardContent customCss={cardContentStyles}>
+                    <p css={descriptionStyles}>
                       {menu.description}
                     </p>
-                    <div className="text-center">
-                      <span className="text-3xl font-bold text-orange-600">
+                    <div css={priceContainerStyles}>
+                      <span css={priceStyles}>
                         {menu.price}
                       </span>
                     </div>
@@ -201,19 +343,7 @@ export function MenuCarousel() {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="hidden md:flex" />
-          <CarouselNext className="hidden md:flex" />
         </Carousel>
-
-        {/* 큰 주문 버튼들 */}
-        <div className="flex gap-4 justify-center mt-8">
-          <button className="px-12 py-4 bg-orange-600 text-white rounded-xl text-xl font-bold hover:bg-orange-700 transition-colors shadow-lg hover:shadow-xl transform hover:scale-105">
-            🍽️ 주문하기
-          </button>
-          <button className="px-12 py-4 bg-orange-600 text-white rounded-xl text-xl font-bold hover:bg-orange-700 transition-colors shadow-lg hover:shadow-xl transform hover:scale-105">
-            📋 주문목록
-          </button>
-        </div>
       </div>
     </section>
   );

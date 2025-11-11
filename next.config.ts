@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  compiler: {
+    emotion: true,
+  },
+  transpilePackages: ["@emotion/react", "@emotion/styled"],
 };
 
 export default nextConfig;

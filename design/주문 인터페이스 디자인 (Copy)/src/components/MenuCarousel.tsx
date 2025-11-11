@@ -9,7 +9,7 @@ import {
 } from "./ui/carousel";
 import { Card, CardContent } from "./ui/card";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface MenuData {
   id: number;
@@ -57,12 +57,12 @@ const menuData: MenuData[] = [
 
 export function MenuCarousel() {
   const [api, setApi] = React.useState<CarouselApi>();
-  const intervalRef = useRef<NodeJS.Timeout>();
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   
   // 애니메이션 텍스트를 위한 상태
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const words = ["남편", "아내", "엄마", "아버지", "친구"];
-  const textIntervalRef = useRef<NodeJS.Timeout>();
+  const textIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!api) return;

@@ -1,3 +1,4 @@
+/** @jsxImportSource @emotion/react */
 "use client";
 
 import * as React from "react";
@@ -5,7 +6,7 @@ import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-
+import { css, SerializedStyles } from "@emotion/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -42,9 +43,13 @@ function useCarousel() {
   return context;
 }
 
+const carouselBaseStyles = css`
+  position: relative;
+`;
+
 const Carousel = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & CarouselProps
+  React.HTMLAttributes<HTMLDivElement> & CarouselProps & { customCss?: SerializedStyles }
 >(
   (
     {
@@ -53,6 +58,7 @@ const Carousel = React.forwardRef<
       setApi,
       plugins,
       className,
+      customCss,
       children,
       ...props
     },
@@ -138,6 +144,7 @@ const Carousel = React.forwardRef<
           ref={ref}
           onKeyDownCapture={handleKeyDown}
           className={cn("relative", className)}
+          css={[carouselBaseStyles, customCss]}
           role="region"
           aria-roledescription="carousel"
           {...props}
@@ -150,14 +157,22 @@ const Carousel = React.forwardRef<
 );
 Carousel.displayName = "Carousel";
 
+const carouselContentWrapperStyles = css`
+  overflow: hidden;
+`;
+
+const carouselContentStyles = css`
+  display: flex;
+`;
+
 const CarouselContent = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => {
+  React.HTMLAttributes<HTMLDivElement> & { customCss?: SerializedStyles }
+>(({ className, customCss, ...props }, ref) => {
   const { carouselRef, orientation } = useCarousel();
 
   return (
-    <div ref={carouselRef} className="overflow-hidden">
+    <div ref={carouselRef} css={carouselContentWrapperStyles}>
       <div
         ref={ref}
         className={cn(
@@ -165,6 +180,7 @@ const CarouselContent = React.forwardRef<
           orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
           className
         )}
+        css={[carouselContentStyles, customCss]}
         {...props}
       />
     </div>
@@ -172,10 +188,17 @@ const CarouselContent = React.forwardRef<
 });
 CarouselContent.displayName = "CarouselContent";
 
+const carouselItemStyles = css`
+  min-width: 0;
+  flex-shrink: 0;
+  flex-grow: 0;
+  flex-basis: 100%;
+`;
+
 const CarouselItem = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => {
+  React.HTMLAttributes<HTMLDivElement> & { customCss?: SerializedStyles }
+>(({ className, customCss, ...props }, ref) => {
   const { orientation } = useCarousel();
 
   return (
@@ -188,6 +211,7 @@ const CarouselItem = React.forwardRef<
         orientation === "horizontal" ? "pl-4" : "pt-4",
         className
       )}
+      css={[carouselItemStyles, customCss]}
       {...props}
     />
   );
@@ -199,6 +223,16 @@ const CarouselPrevious = React.forwardRef<
   React.ComponentProps<typeof Button>
 >(({ className, variant = "outline", size = "icon", ...props }, ref) => {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel();
+
+  const buttonStyles = css`
+    position: absolute;
+    height: 2rem;
+    width: 2rem;
+    border-radius: 9999px;
+    ${orientation === "horizontal"
+      ? "left: -3rem; top: 50%; transform: translateY(-50%);"
+      : "top: -3rem; left: 50%; transform: translateX(-50%) rotate(90deg);"}
+  `;
 
   return (
     <Button
@@ -212,6 +246,7 @@ const CarouselPrevious = React.forwardRef<
           : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
         className
       )}
+      css={buttonStyles}
       disabled={!canScrollPrev}
       onClick={scrollPrev}
       {...props}
@@ -229,6 +264,16 @@ const CarouselNext = React.forwardRef<
 >(({ className, variant = "outline", size = "icon", ...props }, ref) => {
   const { orientation, scrollNext, canScrollNext } = useCarousel();
 
+  const buttonStyles = css`
+    position: absolute;
+    height: 2rem;
+    width: 2rem;
+    border-radius: 9999px;
+    ${orientation === "horizontal"
+      ? "right: -3rem; top: 50%; transform: translateY(-50%);"
+      : "bottom: -3rem; left: 50%; transform: translateX(-50%) rotate(90deg);"}
+  `;
+
   return (
     <Button
       ref={ref}
@@ -241,6 +286,7 @@ const CarouselNext = React.forwardRef<
           : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
         className
       )}
+      css={buttonStyles}
       disabled={!canScrollNext}
       onClick={scrollNext}
       {...props}

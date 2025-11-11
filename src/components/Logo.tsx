@@ -1,8 +1,8 @@
-export function Logo({ className = "w-10 h-10" }: { className?: string }) {
+export function Logo({ style }: { style?: React.CSSProperties }) {
   return (
     <svg
       viewBox="0 0 64 64"
-      className={className}
+      style={style}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >

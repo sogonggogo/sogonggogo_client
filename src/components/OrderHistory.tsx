@@ -1,3 +1,7 @@
+/** @jsxImportSource @emotion/react */
+"use client";
+
+import { css } from "@emotion/react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { ScrollArea } from "./ui/scroll-area";
@@ -57,59 +61,177 @@ const previousOrders: OrderItem[] = [
 function getStatusColor(status: string) {
   switch (status) {
     case "완료":
-      return "bg-green-100 text-green-800";
+      return css`
+        background-color: #dcfce7;
+        color: #166534;
+      `;
     case "준비중":
-      return "bg-yellow-100 text-yellow-800";
+      return css`
+        background-color: #fef9c3;
+        color: #854d0e;
+      `;
     case "배달중":
-      return "bg-blue-100 text-blue-800";
+      return css`
+        background-color: #dbeafe;
+        color: #1e40af;
+      `;
     default:
-      return "bg-gray-100 text-gray-800";
+      return css`
+        background-color: #f3f4f6;
+        color: #374151;
+      `;
   }
 }
 
+const cardStyles = css`
+  width: 100%;
+  height: fit-content;
+`;
+
+const cardHeaderStyles = css`
+  background-color: #ffffff;
+`;
+
+const cardTitleStyles = css`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #171717;
+`;
+
+const cardContentStyles = css`
+  padding: 0;
+  background-color: #ffffff;
+`;
+
+const scrollAreaStyles = css`
+  height: 24rem;
+`;
+
+const ordersContainerStyles = css`
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem;
+`;
+
+const orderItemStyles = css`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #f3f4f6;
+  }
+`;
+
+const orderContentStyles = css`
+  flex: 1;
+`;
+
+const orderHeaderStyles = css`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+`;
+
+const menuNameStyles = css`
+  font-weight: 500;
+  color: #171717;
+`;
+
+const orderDetailsStyles = css`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #525252;
+`;
+
+const reorderButtonStyles = css`
+  color: #ea580c;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+
+  &:hover {
+    color: #c2410c;
+  }
+`;
+
+const footerStyles = css`
+  padding: 1.5rem;
+  border-top: 1px solid #e5e5e5;
+`;
+
+const viewAllButtonStyles = css`
+  width: 100%;
+  padding: 0.5rem;
+  text-align: center;
+  color: #ea580c;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #fff7ed;
+  }
+`;
+
 export function OrderHistory() {
   return (
-    <Card className="w-full h-fit">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card customCss={cardStyles}>
+      <CardHeader customCss={cardHeaderStyles}>
+        <CardTitle customCss={cardTitleStyles}>
           <span>📋</span>
           이전 주문 내역
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-0">
-        <ScrollArea className="h-96">
-          <div className="space-y-3 p-6">
+      <CardContent customCss={cardContentStyles}>
+        <ScrollArea customCss={scrollAreaStyles}>
+          <div css={ordersContainerStyles}>
             {previousOrders.map((order) => (
               <div
                 key={order.id}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                css={orderItemStyles}
               >
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-medium text-gray-900">
+                <div css={orderContentStyles}>
+                  <div css={orderHeaderStyles}>
+                    <h4 css={menuNameStyles}>
                       {order.menuName}
                     </h4>
                     <Badge
-                      className={`text-xs ${getStatusColor(order.status)}`}
+                      customCss={getStatusColor(order.status)}
                     >
                       {order.status}
                     </Badge>
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                  <div css={orderDetailsStyles}>
                     <span>{order.price}</span>
                     <span>수량: {order.quantity}개</span>
                     <span>{order.date}</span>
                   </div>
                 </div>
-                <button className="text-orange-600 hover:text-orange-800 text-sm font-medium">
+                <button css={reorderButtonStyles}>
                   재주문
                 </button>
               </div>
             ))}
           </div>
         </ScrollArea>
-        <div className="p-6 border-t">
-          <button className="w-full py-2 text-center text-orange-600 font-medium hover:bg-orange-50 rounded-lg transition-colors">
+        <div css={footerStyles}>
+          <button css={viewAllButtonStyles}>
             전체 주문 내역 보기
           </button>
         </div>
