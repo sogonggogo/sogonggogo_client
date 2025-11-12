@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import styled from "@emotion/styled";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight, Pause } from "lucide-react";
 import { dinnerMenus } from "@/data/menus";
 
@@ -79,15 +80,10 @@ const ImageContainer = styled.div`
   justify-content: center;
 `;
 
-const ImagePlaceholder = styled.div`
+const StyledImage = styled(Image)`
   width: 100%;
   height: 100%;
-  background-color: #e5e5e5;
-  border-radius: ${({ theme }) => theme.borderRadius.sm};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: ${({ theme }) => theme.fontSize.hero};
+  object-fit: contain;
 `;
 
 const ControlsContainer = styled.div`
@@ -169,9 +165,15 @@ export default function HeroSection() {
 
         {/* Menu Image */}
         <ImageContainer>
-          <ImagePlaceholder>
-            <span>🍽️</span>
-          </ImagePlaceholder>
+          {currentMenu.image && (
+            <StyledImage
+              src={currentMenu.image}
+              alt={currentMenu.name}
+              width={364}
+              height={546}
+              priority
+            />
+          )}
         </ImageContainer>
       </GradientBackground>
 

@@ -22,7 +22,7 @@ export const dinnerMenus: MenuItem[] = [
     basePrice: 89000,
     servings: 2,
     availableStyles: ["simple", "grand", "deluxe"],
-    image: "/dinners/valentine.png",
+    image: "/images/valentine.png",
   },
   {
     id: 2,
@@ -33,7 +33,7 @@ export const dinnerMenus: MenuItem[] = [
     basePrice: 65000,
     servings: 1,
     availableStyles: ["simple", "grand", "deluxe"],
-    image: "/dinners/french.png",
+    image: "/images/french.png",
   },
   {
     id: 3,
@@ -44,7 +44,7 @@ export const dinnerMenus: MenuItem[] = [
     basePrice: 55000,
     servings: 1,
     availableStyles: ["simple", "grand", "deluxe"],
-    image: "/dinners/english.png",
+    image: "/images/english.png",
   },
   {
     id: 4,
@@ -61,7 +61,7 @@ export const dinnerMenus: MenuItem[] = [
     basePrice: 120000,
     servings: 2,
     availableStyles: ["grand", "deluxe"], // 샴페인 축제는 grand와 deluxe만 가능
-    image: "/dinners/champagne.png",
+    image: "/images/champagne.png",
   },
 ];
 
