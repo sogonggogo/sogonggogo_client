@@ -1,11 +1,10 @@
-/** @jsxImportSource @emotion/react */
 'use client';
 
 import { useState } from 'react';
-import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 import { ChevronLeft, ChevronRight, Pause } from 'lucide-react';
 
-const heroContainerStyles = css`
+const HeroContainer = styled.div`
   position: relative;
   width: 100%;
   max-width: 824px;
@@ -15,24 +14,24 @@ const heroContainerStyles = css`
   box-shadow: 0px 25px 50px -12px rgba(0, 0, 0, 0.25);
 `;
 
-const gradientBackgroundStyles = css`
+const GradientBackground = styled.div`
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 48px;
-  background: linear-gradient(180deg, #FFA500 0%, #FF8C00 100%);
+  background: linear-gradient(180deg, #ffa500 0%, #ff8c00 100%);
 `;
 
-const textContentStyles = css`
+const TextContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
   z-index: 10;
 `;
 
-const titleStyles = css`
+const Title = styled.h2`
   font-family: 'Arial Black', Arial, sans-serif;
   font-size: 60px;
   font-weight: 900;
@@ -41,19 +40,19 @@ const titleStyles = css`
   margin: 0;
 `;
 
-const subtitleStyles = css`
+const Subtitle = styled.p`
   font-size: 24px;
   color: white;
   margin: 0;
 `;
 
-const descriptionStyles = css`
+const Description = styled.p`
   font-size: 20px;
   color: white;
   margin: 0;
 `;
 
-const imageContainerStyles = css`
+const ImageContainer = styled.div`
   position: relative;
   width: 364px;
   height: 546px;
@@ -62,7 +61,7 @@ const imageContainerStyles = css`
   justify-content: center;
 `;
 
-const imagePlaceholderStyles = css`
+const ImagePlaceholder = styled.div`
   width: 100%;
   height: 100%;
   background-color: #e5e5e5;
@@ -74,7 +73,7 @@ const imagePlaceholderStyles = css`
   font-size: 48px;
 `;
 
-const controlsContainerStyles = css`
+const ControlsContainer = styled.div`
   position: absolute;
   bottom: 32px;
   left: 50%;
@@ -85,7 +84,7 @@ const controlsContainerStyles = css`
   z-index: 20;
 `;
 
-const controlButtonStyles = css`
+const ControlButton = styled.button`
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -102,20 +101,21 @@ const controlButtonStyles = css`
   }
 `;
 
-const indicatorsContainerStyles = css`
+const IndicatorsContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
 `;
 
-const indicatorButtonStyles = (isActive: boolean) => css`
+const IndicatorButton = styled.button<{ isActive: boolean }>`
   height: 12px;
   border-radius: 999px;
   border: none;
   cursor: pointer;
   transition: all 0.3s;
-  width: ${isActive ? '48px' : '12px'};
-  background-color: ${isActive ? 'white' : 'rgba(255, 255, 255, 0.5)'};
+  width: ${({ isActive }) => (isActive ? '48px' : '12px')};
+  background-color: ${({ isActive }) =>
+    isActive ? 'white' : 'rgba(255, 255, 255, 0.5)'};
 `;
 
 const slides = [
@@ -156,52 +156,52 @@ export default function HeroSection() {
   const currentItem = slides[currentSlide];
 
   return (
-    <div css={heroContainerStyles}>
+    <HeroContainer>
       {/* Gradient Background */}
-      <div css={gradientBackgroundStyles}>
+      <GradientBackground>
         {/* Text Content */}
-        <div css={textContentStyles}>
-          <h2 css={titleStyles}>{currentItem.title}</h2>
-          <p css={subtitleStyles}>{currentItem.subtitle}</p>
-          <p css={descriptionStyles}>{currentItem.description}</p>
-        </div>
+        <TextContent>
+          <Title>{currentItem.title}</Title>
+          <Subtitle>{currentItem.subtitle}</Subtitle>
+          <Description>{currentItem.description}</Description>
+        </TextContent>
 
         {/* Burger Image */}
-        <div css={imageContainerStyles}>
-          <div css={imagePlaceholderStyles}>
+        <ImageContainer>
+          <ImagePlaceholder>
             <span>🍔</span>
-          </div>
-        </div>
-      </div>
+          </ImagePlaceholder>
+        </ImageContainer>
+      </GradientBackground>
 
       {/* Controls */}
-      <div css={controlsContainerStyles}>
+      <ControlsContainer>
         {/* Previous Button */}
-        <button css={controlButtonStyles} onClick={prevSlide}>
+        <ControlButton onClick={prevSlide}>
           <ChevronLeft size={24} color="#D62300" strokeWidth={2} />
-        </button>
+        </ControlButton>
 
         {/* Slide Indicators */}
-        <div css={indicatorsContainerStyles}>
+        <IndicatorsContainer>
           {slides.map((_, index) => (
-            <button
+            <IndicatorButton
               key={index}
-              css={indicatorButtonStyles(index === currentSlide)}
+              isActive={index === currentSlide}
               onClick={() => setCurrentSlide(index)}
             />
           ))}
-        </div>
+        </IndicatorsContainer>
 
         {/* Play/Pause Button */}
-        <button css={controlButtonStyles}>
+        <ControlButton>
           <Pause size={20} color="#D62300" strokeWidth={2} />
-        </button>
+        </ControlButton>
 
         {/* Next Button */}
-        <button css={controlButtonStyles} onClick={nextSlide}>
+        <ControlButton onClick={nextSlide}>
           <ChevronRight size={24} color="#D62300" strokeWidth={2} />
-        </button>
-      </div>
-    </div>
+        </ControlButton>
+      </ControlsContainer>
+    </HeroContainer>
   );
 }

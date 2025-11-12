@@ -1,47 +1,46 @@
-/** @jsxImportSource @emotion/react */
 'use client';
 
-import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 import { ShoppingCart, Mic, Clock } from 'lucide-react';
 
-const sectionStyles = css`
+const Section = styled.section`
   width: 100%;
 `;
 
-const headerStyles = css`
+const Header = styled.div`
   margin-bottom: 32px;
 `;
 
-const titleStyles = css`
+const Title = styled.h2`
   font-family: 'Arial Black', Arial, sans-serif;
   font-size: 36px;
   font-weight: 900;
-  color: #D62300;
+  color: #d62300;
   margin: 0;
 `;
 
-const gridStyles = css`
+const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 `;
 
-const cardButtonStyles = css`
+const CardButton = styled.button`
   position: relative;
   height: 225px;
   border-radius: 26px;
-  background-color: #D9D9D9;
+  background-color: #d9d9d9;
   border: none;
   cursor: pointer;
   overflow: hidden;
   transition: all 0.3s;
 
   &:hover {
-    background-color: #C9C9C9;
+    background-color: #c9c9c9;
   }
 `;
 
-const cardContentStyles = css`
+const CardContent = styled.div`
   position: absolute;
   inset: 0;
   display: flex;
@@ -52,37 +51,37 @@ const cardContentStyles = css`
   padding: 32px;
 `;
 
-const iconWrapperStyles = css`
+const IconWrapper = styled.div`
   transition: transform 0.3s;
 
-  ${cardButtonStyles}:hover & {
+  ${CardButton}:hover & {
     transform: scale(1.1);
   }
 `;
 
-const cardTitleStyles = css`
+const CardTitle = styled.h3`
   font-family: 'Arial Black', Arial, sans-serif;
   font-size: 36px;
   font-weight: 900;
-  color: #D62300;
+  color: #d62300;
   margin: 0;
 `;
 
-const cardDescriptionStyles = css`
+const CardDescription = styled.p`
   font-size: 14px;
   color: rgba(92, 51, 23, 0.7);
   text-align: center;
   margin: 0;
 `;
 
-const hoverOverlayStyles = css`
+const HoverOverlay = styled.div`
   position: absolute;
   inset: 0;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.1), transparent);
   opacity: 0;
   transition: opacity 0.3s;
 
-  ${cardButtonStyles}:hover & {
+  ${CardButton}:hover & {
     opacity: 1;
   }
 `;
@@ -113,31 +112,31 @@ const orderCards = [
 
 export default function OrderSection() {
   return (
-    <section css={sectionStyles}>
-      <div css={headerStyles}>
-        <h2 css={titleStyles}>ORDER</h2>
-      </div>
+    <Section>
+      <Header>
+        <Title>ORDER</Title>
+      </Header>
 
-      <div css={gridStyles}>
+      <Grid>
         {orderCards.map((card) => {
           const Icon = card.icon;
           return (
-            <button key={card.id} css={cardButtonStyles}>
+            <CardButton key={card.id}>
               {/* Card Content */}
-              <div css={cardContentStyles}>
-                <div css={iconWrapperStyles}>
+              <CardContent>
+                <IconWrapper>
                   <Icon size={48} color="#5C3317" strokeWidth={1.5} />
-                </div>
-                <h3 css={cardTitleStyles}>{card.title}</h3>
-                <p css={cardDescriptionStyles}>{card.description}</p>
-              </div>
+                </IconWrapper>
+                <CardTitle>{card.title}</CardTitle>
+                <CardDescription>{card.description}</CardDescription>
+              </CardContent>
 
               {/* Hover Effect */}
-              <div css={hoverOverlayStyles} />
-            </button>
+              <HoverOverlay />
+            </CardButton>
           );
         })}
-      </div>
-    </section>
+      </Grid>
+    </Section>
   );
 }

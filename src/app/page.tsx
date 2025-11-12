@@ -1,74 +1,73 @@
-/** @jsxImportSource @emotion/react */
 'use client';
 
-import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import OrderHistory from '@/components/OrderHistory';
 import OrderSection from '@/components/OrderSection';
 
-const containerStyles = css`
+const Container = styled.div`
   min-height: 100vh;
-  background-color: #F5F5DC;
+  background-color: #f5f5dc;
 `;
 
-const mainStyles = css`
+const Main = styled.main`
   padding-top: 88px;
   padding-left: 80px;
   padding-right: 80px;
   padding-bottom: 64px;
 `;
 
-const contentWrapperStyles = css`
+const ContentWrapper = styled.div`
   max-width: 1280px;
   margin: 0 auto;
 `;
 
-const topSectionStyles = css`
+const TopSection = styled.div`
   display: flex;
   gap: 24px;
   margin-bottom: 32px;
 `;
 
-const heroWrapperStyles = css`
+const HeroWrapper = styled.div`
   flex: 1;
 `;
 
-const sidebarWrapperStyles = css`
+const SidebarWrapper = styled.div`
   width: 400px;
 `;
 
-const bottomSectionStyles = css`
+const BottomSection = styled.div`
   margin-top: 32px;
 `;
 
 export default function Home() {
   return (
-    <div css={containerStyles}>
+    <Container>
       <Header />
-      
+
       {/* Main Content */}
-      <main css={mainStyles}>
-        <div css={contentWrapperStyles}>
+      <Main>
+        <ContentWrapper>
           {/* Top Section: Hero + Order History */}
-          <div css={topSectionStyles}>
+          <TopSection>
             {/* Hero Section */}
-            <div css={heroWrapperStyles}>
+            <HeroWrapper>
               <HeroSection />
-            </div>
+            </HeroWrapper>
 
             {/* Order History Sidebar */}
-            <div css={sidebarWrapperStyles}>
+            <SidebarWrapper>
               <OrderHistory />
-            </div>
-          </div>
+            </SidebarWrapper>
+          </TopSection>
 
           {/* Bottom Section: Order Cards */}
-          <div css={bottomSectionStyles}>
+          <BottomSection>
             <OrderSection />
-          </div>
-        </div>
-      </main>
-    </div>
+          </BottomSection>
+        </ContentWrapper>
+      </Main>
+    </Container>
   );
 }
