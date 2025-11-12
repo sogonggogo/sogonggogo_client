@@ -15,7 +15,7 @@ const Header = styled.div`
 `;
 
 const Title = styled.h2`
-  font-family: ${({ theme }) => theme.fontFamily.miwon};
+  font-family: ${({ theme }) => theme.fontFamily.bagelfat};
   font-size: ${({ theme }) => theme.fontSize.xxxl};
   font-weight: ${({ theme }) => theme.fontWeight.black};
   color: ${({ theme }) => theme.colors.primary};
