@@ -12,7 +12,7 @@ const Header = styled.div`
 `;
 
 const Title = styled.h2`
-  font-family: ${({ theme }) => theme.fontFamily.primary};
+  font-family: ${({ theme }) => theme.fontFamily.bagelfat};
   font-size: ${({ theme }) => theme.fontSize.xxxl};
   font-weight: ${({ theme }) => theme.fontWeight.black};
   color: ${({ theme }) => theme.colors.primary};
@@ -77,7 +77,11 @@ const CardDescription = styled.p`
 const HoverOverlay = styled.div`
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, ${({ theme }) => theme.colors.blackAlpha10}, transparent);
+  background: linear-gradient(
+    to top,
+    ${({ theme }) => theme.colors.blackAlpha10},
+    transparent
+  );
   opacity: 0;
   transition: opacity ${({ theme }) => theme.transition.normal};
 

@@ -32,8 +32,8 @@ const LogoContainer = styled.div`
 `;
 
 const Logo = styled.h1`
-  font-family: ${({ theme }) => theme.fontFamily.ttangsbudae};
-  font-size: ${({ theme }) => theme.fontSize.xxl};
+  font-family: ${({ theme }) => theme.fontFamily.bagelfat};
+  font-size: ${({ theme }) => theme.fontSize.xxxl};
   font-weight: 700;
   letter-spacing: 0.8px;
   color: ${({ theme }) => theme.colors.primary};
