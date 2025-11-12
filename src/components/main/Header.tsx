@@ -32,9 +32,9 @@ const LogoContainer = styled.div`
 `;
 
 const Logo = styled.h1`
-  font-family: ${({ theme }) => theme.fontFamily.primary};
+  font-family: ${({ theme }) => theme.fontFamily.ttangsbudae};
   font-size: ${({ theme }) => theme.fontSize.xxl};
-  font-weight: ${({ theme }) => theme.fontWeight.black};
+  font-weight: 700;
   letter-spacing: 0.8px;
   color: ${({ theme }) => theme.colors.primary};
   margin: 0;
@@ -71,7 +71,7 @@ export default function Header() {
         <Content>
           {/* Logo */}
           <LogoContainer>
-            <Logo>BURGER KING</Logo>
+            <Logo>MR.DABAK</Logo>
 
             {/* Hidden Navigation Text */}
             <HiddenText>특별한 날에 당신의 아내를 감동시켜라</HiddenText>

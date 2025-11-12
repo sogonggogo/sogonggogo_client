@@ -1,24 +1,40 @@
 /* Custom Fonts */
 @font-face {
-  font-family: 'TTangsbudae';
-  src: url('/fonts/땅스부대찌개 Light.ttf') format('truetype');
+  font-family: "TTangsbudae";
+  src: url("/fonts/땅스부대찌개 Light.ttf") format("truetype");
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'TTangsbudae';
-  src: url('/fonts/땅스부대찌개 Medium.ttf') format('truetype');
+  font-family: "TTangsbudae";
+  src: url("/fonts/땅스부대찌개 Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'TTangsbudae';
-  src: url('/fonts/땅스부대찌개 Bold.ttf') format('truetype');
+  font-family: "TTangsbudae";
+  src: url("/fonts/땅스부대찌개 Bold.ttf") format("truetype");
   font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "BagelFat";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_JAMO@1.0/BagelFatOne-Regular.woff2")
+    format("woff2");
+  font-weight: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Miwon";
+  src: url("/fonts/미원Miwon.otf") format("opentype");
+  font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
@@ -46,7 +62,9 @@
   --radius: 0.5rem;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --font-ttangsbudae: 'TTangsbudae', sans-serif;
+  --font-ttangsbudae: "TTangsbudae", sans-serif;
+  --font-bagelfat: "BagelFat", sans-serif;
+  --font-miwon: "Miwon", sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {

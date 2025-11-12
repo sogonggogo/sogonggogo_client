@@ -61,6 +61,8 @@ export const theme = {
     primary: "'Arial Black', Arial, sans-serif",
     secondary: "var(--font-geist-sans), Arial, Helvetica, sans-serif",
     ttangsbudae: "var(--font-ttangsbudae), 'TTangsbudae', sans-serif",
+    bagelfat: "var(--font-bagelfat), 'BagelFat', sans-serif",
+    miwon: "var(--font-miwon), 'Miwon', sans-serif",
   },
 
   borderRadius: {
