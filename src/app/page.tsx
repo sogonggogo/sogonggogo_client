@@ -1,10 +1,10 @@
 "use client";
 
 import styled from "@emotion/styled";
-import Header from "@/components/Header";
-import HeroSection from "@/components/HeroSection";
-import OrderHistory from "@/components/OrderHistory";
-import OrderSection from "@/components/OrderSection";
+import Header from "@/components/main/Header";
+import HeroSection from "@/components/main/HeroSection";
+import OrderHistory from "@/components/main/OrderHistory";
+import OrderSection from "@/components/main/OrderSection";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -13,8 +13,8 @@ const Container = styled.div`
 
 const Main = styled.main`
   padding-top: ${({ theme }) => theme.spacing.headerHeight};
-  padding-left: ${({ theme }) => theme.spacing.section};
-  padding-right: ${({ theme }) => theme.spacing.section};
+  padding-left: ${({ theme }) => theme.spacing.container};
+  padding-right: ${({ theme }) => theme.spacing.container};
   padding-bottom: ${({ theme }) => theme.spacing.xxxl};
 `;
 

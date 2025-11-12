@@ -10,7 +10,6 @@ const HeaderContainer = styled.header`
   right: 0;
   z-index: ${({ theme }) => theme.zIndex.fixed};
   background-color: ${({ theme }) => theme.colors.background};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
 const Container = styled.div`
