@@ -6,7 +6,6 @@ const Container = styled.div`
   width: 100%;
   height: ${({ theme }) => theme.sizes.orderHistoryHeight};
   border-radius: ${({ theme }) => theme.borderRadius.lg};
-  box-shadow: ${({ theme }) => theme.shadow.md};
   overflow: hidden;
   background: ${({ theme }) => theme.colors.gradientBrown};
 `;
@@ -16,6 +15,7 @@ const InnerContainer = styled.div`
 `;
 
 const Title = styled.h3`
+  font-family: ${({ theme }) => theme.fontFamily.miwon};
   font-size: ${({ theme }) => theme.fontSize.xl};
   color: ${({ theme }) => theme.colors.white};
   text-align: center;

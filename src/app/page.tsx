@@ -21,26 +21,31 @@ const Main = styled.main`
 const ContentWrapper = styled.div`
   max-width: ${({ theme }) => theme.sizes.maxWidth};
   margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: ${({ theme }) => theme.spacing.lg};
 `;
 
 const TopSection = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.lg};
-  margin-bottom: ${({ theme }) => theme.spacing.xl};
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
 `;
 
 const HeroWrapper = styled.div`
-  flex: 2;
+  grid-column: span 2;
   min-width: 0;
 `;
 
 const SidebarWrapper = styled.div`
-  flex: 1;
+  grid-column: span 1;
   min-width: 0;
 `;
 
 const BottomSection = styled.div`
-  margin-top: ${({ theme }) => theme.spacing.xl};
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
 `;
 
 export default function Home() {

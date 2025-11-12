@@ -64,7 +64,7 @@ const Logo = styled.h1`
 `;
 
 const HiddenText = styled.span`
-  font-family: ${({ theme }) => theme.fontFamily.primary};
+  font-family: ${({ theme }) => theme.fontFamily.miwon};
   font-size: ${({ theme }) => theme.fontSize.md};
   font-weight: ${({ theme }) => theme.fontWeight.black};
   color: ${({ theme }) => theme.colors.accent};
@@ -81,13 +81,15 @@ const LoginButton = styled.button`
   align-items: center;
   gap: ${({ theme }) => theme.spacing.sm};
   color: ${({ theme }) => theme.colors.accent};
-  background: none;
+  background: ${({ theme }) => theme.colors.buttonBackground};
   border: none;
   cursor: pointer;
   font-size: ${({ theme }) => theme.fontSize.md};
   transition: opacity ${({ theme }) => theme.transition.fast};
   white-space: nowrap;
   flex-shrink: 0;
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
 
   &:hover {
     opacity: 0.8;
@@ -106,7 +108,7 @@ export default function Header() {
         <Content>
           {/* Logo */}
           <LogoContainer>
-            <Logo>MR.DABAK</Logo>
+            <Logo>MR.DAEBAK</Logo>
 
             {/* Hidden Navigation Text */}
             <HiddenText>특별한 날에 당신의 아내를 감동시켜라</HiddenText>

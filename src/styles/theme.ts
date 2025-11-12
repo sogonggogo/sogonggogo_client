@@ -4,6 +4,7 @@ export const theme = {
     secondary: "#ffa500",
     accent: "#5c3317",
     background: "#f5f5dc",
+    buttonBackground: "#e8e5d0",
     border: "#e5dcc8",
     white: "#ffffff",
     black: "#000000",

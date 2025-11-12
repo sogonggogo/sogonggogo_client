@@ -10,7 +10,6 @@ const HeroContainer = styled.div`
   height: ${({ theme }) => theme.sizes.heroHeight};
   border-radius: ${({ theme }) => theme.borderRadius.lg};
   overflow: hidden;
-  box-shadow: ${({ theme }) => theme.shadow.lg};
 `;
 
 const GradientBackground = styled.div`
@@ -31,7 +30,7 @@ const TextContent = styled.div`
 `;
 
 const Title = styled.h2`
-  font-family: ${({ theme }) => theme.fontFamily.primary};
+  font-family: ${({ theme }) => theme.fontFamily.miwon};
   font-size: ${({ theme }) => theme.fontSize.hero};
   font-weight: ${({ theme }) => theme.fontWeight.black};
   line-height: 1em;
@@ -42,12 +41,14 @@ const Title = styled.h2`
 const Subtitle = styled.p`
   font-size: ${({ theme }) => theme.fontSize.xl};
   color: ${({ theme }) => theme.colors.white};
+  font-family: ${({ theme }) => theme.fontFamily.miwon};
   margin: 0;
 `;
 
 const Description = styled.p`
   font-size: ${({ theme }) => theme.fontSize.lg};
   color: ${({ theme }) => theme.colors.white};
+  font-family: ${({ theme }) => theme.fontFamily.miwon};
   margin: 0;
 `;
 
@@ -68,7 +69,6 @@ const ImagePlaceholder = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: ${({ theme }) => theme.shadow.xl};
   font-size: ${({ theme }) => theme.fontSize.hero};
 `;
 

@@ -4,25 +4,22 @@ import styled from "@emotion/styled";
 import { ShoppingCart, Mic, Clock } from "lucide-react";
 
 const Section = styled.section`
-  width: 100%;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
 `;
 
 const Header = styled.div`
+  grid-column: 1 / -1;
   margin-bottom: ${({ theme }) => theme.spacing.xl};
 `;
 
 const Title = styled.h2`
-  font-family: ${({ theme }) => theme.fontFamily.bagelfat};
+  font-family: ${({ theme }) => theme.fontFamily.miwon};
   font-size: ${({ theme }) => theme.fontSize.xxxl};
   font-weight: ${({ theme }) => theme.fontWeight.black};
   color: ${({ theme }) => theme.colors.primary};
   margin: 0;
-`;
-
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: ${({ theme }) => theme.spacing.lg};
 `;
 
 const CardButton = styled.button`
@@ -60,7 +57,7 @@ const IconWrapper = styled.div`
 `;
 
 const CardTitle = styled.h3`
-  font-family: ${({ theme }) => theme.fontFamily.primary};
+  font-family: ${({ theme }) => theme.fontFamily.miwon};
   font-size: ${({ theme }) => theme.fontSize.xxxl};
   font-weight: ${({ theme }) => theme.fontWeight.black};
   color: ${({ theme }) => theme.colors.primary};
@@ -68,6 +65,7 @@ const CardTitle = styled.h3`
 `;
 
 const CardDescription = styled.p`
+  font-family: ${({ theme }) => theme.fontFamily.miwon};
   font-size: ${({ theme }) => theme.fontSize.sm};
   color: ${({ theme }) => theme.colors.accentAlpha70};
   text-align: center;
@@ -121,26 +119,24 @@ export default function OrderSection() {
         <Title>ORDER</Title>
       </Header>
 
-      <Grid>
-        {orderCards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <CardButton key={card.id}>
-              {/* Card Content */}
-              <CardContent>
-                <IconWrapper>
-                  <Icon size={48} color="#5C3317" strokeWidth={1.5} />
-                </IconWrapper>
-                <CardTitle>{card.title}</CardTitle>
-                <CardDescription>{card.description}</CardDescription>
-              </CardContent>
+      {orderCards.map((card) => {
+        const Icon = card.icon;
+        return (
+          <CardButton key={card.id}>
+            {/* Card Content */}
+            <CardContent>
+              <IconWrapper>
+                <Icon size={48} color="#5C3317" strokeWidth={1.5} />
+              </IconWrapper>
+              <CardTitle>{card.title}</CardTitle>
+              <CardDescription>{card.description}</CardDescription>
+            </CardContent>
 
-              {/* Hover Effect */}
-              <HoverOverlay />
-            </CardButton>
-          );
-        })}
-      </Grid>
+            {/* Hover Effect */}
+            <HoverOverlay />
+          </CardButton>
+        );
+      })}
     </Section>
   );
 }
