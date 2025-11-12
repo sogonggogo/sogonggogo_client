@@ -2,6 +2,7 @@
 
 import styled from "@emotion/styled";
 import { Clock } from "lucide-react";
+import { formatPrice } from "@/data/menus";
 
 const Container = styled.div`
   width: 100%;
@@ -11,6 +12,7 @@ const Container = styled.div`
   background: ${({ theme }) => theme.colors.gradientBrown};
   display: flex;
   flex-direction: column;
+  box-shadow: ${({ theme }) => theme.shadow.md};
 `;
 
 const InnerContainer = styled.div`
@@ -129,43 +131,43 @@ const orderHistory = [
   {
     id: 1,
     date: "2025.11.12",
-    items: "와퍼 세트, 치즈스틱 4조각",
-    price: "12,800원",
+    items: "발렌타인 디너 (디럭스)",
+    price: formatPrice(Math.round(89000 * 1.6)),
     status: "completed" as const,
   },
   {
     id: 2,
     date: "2025.11.10",
-    items: "맥시멈 버거 세트",
-    price: "9,500원",
+    items: "프렌치 디너 (그랜드)",
+    price: formatPrice(Math.round(65000 * 1.3)),
     status: "completed" as const,
   },
   {
     id: 3,
     date: "2025.11.08",
-    items: "치킨버거, 콜라 (L)",
-    price: "7,300원",
+    items: "잉글리시 디너 (심플)",
+    price: formatPrice(55000),
     status: "completed" as const,
   },
   {
     id: 4,
     date: "2025.11.05",
-    items: "와퍼 주니어, 프렌치프라이",
-    price: "8,900원",
+    items: "샴페인 축제 디너 (디럭스)",
+    price: formatPrice(Math.round(120000 * 1.6)),
     status: "completed" as const,
   },
   {
     id: 5,
     date: "2025.11.03",
-    items: "맥시멈 버거 2개, 콜라 2개",
-    price: "18,600원",
+    items: "프렌치 디너 (심플)",
+    price: formatPrice(65000),
     status: "completed" as const,
   },
   {
     id: 6,
     date: "2025.11.01",
-    items: "치즈버거 세트",
-    price: "6,500원",
+    items: "발렌타인 디너 (그랜드)",
+    price: formatPrice(Math.round(89000 * 1.3)),
     status: "completed" as const,
   },
 ];

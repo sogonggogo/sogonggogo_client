@@ -3,6 +3,7 @@
 import { useState } from "react";
 import styled from "@emotion/styled";
 import { ChevronLeft, ChevronRight, Pause } from "lucide-react";
+import { dinnerMenus } from "@/data/menus";
 
 const HeroContainer = styled.div`
   position: relative;
@@ -10,6 +11,7 @@ const HeroContainer = styled.div`
   height: ${({ theme }) => theme.sizes.heroHeight};
   border-radius: ${({ theme }) => theme.borderRadius.lg};
   overflow: hidden;
+  box-shadow: ${({ theme }) => theme.shadow.md};
 `;
 
 const GradientBackground = styled.div`
@@ -46,10 +48,26 @@ const Subtitle = styled.p`
 `;
 
 const Description = styled.p`
-  font-size: ${({ theme }) => theme.fontSize.lg};
-  color: ${({ theme }) => theme.colors.white};
+  font-size: ${({ theme }) => theme.fontSize.md};
+  color: ${({ theme }) => theme.colors.whiteAlpha80};
   font-family: ${({ theme }) => theme.fontFamily.miwon};
   margin: 0;
+`;
+
+const MenuItems = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing.sm};
+  margin-top: ${({ theme }) => theme.spacing.sm};
+`;
+
+const ItemTag = styled.span`
+  font-size: ${({ theme }) => theme.fontSize.sm};
+  color: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }) => theme.colors.whiteAlpha25};
+  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
+  border-radius: ${({ theme }) => theme.borderRadius.xs};
+  font-family: ${({ theme }) => theme.fontFamily.miwon};
 `;
 
 const ImageContainer = styled.div`
@@ -118,42 +136,20 @@ const IndicatorButton = styled.button<{ isActive: boolean }>`
     isActive ? theme.colors.white : theme.colors.whiteAlpha50};
 `;
 
-const slides = [
-  {
-    id: 1,
-    title: "MAXIMUM",
-    subtitle: "맥시멈 버거",
-    description: "더 크게, 더 맛있게!",
-    image: "/burger-1.png",
-  },
-  {
-    id: 2,
-    title: "WHOPPER",
-    subtitle: "와퍼 주니어",
-    description: "클래식의 정석!",
-    image: "/burger-2.png",
-  },
-  {
-    id: 3,
-    title: "COMBO",
-    subtitle: "콤보 세트",
-    description: "더 푸짐하게!",
-    image: "/burger-3.png",
-  },
-];
-
 export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
+    setCurrentSlide((prev) => (prev + 1) % dinnerMenus.length);
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    setCurrentSlide(
+      (prev) => (prev - 1 + dinnerMenus.length) % dinnerMenus.length
+    );
   };
 
-  const currentItem = slides[currentSlide];
+  const currentMenu = dinnerMenus[currentSlide];
 
   return (
     <HeroContainer>
@@ -161,15 +157,20 @@ export default function HeroSection() {
       <GradientBackground>
         {/* Text Content */}
         <TextContent>
-          <Title>{currentItem.title}</Title>
-          <Subtitle>{currentItem.subtitle}</Subtitle>
-          <Description>{currentItem.description}</Description>
+          <Title>{currentMenu.nameEn}</Title>
+          <Subtitle>{currentMenu.name}</Subtitle>
+          <Description>{currentMenu.description}</Description>
+          <MenuItems>
+            {currentMenu.items.map((item, index) => (
+              <ItemTag key={index}>{item}</ItemTag>
+            ))}
+          </MenuItems>
         </TextContent>
 
-        {/* Burger Image */}
+        {/* Menu Image */}
         <ImageContainer>
           <ImagePlaceholder>
-            <span>🍔</span>
+            <span>🍽️</span>
           </ImagePlaceholder>
         </ImageContainer>
       </GradientBackground>
@@ -183,7 +184,7 @@ export default function HeroSection() {
 
         {/* Slide Indicators */}
         <IndicatorsContainer>
-          {slides.map((_, index) => (
+          {dinnerMenus.map((_, index) => (
             <IndicatorButton
               key={index}
               isActive={index === currentSlide}
