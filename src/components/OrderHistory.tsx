@@ -1,37 +1,36 @@
-'use client';
+"use client";
 
-import styled from '@emotion/styled';
+import styled from "@emotion/styled";
 
 const Container = styled.div`
   width: 100%;
-  height: 544px;
-  border-radius: 24px;
-  box-shadow: 0 8px 10px -6px rgba(0, 0, 0, 0.1),
-    0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  height: ${({ theme }) => theme.sizes.orderHistoryHeight};
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  box-shadow: ${({ theme }) => theme.shadow.md};
   overflow: hidden;
-  background: linear-gradient(180deg, #6b4423 0%, #4a2c1a 100%);
+  background: ${({ theme }) => theme.colors.gradientBrown};
 `;
 
 const InnerContainer = styled.div`
-  padding: 32px;
+  padding: ${({ theme }) => theme.spacing.xl};
 `;
 
 const Title = styled.h3`
-  font-size: 24px;
-  color: white;
+  font-size: ${({ theme }) => theme.fontSize.xl};
+  color: ${({ theme }) => theme.colors.white};
   text-align: center;
   margin: 0;
 `;
 
 const Content = styled.div`
-  margin-top: 32px;
+  margin-top: ${({ theme }) => theme.spacing.xl};
 `;
 
 const EmptyState = styled.div`
-  color: rgba(255, 255, 255, 0.6);
+  color: ${({ theme }) => theme.colors.whiteAlpha60};
   text-align: center;
-  font-size: 14px;
-  margin-top: 48px;
+  font-size: ${({ theme }) => theme.fontSize.sm};
+  margin-top: ${({ theme }) => theme.spacing.xxl};
 `;
 
 export default function OrderHistory() {

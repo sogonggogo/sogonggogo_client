@@ -1,32 +1,32 @@
-'use client';
+"use client";
 
-import styled from '@emotion/styled';
-import Header from '@/components/Header';
-import HeroSection from '@/components/HeroSection';
-import OrderHistory from '@/components/OrderHistory';
-import OrderSection from '@/components/OrderSection';
+import styled from "@emotion/styled";
+import Header from "@/components/Header";
+import HeroSection from "@/components/HeroSection";
+import OrderHistory from "@/components/OrderHistory";
+import OrderSection from "@/components/OrderSection";
 
 const Container = styled.div`
   min-height: 100vh;
-  background-color: #f5f5dc;
+  background-color: ${({ theme }) => theme.colors.background};
 `;
 
 const Main = styled.main`
-  padding-top: 88px;
-  padding-left: 80px;
-  padding-right: 80px;
-  padding-bottom: 64px;
+  padding-top: ${({ theme }) => theme.spacing.headerHeight};
+  padding-left: ${({ theme }) => theme.spacing.section};
+  padding-right: ${({ theme }) => theme.spacing.section};
+  padding-bottom: ${({ theme }) => theme.spacing.xxxl};
 `;
 
 const ContentWrapper = styled.div`
-  max-width: 1280px;
+  max-width: ${({ theme }) => theme.sizes.maxWidth};
   margin: 0 auto;
 `;
 
 const TopSection = styled.div`
   display: flex;
-  gap: 24px;
-  margin-bottom: 32px;
+  gap: ${({ theme }) => theme.spacing.lg};
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
 `;
 
 const HeroWrapper = styled.div`
@@ -34,11 +34,11 @@ const HeroWrapper = styled.div`
 `;
 
 const SidebarWrapper = styled.div`
-  width: 400px;
+  width: ${({ theme }) => theme.sizes.sidebarWidth};
 `;
 
 const BottomSection = styled.div`
-  margin-top: 32px;
+  margin-top: ${({ theme }) => theme.spacing.xl};
 `;
 
 export default function Home() {

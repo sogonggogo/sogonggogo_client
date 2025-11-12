@@ -8,15 +8,16 @@ const HeaderContainer = styled.header`
   top: 0;
   left: 0;
   right: 0;
-  z-index: 50;
-  background-color: #f5f5dc;
-  border-bottom: 1px solid #e5dcc8;
+  z-index: ${({ theme }) => theme.zIndex.fixed};
+  background-color: ${({ theme }) => theme.colors.background};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
 const Container = styled.div`
-  max-width: 1440px;
+  max-width: ${({ theme }) => theme.sizes.maxWidthFull};
   margin: 0 auto;
-  padding: 16px 96px;
+  padding: ${({ theme }) => theme.spacing.md}
+    ${({ theme }) => theme.spacing.container};
 `;
 
 const Content = styled.div`
@@ -32,32 +33,32 @@ const LogoContainer = styled.div`
 `;
 
 const Logo = styled.h1`
-  font-family: "Arial Black", Arial, sans-serif;
-  font-size: 30px;
-  font-weight: 900;
+  font-family: ${({ theme }) => theme.fontFamily.primary};
+  font-size: ${({ theme }) => theme.fontSize.xxl};
+  font-weight: ${({ theme }) => theme.fontWeight.black};
   letter-spacing: 0.8px;
-  color: #d62300;
+  color: ${({ theme }) => theme.colors.primary};
   margin: 0;
 `;
 
 const HiddenText = styled.span`
-  font-family: "Arial Black", Arial, sans-serif;
-  font-size: 16px;
-  font-weight: 900;
-  color: #5c3317;
+  font-family: ${({ theme }) => theme.fontFamily.primary};
+  font-size: ${({ theme }) => theme.fontSize.md};
+  font-weight: ${({ theme }) => theme.fontWeight.black};
+  color: ${({ theme }) => theme.colors.accent};
   opacity: 0;
 `;
 
 const LoginButton = styled.button`
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #5c3317;
+  gap: ${({ theme }) => theme.spacing.sm};
+  color: ${({ theme }) => theme.colors.accent};
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 16px;
-  transition: opacity 0.2s;
+  font-size: ${({ theme }) => theme.fontSize.md};
+  transition: opacity ${({ theme }) => theme.transition.fast};
 
   &:hover {
     opacity: 0.8;

@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import styled from '@emotion/styled';
-import { ChevronLeft, ChevronRight, Pause } from 'lucide-react';
+import { useState } from "react";
+import styled from "@emotion/styled";
+import { ChevronLeft, ChevronRight, Pause } from "lucide-react";
 
 const HeroContainer = styled.div`
   position: relative;
   width: 100%;
-  max-width: 824px;
-  height: 545px;
-  border-radius: 24px;
+  max-width: ${({ theme }) => theme.sizes.heroWidth};
+  height: ${({ theme }) => theme.sizes.heroHeight};
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
   overflow: hidden;
-  box-shadow: 0px 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: ${({ theme }) => theme.shadow.lg};
 `;
 
 const GradientBackground = styled.div`
@@ -20,35 +20,35 @@ const GradientBackground = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 48px;
-  background: linear-gradient(180deg, #ffa500 0%, #ff8c00 100%);
+  padding: 0 ${({ theme }) => theme.spacing.xxl};
+  background: ${({ theme }) => theme.colors.gradientOrange};
 `;
 
 const TextContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  z-index: 10;
+  gap: ${({ theme }) => theme.spacing.md};
+  z-index: ${({ theme }) => theme.zIndex.base + 9};
 `;
 
 const Title = styled.h2`
-  font-family: 'Arial Black', Arial, sans-serif;
-  font-size: 60px;
-  font-weight: 900;
+  font-family: ${({ theme }) => theme.fontFamily.primary};
+  font-size: ${({ theme }) => theme.fontSize.hero};
+  font-weight: ${({ theme }) => theme.fontWeight.black};
   line-height: 1em;
-  color: white;
+  color: ${({ theme }) => theme.colors.white};
   margin: 0;
 `;
 
 const Subtitle = styled.p`
-  font-size: 24px;
-  color: white;
+  font-size: ${({ theme }) => theme.fontSize.xl};
+  color: ${({ theme }) => theme.colors.white};
   margin: 0;
 `;
 
 const Description = styled.p`
-  font-size: 20px;
-  color: white;
+  font-size: ${({ theme }) => theme.fontSize.lg};
+  color: ${({ theme }) => theme.colors.white};
   margin: 0;
 `;
 
@@ -65,81 +65,82 @@ const ImagePlaceholder = styled.div`
   width: 100%;
   height: 100%;
   background-color: #e5e5e5;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.borderRadius.sm};
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0px 25px 50px 0px rgba(0, 0, 0, 0.15);
-  font-size: 48px;
+  box-shadow: ${({ theme }) => theme.shadow.xl};
+  font-size: ${({ theme }) => theme.fontSize.hero};
 `;
 
 const ControlsContainer = styled.div`
   position: absolute;
-  bottom: 32px;
+  bottom: ${({ theme }) => theme.spacing.xl};
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 16px;
-  z-index: 20;
+  gap: ${({ theme }) => theme.spacing.md};
+  z-index: ${({ theme }) => theme.zIndex.sticky};
 `;
 
 const ControlButton = styled.button`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.8);
+  width: ${({ theme }) => theme.sizes.controlButton};
+  height: ${({ theme }) => theme.sizes.controlButton};
+  border-radius: ${({ theme }) => theme.borderRadius.full};
+  background-color: ${({ theme }) => theme.colors.whiteAlpha80};
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color ${({ theme }) => theme.transition.fast};
 
   &:hover {
-    background-color: white;
+    background-color: ${({ theme }) => theme.colors.white};
   }
 `;
 
 const IndicatorsContainer = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: ${({ theme }) => theme.spacing.sm};
 `;
 
 const IndicatorButton = styled.button<{ isActive: boolean }>`
-  height: 12px;
-  border-radius: 999px;
+  height: ${({ theme }) => theme.sizes.indicatorSmall};
+  border-radius: ${({ theme }) => theme.borderRadius.full};
   border: none;
   cursor: pointer;
-  transition: all 0.3s;
-  width: ${({ isActive }) => (isActive ? '48px' : '12px')};
-  background-color: ${({ isActive }) =>
-    isActive ? 'white' : 'rgba(255, 255, 255, 0.5)'};
+  transition: all ${({ theme }) => theme.transition.normal};
+  width: ${({ isActive, theme }) =>
+    isActive ? theme.sizes.indicatorLarge : theme.sizes.indicatorSmall};
+  background-color: ${({ isActive, theme }) =>
+    isActive ? theme.colors.white : theme.colors.whiteAlpha50};
 `;
 
 const slides = [
   {
     id: 1,
-    title: 'MAXIMUM',
-    subtitle: '맥시멈 버거',
-    description: '더 크게, 더 맛있게!',
-    image: '/burger-1.png'
+    title: "MAXIMUM",
+    subtitle: "맥시멈 버거",
+    description: "더 크게, 더 맛있게!",
+    image: "/burger-1.png",
   },
   {
     id: 2,
-    title: 'WHOPPER',
-    subtitle: '와퍼 주니어',
-    description: '클래식의 정석!',
-    image: '/burger-2.png'
+    title: "WHOPPER",
+    subtitle: "와퍼 주니어",
+    description: "클래식의 정석!",
+    image: "/burger-2.png",
   },
   {
     id: 3,
-    title: 'COMBO',
-    subtitle: '콤보 세트',
-    description: '더 푸짐하게!',
-    image: '/burger-3.png'
-  }
+    title: "COMBO",
+    subtitle: "콤보 세트",
+    description: "더 푸짐하게!",
+    image: "/burger-3.png",
+  },
 ];
 
 export default function HeroSection() {
