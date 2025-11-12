@@ -10,25 +10,43 @@ const HeaderContainer = styled.header`
   right: 0;
   z-index: ${({ theme }) => theme.zIndex.fixed};
   background-color: ${({ theme }) => theme.colors.background};
+  height: ${({ theme }) => theme.spacing.headerHeight};
 `;
 
 const Container = styled.div`
   max-width: ${({ theme }) => theme.sizes.maxWidthFull};
+  height: 100%;
   margin: 0 auto;
-  padding: ${({ theme }) => theme.spacing.md}
-    ${({ theme }) => theme.spacing.container};
+  padding: 0 ${({ theme }) => theme.spacing.container};
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.desktop}) {
+    padding: 0 ${({ theme }) => theme.spacing.xl};
+  }
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    padding: 0 ${({ theme }) => theme.spacing.lg};
+  }
 `;
 
 const Content = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 100%;
 `;
 
 const LogoContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 128px;
+
+  @media (max-width: 1200px) {
+    gap: ${({ theme }) => theme.spacing.xl};
+  }
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    gap: 0;
+  }
 `;
 
 const Logo = styled.h1`
@@ -38,6 +56,11 @@ const Logo = styled.h1`
   letter-spacing: 0.8px;
   color: ${({ theme }) => theme.colors.primary};
   margin: 0;
+  white-space: nowrap;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    font-size: ${({ theme }) => theme.fontSize.xl};
+  }
 `;
 
 const HiddenText = styled.span`
@@ -46,6 +69,11 @@ const HiddenText = styled.span`
   font-weight: ${({ theme }) => theme.fontWeight.black};
   color: ${({ theme }) => theme.colors.accent};
   opacity: 0;
+  white-space: nowrap;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.desktop}) {
+    display: none;
+  }
 `;
 
 const LoginButton = styled.button`
@@ -58,9 +86,16 @@ const LoginButton = styled.button`
   cursor: pointer;
   font-size: ${({ theme }) => theme.fontSize.md};
   transition: opacity ${({ theme }) => theme.transition.fast};
+  white-space: nowrap;
+  flex-shrink: 0;
 
   &:hover {
     opacity: 0.8;
+  }
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    font-size: ${({ theme }) => theme.fontSize.sm};
+    gap: ${({ theme }) => theme.spacing.xs};
   }
 `;
 

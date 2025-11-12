@@ -30,11 +30,13 @@ const TopSection = styled.div`
 `;
 
 const HeroWrapper = styled.div`
-  flex: 1;
+  flex: 2;
+  min-width: 0;
 `;
 
 const SidebarWrapper = styled.div`
-  width: ${({ theme }) => theme.sizes.sidebarWidth};
+  flex: 1;
+  min-width: 0;
 `;
 
 const BottomSection = styled.div`

@@ -7,7 +7,6 @@ import { ChevronLeft, ChevronRight, Pause } from "lucide-react";
 const HeroContainer = styled.div`
   position: relative;
   width: 100%;
-  max-width: ${({ theme }) => theme.sizes.heroWidth};
   height: ${({ theme }) => theme.sizes.heroHeight};
   border-radius: ${({ theme }) => theme.borderRadius.lg};
   overflow: hidden;

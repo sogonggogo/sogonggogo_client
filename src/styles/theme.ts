@@ -107,6 +107,7 @@ export const theme = {
   sizes: {
     maxWidth: "1280px",
     maxWidthFull: "1440px",
+    headerHeight: "88px",
     heroWidth: "824px",
     sidebarWidth: "400px",
     heroHeight: "465px",
