@@ -16,7 +16,7 @@ const Container = styled.div`
 `;
 
 const InnerContainer = styled.div`
-  padding: ${({ theme }) => theme.spacing.xl};
+  padding: ${({ theme }) => theme.spacing.lg};
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -33,13 +33,15 @@ const Title = styled.h3`
 `;
 
 const Content = styled.div`
-  margin-top: ${({ theme }) => theme.spacing.xl};
+  margin-top: ${({ theme }) => theme.spacing.lg};
   overflow-y: auto;
   overflow-x: hidden;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.md};
+  gap: ${({ theme }) => theme.spacing.sm};
+  padding-right: ${({ theme }) => theme.spacing.xs};
+  padding-bottom: ${({ theme }) => theme.spacing.sm};
 
   /* Custom scrollbar */
   &::-webkit-scrollbar {
@@ -47,8 +49,9 @@ const Content = styled.div`
   }
 
   &::-webkit-scrollbar-track {
-    background: ${({ theme }) => theme.colors.blackAlpha10};
+    background: ${({ theme }) => theme.colors.whiteAlpha15};
     border-radius: ${({ theme }) => theme.borderRadius.full};
+    margin: ${({ theme }) => theme.spacing.xs} 0;
   }
 
   &::-webkit-scrollbar-thumb {
@@ -56,7 +59,7 @@ const Content = styled.div`
     border-radius: ${({ theme }) => theme.borderRadius.full};
 
     &:hover {
-      background: ${({ theme }) => theme.colors.whiteAlpha60};
+      background: ${({ theme }) => theme.colors.whiteAlpha80};
     }
   }
 `;
@@ -69,15 +72,15 @@ const EmptyState = styled.div`
 `;
 
 const OrderCard = styled.div`
-  background: ${({ theme }) => theme.colors.whiteAlpha10};
+  background: ${({ theme }) => theme.colors.white};
   border-radius: ${({ theme }) => theme.borderRadius.md};
-  padding: ${({ theme }) => theme.spacing.md};
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
   transition: all ${({ theme }) => theme.transition.fast};
-  cursor: pointer;
   flex-shrink: 0;
+  border: 1px solid ${({ theme }) => theme.colors.border};
 
   &:hover {
-    background: ${({ theme }) => theme.colors.whiteAlpha15};
+    box-shadow: ${({ theme }) => theme.shadow.md};
     transform: translateY(-2px);
   }
 `;
@@ -86,14 +89,14 @@ const OrderHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: ${({ theme }) => theme.spacing.sm};
+  margin-bottom: ${({ theme }) => theme.spacing.xs};
 `;
 
 const OrderDate = styled.div`
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.spacing.xs};
-  color: ${({ theme }) => theme.colors.whiteAlpha80};
+  color: ${({ theme }) => theme.colors.accent};
   font-size: ${({ theme }) => theme.fontSize.xs};
 `;
 
@@ -106,24 +109,50 @@ const OrderStatus = styled.span<{
   font-weight: ${({ theme }) => theme.fontWeight.medium};
   background: ${({ status, theme }) =>
     status === "completed"
-      ? theme.colors.whiteAlpha25
+      ? theme.colors.primary
       : status === "pending"
       ? theme.colors.secondary
-      : theme.colors.blackAlpha25};
+      : theme.colors.accent};
   color: ${({ theme }) => theme.colors.white};
 `;
 
 const OrderItems = styled.div`
-  color: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.accent};
   font-size: ${({ theme }) => theme.fontSize.sm};
   margin-bottom: ${({ theme }) => theme.spacing.xs};
+  font-weight: ${({ theme }) => theme.fontWeight.medium};
+`;
+
+const OrderFooter = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: ${({ theme }) => theme.spacing.xs};
 `;
 
 const OrderPrice = styled.div`
-  color: ${({ theme }) => theme.colors.whiteAlpha80};
-  font-size: ${({ theme }) => theme.fontSize.sm};
+  color: ${({ theme }) => theme.colors.primary};
+  font-size: ${({ theme }) => theme.fontSize.md};
+  font-weight: ${({ theme }) => theme.fontWeight.bold};
+`;
+
+const ReorderButton = styled.button`
+  background: ${({ theme }) => theme.colors.buttonBackground};
+  color: ${({ theme }) => theme.colors.accent};
+  border: none;
+  border-radius: ${({ theme }) => theme.borderRadius.sm};
+  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.md};
+  font-size: ${({ theme }) => theme.fontSize.xs};
   font-weight: ${({ theme }) => theme.fontWeight.medium};
-  text-align: right;
+  cursor: pointer;
+  transition: all ${({ theme }) => theme.transition.fast};
+  white-space: nowrap;
+  font-family: ${({ theme }) => theme.fontFamily.miwon};
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.white};
+  }
 `;
 
 // 샘플 데이터
@@ -192,7 +221,14 @@ export default function OrderHistory() {
                   <OrderStatus status={order.status}>완료</OrderStatus>
                 </OrderHeader>
                 <OrderItems>{order.items}</OrderItems>
-                <OrderPrice>{order.price}</OrderPrice>
+                <OrderFooter>
+                  <OrderPrice>{order.price}</OrderPrice>
+                  <ReorderButton
+                    onClick={() => console.log(`재주문: ${order.items}`)}
+                  >
+                    바로 주문하기
+                  </ReorderButton>
+                </OrderFooter>
               </OrderCard>
             ))
           ) : (
