@@ -20,7 +20,7 @@ const Main = styled.main`
 `;
 
 const ContentWrapper = styled.div`
-  max-width: 600px;
+  max-width: ${({ theme }) => theme.sizes.heroWidth};
   margin: 0 auto;
 `;
 
