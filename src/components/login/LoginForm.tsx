@@ -2,6 +2,9 @@
 
 import styled from "@emotion/styled";
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { saveUserInfo } from "@/utils/userStorage";
 
 const LoginCard = styled.div`
   width: 100%;
@@ -79,9 +82,21 @@ const StyledLink = styled(Link)`
 `;
 
 export default function LoginForm() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [isRegular, setIsRegular] = useState(false);
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Save user info (for demo purposes)
+    saveUserInfo({
+      email,
+      isRegularCustomer: isRegular,
+    });
+    
     alert("로그인 되었습니다!");
+    router.push("/");
   };
 
   return (
@@ -93,6 +108,8 @@ export default function LoginForm() {
             type="email"
             id="email"
             placeholder="example@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </FormGroup>
@@ -105,6 +122,18 @@ export default function LoginForm() {
             placeholder="••••••••"
             required
           />
+        </FormGroup>
+
+        <FormGroup>
+          <Label style={{ flexDirection: "row", gap: "8px", cursor: "pointer" }}>
+            <input
+              type="checkbox"
+              checked={isRegular}
+              onChange={(e) => setIsRegular(e.target.checked)}
+              style={{ cursor: "pointer" }}
+            />
+            단골 고객으로 로그인 (10% 할인)
+          </Label>
         </FormGroup>
 
         <LoginButton type="submit">로그인</LoginButton>

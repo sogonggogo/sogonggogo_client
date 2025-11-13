@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ShoppingBag } from "lucide-react";
 import DeliveryForm from "@/components/order/delivery-info/DeliveryForm";
-import { clearOrders } from "@/utils/orderStorage";
+import { saveDeliveryInfo, DeliveryInfo } from "@/utils/deliveryStorage";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -35,31 +35,18 @@ const PageTitle = styled.h1`
   gap: ${({ theme }) => theme.spacing.md};
 `;
 
-export interface DeliveryInfo {
-  address: string;
-  date: string;
-  time: string;
-  cardNumber: string;
-}
-
 export default function DeliveryInfoPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (deliveryInfo: DeliveryInfo) => {
+  const handleSubmit = (deliveryInfo: DeliveryInfo) => {
     setIsSubmitting(true);
     
-    // Here you would normally send the order to a backend
-    console.log("Order submitted with delivery info:", deliveryInfo);
+    // Save delivery info to localStorage
+    saveDeliveryInfo(deliveryInfo);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Clear orders after successful submission
-    clearOrders();
-    
-    // Redirect to home or success page
-    router.push("/");
+    // Redirect to purchase page
+    router.push("/purchase");
   };
 
   const handleCancel = () => {

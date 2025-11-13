@@ -3,7 +3,7 @@
 import styled from "@emotion/styled";
 import { useState } from "react";
 import { MapPin, Calendar, Clock, CreditCard } from "lucide-react";
-import type { DeliveryInfo } from "@/app/(order)/delivery-info/page";
+import type { DeliveryInfo } from "@/utils/deliveryStorage";
 
 const FormContainer = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -173,7 +173,7 @@ export default function DeliveryForm({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    
+
     // Format card number with spaces
     if (name === "cardNumber") {
       const cleaned = value.replace(/\s/g, "");
@@ -182,7 +182,7 @@ export default function DeliveryForm({
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
-    
+
     // Clear error for this field
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
@@ -299,15 +299,19 @@ export default function DeliveryForm({
         </FormGroup>
 
         <ButtonGroup>
-          <Button type="button" variant="secondary" onClick={onCancel} disabled={isSubmitting}>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
             취소
           </Button>
           <Button type="submit" variant="primary" disabled={isSubmitting}>
-            {isSubmitting ? "주문 중..." : "주문 완료"}
+            {isSubmitting ? "이동중..." : "결제 페이지로 이동"}
           </Button>
         </ButtonGroup>
       </form>
     </FormContainer>
   );
 }
-
