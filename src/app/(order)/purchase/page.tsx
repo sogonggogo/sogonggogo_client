@@ -217,8 +217,8 @@ export default function PurchasePage() {
     clearOrders();
     clearDeliveryInfo();
 
-    // Redirect to home
-    router.push("/");
+    // Redirect to order complete page
+    router.push("/order-complete");
   };
 
   return (
