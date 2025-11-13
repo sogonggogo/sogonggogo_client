@@ -1,10 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "@emotion/styled";
+import { keyframes } from "@emotion/react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Pause } from "lucide-react";
+import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { dinnerMenus } from "@/data/menus";
+
+// 애니메이션 정의
+const fadeInLeft = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+const fadeInRight = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
 
 const HeroContainer = styled.div`
   position: relative;
@@ -18,18 +51,27 @@ const HeroContainer = styled.div`
 const GradientBackground = styled.div`
   position: absolute;
   inset: 0;
+  background: ${({ theme }) => theme.colors.gradientOrange};
+  animation: ${fadeIn} 0.6s ease-out;
+`;
+
+const ContentWrapper = styled.div`
+  max-width: 50%;
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   padding: 0 ${({ theme }) => theme.spacing.xxl};
-  background: ${({ theme }) => theme.colors.gradientOrange};
 `;
 
 const TextContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.md};
-  z-index: ${({ theme }) => theme.zIndex.base + 9};
+  z-index: ${({ theme }) => theme.zIndex.base + 10};
+  position: relative;
+  animation: ${fadeInLeft} 0.6s ease-out;
 `;
 
 const Title = styled.h2`
@@ -72,12 +114,17 @@ const ItemTag = styled.span`
 `;
 
 const ImageContainer = styled.div`
-  position: relative;
-  width: 364px;
-  height: 546px;
+  position: absolute;
+  right: ${({ theme }) => theme.spacing.xxl};
+  top: 50%;
+  margin-top: -266px; /* height / 2 for centering */
+  width: 342px;
+  height: 532px;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: ${({ theme }) => theme.zIndex.base + 5};
+  animation: ${fadeInLeft} 0.6s ease-out;
 `;
 
 const StyledImage = styled(Image)`
@@ -107,10 +154,15 @@ const ControlButton = styled.button`
   justify-content: center;
   border: none;
   cursor: pointer;
-  transition: background-color ${({ theme }) => theme.transition.fast};
+  transition: all ${({ theme }) => theme.transition.fast};
 
   &:hover {
     background-color: ${({ theme }) => theme.colors.white};
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 `;
 
@@ -130,10 +182,15 @@ const IndicatorButton = styled.button<{ isActive: boolean }>`
     isActive ? theme.sizes.indicatorLarge : theme.sizes.indicatorSmall};
   background-color: ${({ isActive, theme }) =>
     isActive ? theme.colors.white : theme.colors.whiteAlpha50};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.whiteAlpha80};
+  }
 `;
 
 export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % dinnerMenus.length);
@@ -145,14 +202,44 @@ export default function HeroSection() {
     );
   };
 
+  const togglePlayPause = () => {
+    setIsPlaying((prev) => !prev);
+  };
+
+  // 자동 슬라이드 효과
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % dinnerMenus.length);
+    }, 3000); // 3초마다 자동 전환
+
+    return () => clearInterval(interval);
+  }, [isPlaying]);
+
   const currentMenu = dinnerMenus[currentSlide];
 
   return (
     <HeroContainer>
       {/* Gradient Background */}
-      <GradientBackground>
-        {/* Text Content */}
-        <TextContent>
+      <GradientBackground />
+
+      {/* Background Image Layer */}
+      <ImageContainer key={`image-${currentSlide}`}>
+        {currentMenu.image && (
+          <StyledImage
+            src={currentMenu.image}
+            alt={currentMenu.name}
+            width={364}
+            height={546}
+            priority
+          />
+        )}
+      </ImageContainer>
+
+      {/* Content Layer */}
+      <ContentWrapper>
+        <TextContent key={`text-${currentSlide}`}>
           <Title>{currentMenu.nameEn}</Title>
           <Subtitle>{currentMenu.name}</Subtitle>
           <Description>{currentMenu.description}</Description>
@@ -162,20 +249,7 @@ export default function HeroSection() {
             ))}
           </MenuItems>
         </TextContent>
-
-        {/* Menu Image */}
-        <ImageContainer>
-          {currentMenu.image && (
-            <StyledImage
-              src={currentMenu.image}
-              alt={currentMenu.name}
-              width={364}
-              height={546}
-              priority
-            />
-          )}
-        </ImageContainer>
-      </GradientBackground>
+      </ContentWrapper>
 
       {/* Controls */}
       <ControlsContainer>
@@ -196,8 +270,12 @@ export default function HeroSection() {
         </IndicatorsContainer>
 
         {/* Play/Pause Button */}
-        <ControlButton>
-          <Pause size={20} color="#D62300" strokeWidth={2} />
+        <ControlButton onClick={togglePlayPause}>
+          {isPlaying ? (
+            <Pause size={20} color="#D62300" strokeWidth={2} />
+          ) : (
+            <Play size={20} color="#D62300" strokeWidth={2} />
+          )}
         </ControlButton>
 
         {/* Next Button */}

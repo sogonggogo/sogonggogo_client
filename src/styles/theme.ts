@@ -49,7 +49,7 @@ export const theme = {
     xl: "24px",
     xxl: "30px",
     xxxl: "36px",
-    hero: "60px",
+    hero: "50px",
   },
 
   fontWeight: {
