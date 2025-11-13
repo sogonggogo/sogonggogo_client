@@ -132,7 +132,6 @@ export default function OrderSection() {
         return (
           <CardLink href={card.link} key={card.id}>
             <CardButton>
-              {/* Card Content */}
               <CardContent>
                 <IconWrapper>
                   <Icon size={48} color="#5C3317" strokeWidth={1.5} />
@@ -140,8 +139,6 @@ export default function OrderSection() {
                 <CardTitle>{card.title}</CardTitle>
                 <CardDescription>{card.description}</CardDescription>
               </CardContent>
-
-              {/* Hover Effect */}
               <HoverOverlay />
             </CardButton>
           </CardLink>

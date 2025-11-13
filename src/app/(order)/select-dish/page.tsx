@@ -63,16 +63,13 @@ export default function SelectDishPage() {
     if (!selectedMenuData || !selectedMenu) {
       return;
     }
-    // 메뉴의 모든 세부 아이템을 각각의 기본 수량으로 초기화
     const menuItems = getItemsForMenu(selectedMenu);
     const initialItems = menuItems.map((item) => ({
       name: item.name,
       quantity: item.defaultQuantity || 1,
     }));
 
-    // localStorage에 주문 추가
     addOrder(selectedMenu, selectedStyle, initialItems);
-    // change-option 페이지로 이동
     router.push("/change-option");
   };
 
@@ -85,7 +82,6 @@ export default function SelectDishPage() {
             일반주문
           </PageTitle>
 
-          {/* 메뉴 선택 */}
           <SectionTitle>메뉴 선택</SectionTitle>
           <MenuGrid
             menus={dinnerMenus}
@@ -93,7 +89,6 @@ export default function SelectDishPage() {
             onSelectMenu={setSelectedMenu}
           />
 
-          {/* 서빙 스타일 선택 */}
           {selectedMenuData && (
             <StyleSelector
               selectedMenu={selectedMenuData}
@@ -102,7 +97,6 @@ export default function SelectDishPage() {
             />
           )}
 
-          {/* 옵션선택 버튼 */}
           <OrderButton onClick={handleGoToOptions} disabled={!selectedMenuData}>
             {selectedMenuData ? `옵션 선택하기` : "메뉴를 선택해주세요"}
           </OrderButton>

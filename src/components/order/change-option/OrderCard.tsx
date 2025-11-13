@@ -187,7 +187,6 @@ export default function OrderCard({
   onDecrease,
   onDelete,
 }: OrderCardProps) {
-  // 기본 수량과 다른 수량만 표시
   const modifiedItems = selectedItems.filter((item) => {
     const itemData = availableItems.find((i) => i.name === item.name);
     const defaultQty = itemData?.defaultQuantity || 1;

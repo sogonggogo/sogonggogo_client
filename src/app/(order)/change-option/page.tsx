@@ -213,7 +213,6 @@ export default function ChangeOptionPage() {
     ? dinnerMenus.find((m) => m.id === currentEditingOrder.menuId)
     : null;
 
-  // 전체 주문 총액 계산
   const grandTotal = orders.reduce((total, order) => {
     const menu = dinnerMenus.find((m) => m.id === order.menuId);
     if (!menu) return total;

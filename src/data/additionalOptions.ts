@@ -6,15 +6,12 @@ export interface MenuItemOption {
   defaultQuantity?: number; // 기본 수량 (지정하지 않으면 1)
 }
 
-// 각 세부 메뉴의 단가와 기본 수량
 interface ItemPriceConfig {
-  unitPrice: number; // 단가
-  defaultQuantity: number; // 기본 수량
+  unitPrice: number;
+  defaultQuantity: number;
 }
 
-// 각 메뉴의 세부 아이템 (단가 × 기본수량) 합 = 메뉴 basePrice와 정확히 일치
 const itemPrices: Record<string, ItemPriceConfig> = {
-  // 발렌타인 디너 전용 (총 89,000원)
   "발렌타인-와인": { unitPrice: 25000, defaultQuantity: 1 },
   "발렌타인-스테이크": { unitPrice: 35000, defaultQuantity: 1 },
   "하트 장식": { unitPrice: 14500, defaultQuantity: 1 },

@@ -113,7 +113,6 @@ export default function MenuItemOptions({
     const selectedItem = selectedItems.find((si) => si.name === itemName);
     if (selectedItem) return selectedItem.quantity;
 
-    // selectedItems에 없으면 해당 아이템의 기본 수량 사용
     const itemData = items.find((i) => i.name === itemName);
     return itemData?.defaultQuantity || 1;
   };
