@@ -66,7 +66,7 @@ const StyleBadge = styled.span`
   color: ${({ theme }) => theme.colors.white};
   padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
   border-radius: ${({ theme }) => theme.borderRadius.xs};
-  font-size: ${({ theme }) => theme.fontSize.xs};
+  font-size: ${({ theme }) => theme.fontSize.md};
   font-weight: ${({ theme }) => theme.fontWeight.bold};
 `;
 
@@ -82,7 +82,7 @@ const TotalPrice = styled.div`
 `;
 
 const OptionsText = styled.div`
-  font-size: ${({ theme }) => theme.fontSize.xs};
+  font-size: ${({ theme }) => theme.fontSize.md};
   color: ${({ theme }) => theme.colors.accentAlpha70};
   margin-top: ${({ theme }) => theme.spacing.xs};
   white-space: nowrap;
@@ -92,12 +92,13 @@ const OptionsText = styled.div`
 
 const BottomRow = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   gap: ${({ theme }) => theme.spacing.md};
 `;
 
 const ChangeOptionButton = styled.button`
+  margin-top: ${({ theme }) => theme.spacing.sm};
   padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
   border: 2px solid ${({ theme }) => theme.colors.border};
   background: ${({ theme }) => theme.colors.white};
@@ -210,13 +211,13 @@ export default function OrderCard({
           </MenuInfo>
           <PriceDisplay>
             <TotalPrice>{formatPrice(totalPrice)}</TotalPrice>
+            <ChangeOptionButton onClick={onChangeOption}>
+              옵션 변경
+            </ChangeOptionButton>
           </PriceDisplay>
         </TopRow>
 
         <BottomRow>
-          <ChangeOptionButton onClick={onChangeOption}>
-            옵션 변경
-          </ChangeOptionButton>
           <QuantityControls>
             <DeleteButton onClick={onDelete}>
               <Trash2 size={16} strokeWidth={2} />
