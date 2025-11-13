@@ -51,7 +51,7 @@ export const dinnerMenus: MenuItem[] = [
     name: "샴페인 축제 디너",
     nameEn: "CHAMPAGNE FEAST",
     description: "축제를 위한 특별한 2인 디너",
-    items: ["샴페인 1병", "바게트 빵 4개", "커피 1포트", "와인", "스테이크"],
+    items: ["샴페인", "바게트 빵", "커피", "와인", "스테이크"],
     basePrice: 120000,
     servings: 2,
     availableStyles: ["grand", "deluxe"], // 샴페인 축제는 grand와 deluxe만 가능

@@ -4,6 +4,7 @@ import styled from "@emotion/styled";
 import Image from "next/image";
 import { MenuItem, formatPrice } from "@/data/menus";
 import { ServingStyle } from "@/data/styles";
+import { SelectedItem, MenuItemOption } from "@/data/additionalOptions";
 import { Minus, Plus, Trash2 } from "lucide-react";
 
 const Card = styled.div`
@@ -165,7 +166,8 @@ interface OrderCardProps {
   style: ServingStyle;
   basePrice: number;
   quantity: number;
-  selectedOptions: { name: string; price: number }[];
+  selectedItems: SelectedItem[];
+  availableItems: MenuItemOption[];
   totalPrice: number;
   onChangeOption: () => void;
   onIncrease: () => void;
@@ -177,17 +179,37 @@ export default function OrderCard({
   menu,
   style,
   quantity,
-  selectedOptions,
+  selectedItems,
+  availableItems,
   totalPrice,
   onChangeOption,
   onIncrease,
   onDecrease,
   onDelete,
 }: OrderCardProps) {
-  const optionsText =
-    selectedOptions.length > 0
-      ? `옵션: ${selectedOptions.map((opt) => opt.name).join(", ")}`
-      : "추가 옵션 없음";
+  // 기본 수량과 다른 수량만 표시
+  const modifiedItems = selectedItems.filter((item) => {
+    const itemData = availableItems.find((i) => i.name === item.name);
+    const defaultQty = itemData?.defaultQuantity || 1;
+    return item.quantity !== defaultQty;
+  });
+
+  const itemsText =
+    modifiedItems.length > 0
+      ? modifiedItems
+          .map((item) => {
+            const itemData = availableItems.find((i) => i.name === item.name);
+            const defaultQty = itemData?.defaultQuantity || 1;
+            if (item.quantity === 0) {
+              return `${item.name} 제거`;
+            } else if (item.quantity > defaultQty) {
+              return `${item.name} +${item.quantity - defaultQty}`;
+            } else {
+              return `${item.name} ${item.quantity}/${defaultQty}`;
+            }
+          })
+          .join(", ")
+      : "기본 구성";
 
   return (
     <Card>
@@ -207,7 +229,7 @@ export default function OrderCard({
           <MenuInfo>
             <MenuTitle>{menu.name}</MenuTitle>
             <StyleBadge>{style.name}</StyleBadge>
-            <OptionsText>{optionsText}</OptionsText>
+            <OptionsText>{itemsText}</OptionsText>
           </MenuInfo>
           <PriceDisplay>
             <TotalPrice>{formatPrice(totalPrice)}</TotalPrice>

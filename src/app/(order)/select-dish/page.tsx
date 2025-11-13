@@ -10,6 +10,7 @@ import MenuGrid from "@/components/select-dish/MenuGrid";
 import StyleSelector from "@/components/select-dish/StyleSelector";
 import OrderButton from "@/components/select-dish/OrderButton";
 import { addOrder } from "@/utils/orderStorage";
+import { getItemsForMenu } from "@/data/additionalOptions";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -62,8 +63,15 @@ export default function SelectDishPage() {
     if (!selectedMenuData || !selectedMenu) {
       return;
     }
+    // 메뉴의 모든 세부 아이템을 각각의 기본 수량으로 초기화
+    const menuItems = getItemsForMenu(selectedMenu);
+    const initialItems = menuItems.map((item) => ({
+      name: item.name,
+      quantity: item.defaultQuantity || 1,
+    }));
+
     // localStorage에 주문 추가
-    addOrder(selectedMenu, selectedStyle);
+    addOrder(selectedMenu, selectedStyle, initialItems);
     // change-option 페이지로 이동
     router.push("/change-option");
   };
