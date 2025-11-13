@@ -102,6 +102,7 @@ const HeaderButton = styled.button`
   border: none;
   cursor: pointer;
   font-size: ${({ theme }) => theme.fontSize.md};
+  font-family: ${({ theme }) => theme.fontFamily.miwon};
   transition: opacity ${({ theme }) => theme.transition.fast};
   white-space: nowrap;
   flex-shrink: 0;

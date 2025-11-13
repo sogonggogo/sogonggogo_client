@@ -14,6 +14,7 @@ export interface ServingStyle {
     extras?: string[];
   };
   priceMultiplier: number; // 기본 가격에 곱해지는 배율
+  image: string; // 스타일 이미지 경로
 }
 
 export const servingStyles: Record<ServingStyleType, ServingStyle> = {
@@ -30,6 +31,7 @@ export const servingStyles: Record<ServingStyleType, ServingStyle> = {
       wineGlass: "플라스틱 잔",
     },
     priceMultiplier: 1.0,
+    image: "/images/style/simple.png",
   },
   grand: {
     type: "grand",
@@ -44,6 +46,7 @@ export const servingStyles: Record<ServingStyleType, ServingStyle> = {
       wineGlass: "플라스틱 잔",
     },
     priceMultiplier: 1.3,
+    image: "/images/style/grand.png",
   },
   deluxe: {
     type: "deluxe",
@@ -59,6 +62,7 @@ export const servingStyles: Record<ServingStyleType, ServingStyle> = {
       extras: ["작은 꽃병과 꽃"],
     },
     priceMultiplier: 1.6,
+    image: "/images/style/deluxe.png",
   },
 };
 
