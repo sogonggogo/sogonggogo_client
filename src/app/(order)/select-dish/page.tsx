@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import { dinnerMenus } from "@/data/menus";
 import { ServingStyleType } from "@/data/styles";
 import { ShoppingCart } from "lucide-react";
-import MenuGrid from "@/components/select-dish/MenuGrid";
-import StyleSelector from "@/components/select-dish/StyleSelector";
-import OrderButton from "@/components/select-dish/OrderButton";
+import MenuGrid from "@/components/order/select-dish/MenuGrid";
+import StyleSelector from "@/components/order/select-dish/StyleSelector";
+import OrderButton from "@/components/order/select-dish/OrderButton";
 import { addOrder } from "@/utils/orderStorage";
 import { getItemsForMenu } from "@/data/additionalOptions";
 
