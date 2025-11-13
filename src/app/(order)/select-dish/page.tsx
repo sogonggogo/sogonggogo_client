@@ -9,6 +9,7 @@ import { ShoppingCart } from "lucide-react";
 import MenuGrid from "@/components/select-dish/MenuGrid";
 import StyleSelector from "@/components/select-dish/StyleSelector";
 import OrderButton from "@/components/select-dish/OrderButton";
+import { addOrder } from "@/utils/orderStorage";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -58,11 +59,13 @@ export default function SelectDishPage() {
       : null;
 
   const handleGoToOptions = () => {
-    if (!selectedMenuData) {
+    if (!selectedMenuData || !selectedMenu) {
       return;
     }
-    // URL에 선택한 메뉴와 스타일 정보 전달
-    router.push(`/change-option?menuId=${selectedMenu}&style=${selectedStyle}`);
+    // localStorage에 주문 추가
+    addOrder(selectedMenu, selectedStyle);
+    // change-option 페이지로 이동
+    router.push("/change-option");
   };
 
   return (
