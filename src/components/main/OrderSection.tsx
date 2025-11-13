@@ -102,7 +102,7 @@ const orderCards = [
     title: "일반주문",
     icon: ShoppingCart,
     description: "메뉴를 선택하여 주문하세요",
-    link: "/order",
+    link: "/select-dish",
   },
   {
     id: 2,

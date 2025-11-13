@@ -2,12 +2,9 @@
 
 import styled from "@emotion/styled";
 import { useState } from "react";
-import { dinnerMenus, formatPrice } from "@/data/menus";
-import {
-  servingStyles,
-  calculatePriceWithStyle,
-  ServingStyleType,
-} from "@/data/styles";
+import { useRouter } from "next/navigation";
+import { dinnerMenus } from "@/data/menus";
+import { ServingStyleType } from "@/data/styles";
 import { ShoppingCart } from "lucide-react";
 import MenuGrid from "@/components/select-dish/MenuGrid";
 import StyleSelector from "@/components/select-dish/StyleSelector";
@@ -50,6 +47,7 @@ const SectionTitle = styled.h2`
 `;
 
 export default function SelectDishPage() {
+  const router = useRouter();
   const [selectedMenu, setSelectedMenu] = useState<number | null>(null);
   const [selectedStyle, setSelectedStyle] =
     useState<ServingStyleType>("simple");
@@ -59,20 +57,12 @@ export default function SelectDishPage() {
       ? dinnerMenus.find((m) => m.id === selectedMenu)
       : null;
 
-  const finalPrice = selectedMenuData
-    ? calculatePriceWithStyle(selectedMenuData.basePrice, selectedStyle)
-    : 0;
-
-  const handleOrder = () => {
+  const handleGoToOptions = () => {
     if (!selectedMenuData) {
-      alert("메뉴를 선택해주세요!");
       return;
     }
-    alert(
-      `주문이 완료되었습니다!\n${selectedMenuData.name} (${
-        servingStyles[selectedStyle].name
-      })\n${formatPrice(finalPrice)}`
-    );
+    // URL에 선택한 메뉴와 스타일 정보 전달
+    router.push(`/change-option?menuId=${selectedMenu}&style=${selectedStyle}`);
   };
 
   return (
@@ -101,11 +91,9 @@ export default function SelectDishPage() {
             />
           )}
 
-          {/* 주문 버튼 */}
-          <OrderButton onClick={handleOrder} disabled={!selectedMenuData}>
-            {selectedMenuData
-              ? `${formatPrice(finalPrice)} 주문하기`
-              : "메뉴를 선택해주세요"}
+          {/* 옵션선택 버튼 */}
+          <OrderButton onClick={handleGoToOptions} disabled={!selectedMenuData}>
+            {selectedMenuData ? `옵션 선택하기` : "메뉴를 선택해주세요"}
           </OrderButton>
         </ContentWrapper>
       </Main>

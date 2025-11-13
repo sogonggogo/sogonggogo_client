@@ -12,15 +12,13 @@ const Grid = styled.div`
 `;
 
 const MenuCard = styled.div<{ selected: boolean }>`
-  background: ${({ theme }) => theme.colors.white};
+  background: ${({ selected, theme }) =>
+    selected ? theme.colors.primary : theme.colors.white};
   border-radius: ${({ theme }) => theme.borderRadius.lg};
   overflow: hidden;
   box-shadow: ${({ theme }) => theme.shadow.md};
   cursor: pointer;
   transition: all ${({ theme }) => theme.transition.fast};
-  border: 3px solid
-    ${({ selected, theme }) =>
-      selected ? theme.colors.primary : "transparent"};
 
   &:hover {
     transform: translateY(-4px);
@@ -39,21 +37,25 @@ const MenuImage = styled.div`
   border-radius: ${({ theme }) => theme.borderRadius.lg};
 `;
 
-const MenuInfo = styled.div`
+const MenuInfo = styled.div<{ selected: boolean }>`
   padding: ${({ theme }) => theme.spacing.lg};
+  background: ${({ selected, theme }) =>
+    selected ? theme.colors.primary : "transparent"};
 `;
 
-const MenuName = styled.h3`
+const MenuName = styled.h3<{ selected: boolean }>`
   font-family: ${({ theme }) => theme.fontFamily.miwon};
   font-size: ${({ theme }) => theme.fontSize.xl};
   font-weight: ${({ theme }) => theme.fontWeight.bold};
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ selected, theme }) =>
+    selected ? theme.colors.white : theme.colors.accent};
   margin-bottom: ${({ theme }) => theme.spacing.sm};
 `;
 
-const MenuDescription = styled.p`
+const MenuDescription = styled.p<{ selected: boolean }>`
   font-size: ${({ theme }) => theme.fontSize.sm};
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ selected, theme }) =>
+    selected ? theme.colors.white : theme.colors.accent};
   margin-bottom: ${({ theme }) => theme.spacing.md};
 `;
 
@@ -64,10 +66,12 @@ const MenuItems = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing.md};
 `;
 
-const ItemTag = styled.span`
+const ItemTag = styled.span<{ selected: boolean }>`
   font-size: ${({ theme }) => theme.fontSize.xs};
-  color: ${({ theme }) => theme.colors.accent};
-  background: ${({ theme }) => theme.colors.buttonBackground};
+  color: ${({ selected, theme }) =>
+    selected ? theme.colors.primary : theme.colors.accent};
+  background: ${({ selected, theme }) =>
+    selected ? theme.colors.white : theme.colors.buttonBackground};
   padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
   border-radius: ${({ theme }) => theme.borderRadius.xs};
 `;
@@ -85,35 +89,41 @@ export default function MenuGrid({
 }: MenuGridProps) {
   return (
     <Grid>
-      {menus.map((menu) => (
-        <MenuCard
-          key={menu.id}
-          selected={selectedMenuId === menu.id}
-          onClick={() => onSelectMenu(menu.id)}
-        >
-          <MenuImage>
-            {menu.image && (
-              <Image
-                src={menu.image}
-                alt={menu.name}
-                width={300}
-                height={300}
-                style={{ objectFit: "contain" }}
-              />
-            )}
-          </MenuImage>
-          <MenuInfo>
-            <MenuName>{menu.name}</MenuName>
-            <MenuDescription>{menu.description}</MenuDescription>
-            <MenuItems>
-              {menu.items.map((item, index) => (
-                <ItemTag key={index}>{item}</ItemTag>
-              ))}
-            </MenuItems>
-          </MenuInfo>
-        </MenuCard>
-      ))}
+      {menus.map((menu) => {
+        const isSelected = selectedMenuId === menu.id;
+        return (
+          <MenuCard
+            key={menu.id}
+            selected={isSelected}
+            onClick={() => onSelectMenu(menu.id)}
+          >
+            <MenuImage>
+              {menu.image && (
+                <Image
+                  src={menu.image}
+                  alt={menu.name}
+                  width={300}
+                  height={300}
+                  style={{ objectFit: "contain" }}
+                />
+              )}
+            </MenuImage>
+            <MenuInfo selected={isSelected}>
+              <MenuName selected={isSelected}>{menu.name}</MenuName>
+              <MenuDescription selected={isSelected}>
+                {menu.description}
+              </MenuDescription>
+              <MenuItems>
+                {menu.items.map((item, index) => (
+                  <ItemTag key={index} selected={isSelected}>
+                    {item}
+                  </ItemTag>
+                ))}
+              </MenuItems>
+            </MenuInfo>
+          </MenuCard>
+        );
+      })}
     </Grid>
   );
 }
-

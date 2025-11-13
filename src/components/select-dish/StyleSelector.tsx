@@ -28,7 +28,7 @@ const SectionTitle = styled.h2`
 const StyleGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: ${({ theme }) => theme.spacing.md};
+  gap: ${({ theme }) => theme.spacing.lg};
 `;
 
 const StyleCard = styled.button<{ selected: boolean; disabled: boolean }>`
@@ -38,12 +38,13 @@ const StyleCard = styled.button<{ selected: boolean; disabled: boolean }>`
     selected ? theme.colors.white : theme.colors.accent};
   border: none;
   border-radius: ${({ theme }) => theme.borderRadius.md};
-  padding: 0;
   cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
   opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};
   transition: all ${({ theme }) => theme.transition.fast};
   text-align: left;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 
   &:hover:not(:disabled) {
     transform: translateY(-2px);
@@ -54,11 +55,12 @@ const StyleCard = styled.button<{ selected: boolean; disabled: boolean }>`
 const StyleImageWrapper = styled.div`
   position: relative;
   width: 100%;
-  height: 280px;
+  height: 290px;
   background: ${({ theme }) => theme.colors.gradientOrange};
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: ${({ theme }) => theme.spacing.md};
 `;
 
 const StyleInfo = styled.div`
@@ -68,18 +70,19 @@ const StyleInfo = styled.div`
 const StyleName = styled.div`
   font-family: ${({ theme }) => theme.fontFamily.miwon};
   font-weight: ${({ theme }) => theme.fontWeight.bold};
-  font-size: ${({ theme }) => theme.fontSize.md};
+  font-size: ${({ theme }) => theme.fontSize.xl};
   margin-bottom: ${({ theme }) => theme.spacing.xs};
 `;
 
 const StylePrice = styled.div`
-  font-size: ${({ theme }) => theme.fontSize.sm};
+  font-size: ${({ theme }) => theme.fontSize.lg};
   font-weight: ${({ theme }) => theme.fontWeight.bold};
   margin-bottom: ${({ theme }) => theme.spacing.sm};
+  font-family: ${({ theme }) => theme.fontFamily.miwon};
 `;
 
 const StyleFeatures = styled.div`
-  font-size: ${({ theme }) => theme.fontSize.xs};
+  font-size: ${({ theme }) => theme.fontSize.sm};
   opacity: 0.7;
   line-height: 1.4;
 `;
@@ -142,4 +145,3 @@ export default function StyleSelector({
     </StyleSection>
   );
 }
-
