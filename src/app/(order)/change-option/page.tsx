@@ -193,8 +193,7 @@ export default function ChangeOptionPage() {
   };
 
   const handleOrder = () => {
-    clearOrders();
-    router.push("/");
+    router.push("/delivery-info");
   };
 
   if (orders.length === 0) {
