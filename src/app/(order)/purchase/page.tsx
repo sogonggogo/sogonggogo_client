@@ -7,6 +7,7 @@ import { CreditCard, Tag } from "lucide-react";
 import { getOrders, clearOrders } from "@/utils/orderStorage";
 import { getDeliveryInfo, clearDeliveryInfo } from "@/utils/deliveryStorage";
 import { isRegularCustomer } from "@/utils/userStorage";
+import { addOrderHistory } from "@/utils/orderHistoryStorage";
 import { dinnerMenus, formatPrice } from "@/data/menus";
 import { calculatePriceWithStyle } from "@/data/styles";
 import { getItemsForMenu } from "@/data/additionalOptions";
@@ -197,6 +198,20 @@ export default function PurchasePage() {
 
     // Simulate payment process
     await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    // Save order to history before clearing
+    if (deliveryInfo) {
+      addOrderHistory({
+        orderDate: new Date().toISOString(),
+        orders: orders,
+        deliveryInfo: deliveryInfo,
+        subtotal: subtotal,
+        discount: discount,
+        total: total,
+        isRegularCustomer: isRegular,
+        status: "completed",
+      });
+    }
 
     // Clear all stored data
     clearOrders();

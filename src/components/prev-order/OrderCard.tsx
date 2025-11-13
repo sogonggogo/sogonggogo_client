@@ -2,7 +2,7 @@
 
 import styled from "@emotion/styled";
 import { formatPrice } from "@/data/menus";
-import { Clock } from "lucide-react";
+import { Clock, MapPin, Calendar } from "lucide-react";
 
 const Card = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -96,6 +96,41 @@ const OrderPrice = styled.div`
   text-align: right;
 `;
 
+const DeliveryInfo = styled.div`
+  margin-bottom: ${({ theme }) => theme.spacing.lg};
+  padding: ${({ theme }) => theme.spacing.md};
+  background: ${({ theme }) => theme.colors.background};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+`;
+
+const DeliveryRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+  color: ${({ theme }) => theme.colors.accent};
+  font-size: ${({ theme }) => theme.fontSize.sm};
+  margin-bottom: ${({ theme }) => theme.spacing.xs};
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  svg {
+    color: ${({ theme }) => theme.colors.primary};
+    flex-shrink: 0;
+  }
+`;
+
+const DeliveryLabel = styled.span`
+  font-weight: ${({ theme }) => theme.fontWeight.medium};
+  min-width: 70px;
+`;
+
+const DeliveryValue = styled.span`
+  flex: 1;
+`;
+
 const OrderFooter = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing.md};
@@ -123,18 +158,21 @@ const FooterButton = styled.button<{ variant?: "primary" | "secondary" }>`
 `;
 
 interface Order {
-  id: number;
+  id: string | number;
   date: string;
   menuName: string;
   style: string;
   items: string[];
   price: number;
   status: "completed" | "pending" | "cancelled";
+  deliveryAddress?: string;
+  deliveryDate?: string;
+  deliveryTime?: string;
 }
 
 interface OrderCardProps {
   order: Order;
-  onViewDetails: (id: number) => void;
+  onViewDetails: (id: string | number) => void;
   onReorder: (menuName: string, style: string) => void;
 }
 
@@ -167,6 +205,32 @@ export default function OrderCard({
         </OrderDetails>
         <OrderPrice>{formatPrice(order.price)}</OrderPrice>
       </OrderContent>
+
+      {(order.deliveryAddress || order.deliveryDate || order.deliveryTime) && (
+        <DeliveryInfo>
+          {order.deliveryAddress && (
+            <DeliveryRow>
+              <MapPin size={16} />
+              <DeliveryLabel>배달 주소:</DeliveryLabel>
+              <DeliveryValue>{order.deliveryAddress}</DeliveryValue>
+            </DeliveryRow>
+          )}
+          {order.deliveryDate && (
+            <DeliveryRow>
+              <Calendar size={16} />
+              <DeliveryLabel>도착 날짜:</DeliveryLabel>
+              <DeliveryValue>{order.deliveryDate}</DeliveryValue>
+            </DeliveryRow>
+          )}
+          {order.deliveryTime && (
+            <DeliveryRow>
+              <Clock size={16} />
+              <DeliveryLabel>도착 시각:</DeliveryLabel>
+              <DeliveryValue>{order.deliveryTime}</DeliveryValue>
+            </DeliveryRow>
+          )}
+        </DeliveryInfo>
+      )}
 
       <OrderFooter>
         <FooterButton onClick={() => onViewDetails(order.id)}>
