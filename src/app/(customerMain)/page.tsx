@@ -1,7 +1,6 @@
 "use client";
 
 import styled from "@emotion/styled";
-import Header from "@/components/main/Header";
 import HeroSection from "@/components/main/HeroSection";
 import OrderHistory from "@/components/main/OrderHistory";
 import OrderSection from "@/components/main/OrderSection";
@@ -51,8 +50,6 @@ const BottomSection = styled.div`
 export default function Home() {
   return (
     <Container>
-      <Header />
-
       {/* Main Content */}
       <Main>
         <ContentWrapper>

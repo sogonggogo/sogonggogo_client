@@ -1,7 +1,6 @@
 "use client";
 
 import styled from "@emotion/styled";
-import Header from "@/components/main/Header";
 import { Settings } from "lucide-react";
 
 const Container = styled.div`
@@ -103,7 +102,6 @@ export default function UpdateInfoPage() {
 
   return (
     <Container>
-      <Header />
       <Main>
         <ContentWrapper>
           <PageTitle>

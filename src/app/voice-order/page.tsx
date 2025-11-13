@@ -2,7 +2,6 @@
 
 import styled from "@emotion/styled";
 import { useState } from "react";
-import Header from "@/components/main/Header";
 import { Mic, MicOff } from "lucide-react";
 
 const Container = styled.div`
@@ -180,7 +179,6 @@ export default function VoiceOrderPage() {
 
   return (
     <Container>
-      <Header />
       <Main>
         <ContentWrapper>
           <PageTitle>

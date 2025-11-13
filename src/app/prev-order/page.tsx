@@ -1,7 +1,6 @@
 "use client";
 
 import styled from "@emotion/styled";
-import Header from "@/components/main/Header";
 import { formatPrice } from "@/data/menus";
 import { Clock } from "lucide-react";
 
@@ -217,7 +216,6 @@ export default function OrderHistoryPage() {
 
   return (
     <Container>
-      <Header />
       <Main>
         <ContentWrapper>
           <PageTitle>

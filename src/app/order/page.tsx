@@ -2,7 +2,6 @@
 
 import styled from "@emotion/styled";
 import { useState } from "react";
-import Header from "@/components/main/Header";
 import { dinnerMenus, formatPrice } from "@/data/menus";
 import { servingStyles, calculatePriceWithStyle, ServingStyleType } from "@/data/styles";
 import Image from "next/image";
@@ -208,7 +207,6 @@ export default function OrderPage() {
 
   return (
     <Container>
-      <Header />
       <Main>
         <ContentWrapper>
           <PageTitle>

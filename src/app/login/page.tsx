@@ -2,7 +2,6 @@
 
 import styled from "@emotion/styled";
 import Link from "next/link";
-import Header from "@/components/main/Header";
 import { User } from "lucide-react";
 
 const Container = styled.div`
@@ -116,7 +115,6 @@ export default function LoginPage() {
 
   return (
     <Container>
-      <Header />
       <Main>
         <LoginCard>
           <PageTitle>
