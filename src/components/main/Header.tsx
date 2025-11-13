@@ -1,7 +1,7 @@
 "use client";
 
 import styled from "@emotion/styled";
-import { User } from "lucide-react";
+import { User, Settings } from "lucide-react";
 
 const HeaderContainer = styled.header`
   position: fixed;
@@ -76,7 +76,13 @@ const HiddenText = styled.span`
   }
 `;
 
-const LoginButton = styled.button`
+const ButtonGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.md};
+`;
+
+const HeaderButton = styled.button`
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.spacing.sm};
@@ -114,11 +120,20 @@ export default function Header() {
             <HiddenText>특별한 날에 당신의 아내를 감동시켜라</HiddenText>
           </LogoContainer>
 
-          {/* Login Button */}
-          <LoginButton>
-            <User size={20} strokeWidth={1.67} />
-            <span>로그인</span>
-          </LoginButton>
+          {/* Button Group */}
+          <ButtonGroup>
+            {/* Edit Info Button */}
+            <HeaderButton>
+              <Settings size={20} strokeWidth={1.67} />
+              <span>정보 수정</span>
+            </HeaderButton>
+
+            {/* Login Button */}
+            <HeaderButton>
+              <User size={20} strokeWidth={1.67} />
+              <span>로그인</span>
+            </HeaderButton>
+          </ButtonGroup>
         </Content>
       </Container>
     </HeaderContainer>
