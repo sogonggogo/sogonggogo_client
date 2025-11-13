@@ -2,7 +2,10 @@
 
 import styled from "@emotion/styled";
 import Link from "next/link";
-import { User, Settings } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { User, Settings, LogOut } from "lucide-react";
+import { isLoggedIn, clearUserInfo } from "@/utils/userStorage";
 
 const HeaderContainer = styled.header`
   position: fixed;
@@ -120,6 +123,46 @@ const HeaderButton = styled.button`
 `;
 
 export default function Header() {
+  const router = useRouter();
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check login status on mount
+    setLoggedIn(isLoggedIn());
+
+    // Listen for storage changes (when user logs in/out in another tab or updates)
+    const handleStorageChange = () => {
+      setLoggedIn(isLoggedIn());
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    // Also check on window focus (when returning to the tab)
+    const handleFocus = () => {
+      setLoggedIn(isLoggedIn());
+    };
+
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, []);
+
+  const handleAuthClick = () => {
+    if (loggedIn) {
+      // Logout
+      clearUserInfo();
+      setLoggedIn(false);
+      alert("로그아웃 되었습니다.");
+      window.location.href = "/";
+    } else {
+      // Go to login page
+      router.push("/login");
+    }
+  };
+
   return (
     <HeaderContainer>
       <Container>
@@ -144,13 +187,20 @@ export default function Header() {
               </HeaderButton>
             </Link>
 
-            {/* Login Button */}
-            <Link href="/login" style={{ textDecoration: "none" }}>
-              <HeaderButton>
-                <User size={20} strokeWidth={1.67} />
-                <span>로그인</span>
-              </HeaderButton>
-            </Link>
+            {/* Login/Logout Button */}
+            <HeaderButton onClick={handleAuthClick}>
+              {loggedIn ? (
+                <>
+                  <LogOut size={20} strokeWidth={1.67} />
+                  <span>로그아웃</span>
+                </>
+              ) : (
+                <>
+                  <User size={20} strokeWidth={1.67} />
+                  <span>로그인</span>
+                </>
+              )}
+            </HeaderButton>
           </ButtonGroup>
         </Content>
       </Container>

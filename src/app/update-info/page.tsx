@@ -1,8 +1,11 @@
 "use client";
 
 import styled from "@emotion/styled";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Settings } from "lucide-react";
 import UpdateInfoForm from "@/components/update-info/UpdateInfoForm";
+import { isLoggedIn } from "@/utils/userStorage";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -33,6 +36,21 @@ const PageTitle = styled.h1`
 `;
 
 export default function UpdateInfoPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Redirect to login if not logged in
+    if (!isLoggedIn()) {
+      alert("로그인이 필요한 페이지입니다.");
+      router.push("/login");
+    }
+  }, [router]);
+
+  // Don't render until we've checked login status
+  if (!isLoggedIn()) {
+    return null;
+  }
+
   return (
     <Container>
       <Main>

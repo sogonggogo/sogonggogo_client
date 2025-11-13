@@ -84,19 +84,20 @@ const StyledLink = styled(Link)`
 export default function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const [isRegular, setIsRegular] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Save user info (for demo purposes)
+    // Save user info - all logged in users are regular customers (10% discount)
     saveUserInfo({
       email,
-      isRegularCustomer: isRegular,
+      isRegularCustomer: true, // 로그인한 모든 사용자는 자동으로 단골 고객
     });
     
-    alert("로그인 되었습니다!");
-    router.push("/");
+    alert("로그인 되었습니다! 단골 고객 10% 할인이 자동으로 적용됩니다.");
+    
+    // Use window.location to ensure full page reload and Header update
+    window.location.href = "/";
   };
 
   return (
@@ -122,18 +123,6 @@ export default function LoginForm() {
             placeholder="••••••••"
             required
           />
-        </FormGroup>
-
-        <FormGroup>
-          <Label style={{ flexDirection: "row", gap: "8px", cursor: "pointer" }}>
-            <input
-              type="checkbox"
-              checked={isRegular}
-              onChange={(e) => setIsRegular(e.target.checked)}
-              style={{ cursor: "pointer" }}
-            />
-            단골 고객으로 로그인 (10% 할인)
-          </Label>
         </FormGroup>
 
         <LoginButton type="submit">로그인</LoginButton>
