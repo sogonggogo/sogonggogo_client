@@ -1,6 +1,7 @@
 "use client";
 
 import styled from "@emotion/styled";
+import Link from "next/link";
 import { ShoppingCart, Mic, Clock } from "lucide-react";
 
 const Section = styled.section`
@@ -22,12 +23,17 @@ const Title = styled.h2`
   margin: 0;
 `;
 
-const CardButton = styled.button`
+const CardLink = styled(Link)`
+  text-decoration: none;
+  display: block;
+`;
+
+const CardButton = styled.div`
   position: relative;
+  width: 100%;
   height: ${({ theme }) => theme.sizes.orderCardHeight};
   border-radius: ${({ theme }) => theme.borderRadius.xl};
   background-color: ${({ theme }) => theme.colors.buttonBackground};
-  border: none;
   cursor: pointer;
   overflow: hidden;
   transition: all ${({ theme }) => theme.transition.normal};
@@ -110,7 +116,7 @@ const orderCards = [
     title: "주문내역",
     icon: Clock,
     description: "이전 주문을 확인하세요",
-    link: "/order-history",
+    link: "/prev-order",
   },
 ];
 
@@ -124,19 +130,21 @@ export default function OrderSection() {
       {orderCards.map((card) => {
         const Icon = card.icon;
         return (
-          <CardButton key={card.id}>
-            {/* Card Content */}
-            <CardContent>
-              <IconWrapper>
-                <Icon size={48} color="#5C3317" strokeWidth={1.5} />
-              </IconWrapper>
-              <CardTitle>{card.title}</CardTitle>
-              <CardDescription>{card.description}</CardDescription>
-            </CardContent>
+          <CardLink href={card.link} key={card.id}>
+            <CardButton>
+              {/* Card Content */}
+              <CardContent>
+                <IconWrapper>
+                  <Icon size={48} color="#5C3317" strokeWidth={1.5} />
+                </IconWrapper>
+                <CardTitle>{card.title}</CardTitle>
+                <CardDescription>{card.description}</CardDescription>
+              </CardContent>
 
-            {/* Hover Effect */}
-            <HoverOverlay />
-          </CardButton>
+              {/* Hover Effect */}
+              <HoverOverlay />
+            </CardButton>
+          </CardLink>
         );
       })}
     </Section>

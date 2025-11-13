@@ -1,6 +1,7 @@
 "use client";
 
 import styled from "@emotion/styled";
+import Link from "next/link";
 import { User, Settings } from "lucide-react";
 
 const HeaderContainer = styled.header`
@@ -49,6 +50,10 @@ const LogoContainer = styled.div`
   }
 `;
 
+const LogoLink = styled(Link)`
+  text-decoration: none;
+`;
+
 const Logo = styled.h1`
   font-family: ${({ theme }) => theme.fontFamily.bagelfat};
   font-size: ${({ theme }) => theme.fontSize.xxxl};
@@ -57,6 +62,12 @@ const Logo = styled.h1`
   color: ${({ theme }) => theme.colors.primary};
   margin: 0;
   white-space: nowrap;
+  cursor: pointer;
+  transition: opacity ${({ theme }) => theme.transition.fast};
+
+  &:hover {
+    opacity: 0.8;
+  }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     font-size: ${({ theme }) => theme.fontSize.xl};
@@ -114,7 +125,9 @@ export default function Header() {
         <Content>
           {/* Logo */}
           <LogoContainer>
-            <Logo>MR.DAEBAK</Logo>
+            <LogoLink href="/">
+              <Logo>MR.DAEBAK</Logo>
+            </LogoLink>
 
             {/* Hidden Navigation Text */}
             <HiddenText>특별한 날에 당신의 아내를 감동시켜라</HiddenText>
@@ -123,16 +136,20 @@ export default function Header() {
           {/* Button Group */}
           <ButtonGroup>
             {/* Edit Info Button */}
-            <HeaderButton>
-              <Settings size={20} strokeWidth={1.67} />
-              <span>정보 수정</span>
-            </HeaderButton>
+            <Link href="/update-info" style={{ textDecoration: "none" }}>
+              <HeaderButton>
+                <Settings size={20} strokeWidth={1.67} />
+                <span>정보 수정</span>
+              </HeaderButton>
+            </Link>
 
             {/* Login Button */}
-            <HeaderButton>
-              <User size={20} strokeWidth={1.67} />
-              <span>로그인</span>
-            </HeaderButton>
+            <Link href="/login" style={{ textDecoration: "none" }}>
+              <HeaderButton>
+                <User size={20} strokeWidth={1.67} />
+                <span>로그인</span>
+              </HeaderButton>
+            </Link>
           </ButtonGroup>
         </Content>
       </Container>
