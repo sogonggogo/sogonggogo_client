@@ -40,27 +40,14 @@ const Content = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.sm};
-  padding-right: ${({ theme }) => theme.spacing.xs};
   padding-bottom: ${({ theme }) => theme.spacing.sm};
 
-  /* Custom scrollbar */
+  /* Hide scrollbar */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+
   &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: ${({ theme }) => theme.colors.whiteAlpha15};
-    border-radius: ${({ theme }) => theme.borderRadius.full};
-    margin: ${({ theme }) => theme.spacing.xs} 0;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.colors.whiteAlpha50};
-    border-radius: ${({ theme }) => theme.borderRadius.full};
-
-    &:hover {
-      background: ${({ theme }) => theme.colors.whiteAlpha80};
-    }
+    display: none; /* Chrome, Safari, Opera */
   }
 `;
 

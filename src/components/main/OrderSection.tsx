@@ -26,14 +26,16 @@ const CardButton = styled.button`
   position: relative;
   height: ${({ theme }) => theme.sizes.orderCardHeight};
   border-radius: ${({ theme }) => theme.borderRadius.xl};
-  background-color: #d9d9d9;
+  background-color: ${({ theme }) => theme.colors.buttonBackground};
   border: none;
   cursor: pointer;
   overflow: hidden;
   transition: all ${({ theme }) => theme.transition.normal};
 
   &:hover {
-    background-color: #c9c9c9;
+    background-color: ${({ theme }) => theme.colors.border};
+    transform: translateY(-4px);
+    box-shadow: ${({ theme }) => theme.shadow.md};
   }
 `;
 
