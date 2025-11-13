@@ -41,6 +41,8 @@ const OrderList = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.lg};
+  max-width: ${({ theme }) => theme.sizes.heroWidth};
+  justify-self: center;
 `;
 
 const EmptyState = styled.div`
@@ -80,36 +82,48 @@ const convertToOrderCardFormat = (history: OrderHistory) => {
     })
     .join(", ");
 
-  // Get all items
-  const allItems: string[] = [];
+  // Get all items and merge duplicates
+  const itemsMap = new Map<string, number>();
+  const stylesSet = new Set<string>();
+
   history.orders.forEach((order) => {
     const style = servingStyles[order.style];
     if (style) {
-      allItems.push(style.name);
+      stylesSet.add(style.name);
     }
 
     const availableItems = getItemsForMenu(order.menuId);
     const selectedItems = order.selectedItems || [];
-    
+
     selectedItems.forEach((selectedItem) => {
       if (selectedItem.quantity > 0) {
-        const itemData = availableItems.find((item) => item.name === selectedItem.name);
+        const itemData = availableItems.find(
+          (item) => item.name === selectedItem.name
+        );
         if (itemData) {
-          if (selectedItem.quantity > 1) {
-            allItems.push(`${itemData.name} ${selectedItem.quantity}개`);
-          } else {
-            allItems.push(itemData.name);
-          }
+          const currentQty = itemsMap.get(itemData.name) || 0;
+          itemsMap.set(itemData.name, currentQty + selectedItem.quantity);
         }
       }
     });
   });
 
+  // Convert to array with proper formatting
+  const allItems: string[] = [
+    ...Array.from(stylesSet),
+    ...Array.from(itemsMap.entries()).map(([name, quantity]) => {
+      return quantity > 1 ? `${name} X${quantity}` : name;
+    }),
+  ];
+
   return {
     id: history.id,
     date: formatDate(history.orderDate),
     menuName: menuNames,
-    style: history.orders.length > 1 ? "복수 주문" : servingStyles[history.orders[0]?.style]?.name || "스타일",
+    style:
+      history.orders.length > 1
+        ? "복수 주문"
+        : servingStyles[history.orders[0]?.style]?.name || "스타일",
     items: allItems,
     price: history.total,
     status: history.status,
@@ -133,7 +147,9 @@ export default function PrevOrderPage() {
   const hasOrders = orderHistory.length > 0;
 
   const handleReorder = (menuName: string, style: string) => {
-    alert(`재주문: ${menuName} (${style})\n재주문 기능은 추후 구현될 예정입니다.`);
+    alert(
+      `재주문: ${menuName} (${style})\n재주문 기능은 추후 구현될 예정입니다.`
+    );
   };
 
   const handleViewDetails = (id: string | number) => {

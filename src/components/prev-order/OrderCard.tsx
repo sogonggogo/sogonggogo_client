@@ -7,7 +7,7 @@ import { Clock, MapPin, Calendar } from "lucide-react";
 const Card = styled.div`
   background: ${({ theme }) => theme.colors.white};
   border-radius: ${({ theme }) => theme.borderRadius.lg};
-  padding: ${({ theme }) => theme.spacing.xl};
+  padding: ${({ theme }) => theme.spacing.lg};
   box-shadow: ${({ theme }) => theme.shadow.md};
   transition: all ${({ theme }) => theme.transition.fast};
 
@@ -21,8 +21,8 @@ const OrderHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: ${({ theme }) => theme.spacing.lg};
-  padding-bottom: ${({ theme }) => theme.spacing.md};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
+  padding-bottom: ${({ theme }) => theme.spacing.sm};
   border-bottom: 2px solid ${({ theme }) => theme.colors.border};
 `;
 
@@ -55,7 +55,7 @@ const OrderContent = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: ${({ theme }) => theme.spacing.lg};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
 `;
 
 const OrderDetails = styled.div`
@@ -66,13 +66,13 @@ const MenuName = styled.div`
   font-size: ${({ theme }) => theme.fontSize.xl};
   font-weight: ${({ theme }) => theme.fontWeight.bold};
   color: ${({ theme }) => theme.colors.accent};
-  margin-bottom: ${({ theme }) => theme.spacing.sm};
+  margin-bottom: ${({ theme }) => theme.spacing.xs};
 `;
 
 const StyleInfo = styled.div`
   font-size: ${({ theme }) => theme.fontSize.md};
   color: ${({ theme }) => theme.colors.accentAlpha70};
-  margin-bottom: ${({ theme }) => theme.spacing.sm};
+  margin-bottom: ${({ theme }) => theme.spacing.xs};
 `;
 
 const ItemsList = styled.div`
@@ -82,7 +82,7 @@ const ItemsList = styled.div`
 `;
 
 const ItemTag = styled.span`
-  font-size: ${({ theme }) => theme.fontSize.xs};
+  font-size: ${({ theme }) => theme.fontSize.sm};
   color: ${({ theme }) => theme.colors.accent};
   background: ${({ theme }) => theme.colors.buttonBackground};
   padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
@@ -97,8 +97,8 @@ const OrderPrice = styled.div`
 `;
 
 const DeliveryInfo = styled.div`
-  margin-bottom: ${({ theme }) => theme.spacing.lg};
-  padding: ${({ theme }) => theme.spacing.md};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
   background: ${({ theme }) => theme.colors.background};
   border-radius: ${({ theme }) => theme.borderRadius.md};
   border: 1px solid ${({ theme }) => theme.colors.border};
@@ -110,7 +110,7 @@ const DeliveryRow = styled.div`
   gap: ${({ theme }) => theme.spacing.sm};
   color: ${({ theme }) => theme.colors.accent};
   font-size: ${({ theme }) => theme.fontSize.sm};
-  margin-bottom: ${({ theme }) => theme.spacing.xs};
+  margin-bottom: 4px;
 
   &:last-child {
     margin-bottom: 0;
@@ -124,7 +124,7 @@ const DeliveryRow = styled.div`
 
 const DeliveryLabel = styled.span`
   font-weight: ${({ theme }) => theme.fontWeight.medium};
-  min-width: 70px;
+  min-width: 65px;
 `;
 
 const DeliveryValue = styled.span`
@@ -139,12 +139,14 @@ const OrderFooter = styled.div`
 const FooterButton = styled.button<{ variant?: "primary" | "secondary" }>`
   flex: 1;
   background: ${({ variant, theme }) =>
-    variant === "primary" ? theme.colors.primary : theme.colors.buttonBackground};
+    variant === "primary"
+      ? theme.colors.primary
+      : theme.colors.buttonBackground};
   color: ${({ variant, theme }) =>
     variant === "primary" ? theme.colors.white : theme.colors.accent};
   border: none;
   border-radius: ${({ theme }) => theme.borderRadius.md};
-  padding: ${({ theme }) => theme.spacing.md};
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
   font-size: ${({ theme }) => theme.fontSize.md};
   font-weight: ${({ theme }) => theme.fontWeight.medium};
   font-family: ${({ theme }) => theme.fontFamily.miwon};
@@ -246,4 +248,3 @@ export default function OrderCard({
     </Card>
   );
 }
-
