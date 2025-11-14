@@ -1,8 +1,14 @@
 "use client";
 
 import styled from "@emotion/styled";
+import { useEffect, useState } from "react";
 import { Clock } from "lucide-react";
-import { formatPrice } from "@/data/menus";
+import { dinnerMenus, formatPrice } from "@/data/menus";
+import { servingStyles } from "@/data/styles";
+import {
+  getOrderHistory,
+  OrderHistory as OrderHistoryType,
+} from "@/utils/orderHistoryStorage";
 
 const Container = styled.div`
   width: 100%;
@@ -142,53 +148,41 @@ const ReorderButton = styled.button`
   }
 `;
 
-// 샘플 데이터
-const orderHistory = [
-  {
-    id: 1,
-    date: "2025.11.12",
-    items: "발렌타인 디너 (디럭스)",
-    price: formatPrice(Math.round(89000 * 1.6)),
-    status: "completed" as const,
-  },
-  {
-    id: 2,
-    date: "2025.11.10",
-    items: "프렌치 디너 (그랜드)",
-    price: formatPrice(Math.round(65000 * 1.3)),
-    status: "completed" as const,
-  },
-  {
-    id: 3,
-    date: "2025.11.08",
-    items: "잉글리시 디너 (심플)",
-    price: formatPrice(55000),
-    status: "completed" as const,
-  },
-  {
-    id: 4,
-    date: "2025.11.05",
-    items: "샴페인 축제 디너 (디럭스)",
-    price: formatPrice(Math.round(120000 * 1.6)),
-    status: "completed" as const,
-  },
-  {
-    id: 5,
-    date: "2025.11.03",
-    items: "프렌치 디너 (심플)",
-    price: formatPrice(65000),
-    status: "completed" as const,
-  },
-  {
-    id: 6,
-    date: "2025.11.01",
-    items: "발렌타인 디너 (그랜드)",
-    price: formatPrice(Math.round(89000 * 1.3)),
-    status: "completed" as const,
-  },
-];
+const formatDate = (isoDate: string): string => {
+  const date = new Date(isoDate);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}.${month}.${day}`;
+};
+
+const getOrderSummary = (history: OrderHistoryType): string => {
+  const entries = history.orders.map((order) => {
+    const menu = dinnerMenus.find((m) => m.id === order.menuId);
+    const style = servingStyles[order.style];
+    if (!menu) return "알 수 없는 메뉴";
+    return style ? `${menu.name} (${style.name})` : menu.name;
+  });
+
+  if (entries.length === 0) {
+    return "주문 내역";
+  }
+
+  const summary = entries[0];
+  if (entries.length > 1) {
+    return `${summary} 외 ${entries.length - 1}건`;
+  }
+  return summary;
+};
 
 export default function OrderHistory() {
+  const [orderHistory, setOrderHistory] = useState<OrderHistoryType[]>([]);
+
+  useEffect(() => {
+    const history = getOrderHistory();
+    setOrderHistory(history);
+  }, []);
+
   const hasOrders = orderHistory.length > 0;
 
   return (
@@ -203,15 +197,27 @@ export default function OrderHistory() {
                 <OrderHeader>
                   <OrderDate>
                     <Clock size={12} />
-                    <span>{order.date}</span>
+                    <span>{formatDate(order.orderDate)}</span>
                   </OrderDate>
-                  <OrderStatus status={order.status}>완료</OrderStatus>
+                  <OrderStatus status={order.status}>
+                    {order.status === "completed"
+                      ? "완료"
+                      : order.status === "pending"
+                      ? "진행중"
+                      : "취소"}
+                  </OrderStatus>
                 </OrderHeader>
-                <OrderItems>{order.items}</OrderItems>
+                <OrderItems>{getOrderSummary(order)}</OrderItems>
                 <OrderFooter>
-                  <OrderPrice>{order.price}</OrderPrice>
+                  <OrderPrice>{formatPrice(order.total)}</OrderPrice>
                   <ReorderButton
-                    onClick={() => console.log(`재주문: ${order.items}`)}
+                    onClick={() =>
+                      alert(
+                        `재주문 기능은 추후 제공 예정입니다. (주문: ${getOrderSummary(
+                          order
+                        )})`
+                      )
+                    }
                   >
                     바로 주문하기
                   </ReorderButton>
