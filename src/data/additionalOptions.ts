@@ -17,22 +17,22 @@ const itemPrices: Record<string, ItemPriceConfig> = {
   "하트 장식": { unitPrice: 14500, defaultQuantity: 1 },
   "큐피드 장식": { unitPrice: 14500, defaultQuantity: 1 },
 
-  // 프렌치 디너 전용 (총 65,000원)
-  "프렌치-커피": { unitPrice: 10000, defaultQuantity: 1 },
-  "프렌치-와인": { unitPrice: 20000, defaultQuantity: 1 },
+  // 프렌치 디너 전용
+  "프렌치-커피": { unitPrice: 15000, defaultQuantity: 1 },
+  "프렌치-와인": { unitPrice: 25000, defaultQuantity: 1 },
   샐러드: { unitPrice: 15000, defaultQuantity: 1 },
-  "프렌치-스테이크": { unitPrice: 20000, defaultQuantity: 1 },
+  "프렌치-스테이크": { unitPrice: 35000, defaultQuantity: 1 },
 
-  // 잉글리시 디너 전용 (총 55,000원)
+  // 잉글리시 디너 전용
   "에그 스크램블": { unitPrice: 7000, defaultQuantity: 1 },
   베이컨: { unitPrice: 8000, defaultQuantity: 1 },
   빵: { unitPrice: 5000, defaultQuantity: 1 },
   "잉글리시-스테이크": { unitPrice: 35000, defaultQuantity: 1 },
 
-  // 샴페인 축제 디너 전용 (총 120,000원)
+  // 샴페인 축제 디너 전용
   샴페인: { unitPrice: 25000, defaultQuantity: 1 },
-  "바게트 빵": { unitPrice: 3750, defaultQuantity: 4 }, // 15,000 / 4 = 3,750
-  "샴페인-커피": { unitPrice: 20000, defaultQuantity: 1 },
+  "바게트 빵": { unitPrice: 4000, defaultQuantity: 4 }, // 16,000 / 4 = 4,000
+  "샴페인-커피": { unitPrice: 15000, defaultQuantity: 1 },
   "샴페인-와인": { unitPrice: 25000, defaultQuantity: 1 },
   "샴페인-스테이크": { unitPrice: 35000, defaultQuantity: 1 },
 };
