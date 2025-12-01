@@ -1,11 +1,15 @@
 "use client";
 
 import styled from "@emotion/styled";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Mic, MicOff, RotateCcw, Loader2 } from "lucide-react";
 import voiceOrderApi from "@/services/voiceOrderApi";
 import { getUserInfo } from "@/utils/userStorage";
+import {
+  getSpeechRecognition,
+  isSpeechRecognitionSupported,
+} from "@/utils/speechRecognition";
 import type {
   ConversationMessage,
   OrderData,
@@ -133,6 +137,20 @@ const InstructionText = styled.p`
   color: ${({ theme }) => theme.colors.accentAlpha70};
   text-align: center;
   max-width: 500px;
+  line-height: 1.6;
+`;
+
+const InterimText = styled.div`
+  font-size: ${({ theme }) => theme.fontSize.md};
+  color: ${({ theme }) => theme.colors.primary};
+  text-align: center;
+  padding: ${({ theme }) => theme.spacing.md};
+  background: ${({ theme }) => theme.colors.whiteAlpha80};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const ActionButtons = styled.div`
@@ -175,13 +193,15 @@ export default function VoiceRecorder() {
   const [conversation, setConversation] = useState<ConversationMessage[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [orderData, setOrderData] = useState<OrderData | null>(null);
-  
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
+  const [interimText, setInterimText] = useState<string>("");
+  const [isSupported, setIsSupported] = useState(true);
 
   // Initialize chat session on component mount
   useEffect(() => {
-    initializeChat();
+    setIsSupported(isSpeechRecognitionSupported());
+    if (isSpeechRecognitionSupported()) {
+      initializeChat();
+    }
   }, []);
 
   const initializeChat = async () => {
@@ -207,48 +227,48 @@ export default function VoiceRecorder() {
     }
   };
 
-  const startRecording = async () => {
+  const startRecording = () => {
     try {
       setError(null);
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
+      setInterimText("");
+      const speechRecognition = getSpeechRecognition();
 
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
+      speechRecognition.start(
+        (result) => {
+          if (result.isFinal) {
+            // 최종 결과 - 서버로 전송
+            sendTextToServer(result.transcript);
+            setInterimText("");
+          } else {
+            // 중간 결과 - UI에만 표시
+            setInterimText(result.transcript);
+          }
+        },
+        (error) => {
+          setError(error);
+          setIsRecording(false);
         }
-      };
+      );
 
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, {
-          type: "audio/wav",
-        });
-        await sendAudioToServer(audioBlob);
-        
-        // Stop all tracks
-        stream.getTracks().forEach((track) => track.stop());
-      };
-
-      mediaRecorder.start();
       setIsRecording(true);
-    } catch (err) {
-      setError("마이크 접근 권한이 필요합니다.");
+    } catch (err: any) {
+      setError(err.message || "음성 인식을 시작할 수 없습니다.");
       console.error("Recording error:", err);
     }
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
+    try {
+      const speechRecognition = getSpeechRecognition();
+      speechRecognition.stop();
       setIsRecording(false);
+    } catch (err) {
+      console.error("Stop recording error:", err);
     }
   };
 
-  const sendAudioToServer = async (audioBlob: Blob) => {
-    if (!sessionId) {
-      setError("세션이 초기화되지 않았습니다.");
+  const sendTextToServer = async (text: string) => {
+    if (!sessionId || !text.trim()) {
       return;
     }
 
@@ -256,20 +276,15 @@ export default function VoiceRecorder() {
       setIsProcessing(true);
       setError(null);
 
-      // Create audio file
-      const audioFile = new File([audioBlob], "audio.wav", {
-        type: "audio/wav",
-      });
+      // Send text to server
+      const response = await voiceOrderApi.sendTextMessage(sessionId, text);
 
-      // Send to server
-      const response = await voiceOrderApi.sendMessage(sessionId, audioFile);
-
-      // Add user message to conversation
+      // Add messages to conversation
       setConversation((prev) => [
         ...prev,
         {
           role: "user",
-          text: response.recognized_text,
+          text: text,
           timestamp: new Date(),
         },
         {
@@ -282,14 +297,13 @@ export default function VoiceRecorder() {
       // Check if order is completed
       if (response.is_completed && response.order_data) {
         setOrderData(response.order_data);
-        // Handle order completion after a short delay
         setTimeout(() => {
           handleOrderComplete(response.order_data!);
         }, 2000);
       }
     } catch (err: any) {
-      setError(err.message || "음성 처리 중 오류가 발생했습니다.");
-      console.error("Send audio error:", err);
+      setError(err.message || "메시지 전송 중 오류가 발생했습니다.");
+      console.error("Send text error:", err);
     } finally {
       setIsProcessing(false);
     }
@@ -310,7 +324,7 @@ export default function VoiceRecorder() {
       await voiceOrderApi.resetChat(sessionId);
       setConversation([]);
       setOrderData(null);
-      // Reinitialize chat
+      setInterimText("");
       await initializeChat();
     } catch (err) {
       setError("대화 초기화에 실패했습니다.");
@@ -325,6 +339,18 @@ export default function VoiceRecorder() {
       startRecording();
     }
   };
+
+  if (!isSupported) {
+    return (
+      <VoiceCard>
+        <ErrorMessage>
+          이 브라우저는 음성 인식을 지원하지 않습니다.
+          <br />
+          Chrome, Edge, Safari 브라우저를 사용해주세요.
+        </ErrorMessage>
+      </VoiceCard>
+    );
+  }
 
   return (
     <VoiceCard>
@@ -344,15 +370,23 @@ export default function VoiceRecorder() {
         {isProcessing
           ? "처리 중..."
           : isRecording
-          ? "녹음 중... 클릭하여 중지"
+          ? "음성 인식 중... 클릭하여 중지"
           : "마이크 버튼을 눌러 주문하세요"}
       </StatusText>
 
       <InstructionText>
         예시: "발렌타인 디너 디럭스 스타일로 내일 저녁 6시에 주문하고 싶어요"
+        <br />
+        <small>💡 브라우저에서 직접 음성을 텍스트로 변환합니다</small>
       </InstructionText>
 
       {error && <ErrorMessage>{error}</ErrorMessage>}
+
+      {interimText && (
+        <InterimText>
+          🎤 {interimText}
+        </InterimText>
+      )}
 
       {isProcessing && (
         <LoadingIndicator>

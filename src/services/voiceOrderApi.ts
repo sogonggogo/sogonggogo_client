@@ -61,7 +61,7 @@ class VoiceOrderApiService {
   }
 
   /**
-   * 3. POST /api/chat/message - 음성 메시지 전송
+   * 3. POST /api/chat/message - 음성 메시지 전송 (오디오 파일)
    */
   async sendMessage(
     sessionId: string,
@@ -79,6 +79,31 @@ class VoiceOrderApiService {
     if (!response.ok) {
       const error: ApiError = await response.json();
       throw new Error(error.detail || "메시지 전송 실패");
+    }
+
+    return response.json();
+  }
+
+  /**
+   * 3-1. POST /api/chat/message - 텍스트 메시지 전송 (음성 인식 후)
+   * Note: 백엔드가 텍스트 전송을 지원하는 경우 사용
+   */
+  async sendTextMessage(
+    sessionId: string,
+    text: string
+  ): Promise<SendMessageResponse> {
+    const formData = new FormData();
+    formData.append("session_id", sessionId);
+    formData.append("text", text);
+
+    const response = await fetch(`${this.baseUrl}/api/chat/message/text`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error: ApiError = await response.json();
+      throw new Error(error.detail || "텍스트 메시지 전송 실패");
     }
 
     return response.json();
