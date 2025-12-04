@@ -89,6 +89,30 @@ const ConversationBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.md};
+
+  /* 스크롤바 스타일 개선 - 투명 컨테이너 */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: ${({ theme }) => theme.borderRadius.md};
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(92, 51, 23, 0.3);
+    border-radius: ${({ theme }) => theme.borderRadius.md};
+    transition: background 0.2s ease;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(92, 51, 23, 0.5);
+  }
+
+  /* Firefox 스크롤바 스타일 */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(92, 51, 23, 0.3) transparent;
 `;
 
 const MessageBubble = styled.div<{ role: "user" | "assistant" }>`
@@ -179,6 +203,11 @@ const ActionButton = styled.button<{ variant?: "primary" | "secondary" }>`
   cursor: pointer;
   transition: all ${({ theme }) => theme.transition.fast};
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+
   &:hover {
     opacity: 0.9;
     transform: translateY(-2px);
@@ -256,9 +285,10 @@ export default function VoiceRecorder() {
       speechRecognition.start(
         (result) => {
           if (result.isFinal) {
-            // 최종 결과 - 서버로 전송
-            sendTextToServer(result.transcript);
+            // 최종 결과 - UI 상태 유지하고 서버로 전송
             setInterimText("");
+            setIsRecording(false); // 음성 인식 종료
+            sendTextToServer(result.transcript);
           } else {
             // 중간 결과 - UI에만 표시
             setInterimText(result.transcript);
@@ -267,6 +297,12 @@ export default function VoiceRecorder() {
         (error) => {
           setError(error);
           setIsRecording(false);
+        },
+        () => {
+          // 음성 인식 종료 콜백 (자동 종료 포함)
+          // 최종 결과가 없이 종료된 경우에만 UI 업데이트
+          setIsRecording(false);
+          setInterimText("");
         }
       );
 
@@ -293,7 +329,6 @@ export default function VoiceRecorder() {
     }
 
     try {
-      setIsProcessing(true);
       setError(null);
 
       // 한글 스타일을 영어로 변환
@@ -304,6 +339,7 @@ export default function VoiceRecorder() {
 
       if (TEST_MODE) {
         // 테스트 모드: 콘솔에 출력만 하고 API 호출 안함
+        setIsProcessing(true);
 
         // 대화 내역에 추가 (테스트용 응답 포함)
         setConversation((prev) => [
@@ -325,13 +361,7 @@ export default function VoiceRecorder() {
           setIsProcessing(false);
         }, 500);
       } else {
-        // 실제 모드: API 호출 (변환된 텍스트 전송)
-        const response = await voiceOrderApi.sendTextMessage(
-          sessionId,
-          convertedText
-        );
-
-        // Add messages to conversation (원본 텍스트로 표시)
+        // 사용자 메시지 먼저 추가
         setConversation((prev) => [
           ...prev,
           {
@@ -339,12 +369,29 @@ export default function VoiceRecorder() {
             text: text,
             timestamp: new Date(),
           },
+        ]);
+
+        // 처리 중 상태로 변경
+        setIsProcessing(true);
+
+        // 실제 모드: API 호출 (변환된 텍스트 전송)
+        const response = await voiceOrderApi.sendTextMessage(
+          sessionId,
+          convertedText
+        );
+
+        // AI 응답 추가
+        setConversation((prev) => [
+          ...prev,
           {
             role: "assistant",
             text: response.text,
             timestamp: new Date(),
           },
         ]);
+
+        // 처리 완료
+        setIsProcessing(false);
 
         // Check if order is completed
         if (response.is_completed && response.order_data) {
@@ -353,8 +400,6 @@ export default function VoiceRecorder() {
             handleOrderComplete(response.order_data!);
           }, 2000);
         }
-
-        setIsProcessing(false);
       }
     } catch (err: any) {
       setError(err.message || "메시지 전송 중 오류가 발생했습니다.");
@@ -578,20 +623,6 @@ export default function VoiceRecorder() {
           : "마이크 버튼을 눌러 주문하세요"}
       </StatusText>
 
-      <InstructionText>
-        예시: "발렌타인 디너 디럭스 스타일로 내일 저녁 6시에 주문하고 싶어요"
-        <br />
-        <small>💡 브라우저에서 직접 음성을 텍스트로 변환합니다</small>
-        {TEST_MODE && (
-          <>
-            <br />
-            <strong style={{ color: "#ffa500" }}>
-              🧪 테스트 모드: 변환된 텍스트가 콘솔에 출력됩니다
-            </strong>
-          </>
-        )}
-      </InstructionText>
-
       {error && <ErrorMessage>{error}</ErrorMessage>}
 
       {interimText && <InterimText>🎤 {interimText}</InterimText>}
@@ -615,7 +646,7 @@ export default function VoiceRecorder() {
 
           <ActionButtons>
             <ActionButton onClick={handleReset} disabled={isProcessing}>
-              <RotateCcw size={18} />
+              <RotateCcw size={16} />
               대화 초기화
             </ActionButton>
           </ActionButtons>
