@@ -4,6 +4,7 @@ import styled from "@emotion/styled";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveUserInfo, getUserInfo } from "@/utils/userStorage";
+import { userApi } from "@/services/userApi";
 
 const FormCard = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -208,12 +209,8 @@ export default function SignupForm() {
       newErrors.email = "이메일을 입력해주세요.";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = "올바른 이메일 형식이 아닙니다.";
-    } else {
-      // Check if email already exists
-      const existingUser = getUserInfo();
-      if (existingUser && existingUser.email === formData.email) {
-        newErrors.email = "이미 가입된 이메일입니다.";
-      }
+    } else if (emailCheckStatus !== "available") {
+      newErrors.email = "이메일 중복 확인을 해주세요.";
     }
 
     // Password validation
@@ -256,29 +253,62 @@ export default function SignupForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
       return;
     }
 
-    // Save new user info
-    const newUser = {
-      email: formData.email,
-      password: formData.password,
-      name: formData.name,
-      phone: formData.phone,
-      address: formData.address,
-      cardNumber: formData.cardNumber,
-      isRegularCustomer: true, // 회원가입한 사용자는 자동으로 단골 고객
-    };
+    // 이메일 중복 확인이 완료되지 않은 경우
+    if (emailCheckStatus !== "available") {
+      setErrors((prev) => ({
+        ...prev,
+        email: "이메일 중복 확인을 해주세요.",
+      }));
+      return;
+    }
 
-    saveUserInfo(newUser);
-    alert("회원가입이 완료되었습니다! 단골 고객 10% 할인이 자동으로 적용됩니다.");
-    
-    // Redirect to home page with full page reload to update header
-    window.location.href = "/";
+    try {
+      // 카드 번호에서 공백 제거
+      const cleanedCardNumber = formData.cardNumber.replace(/\s/g, "");
+
+      // API 호출
+      const userResponse = await userApi.signup({
+        name: formData.name,
+        address: formData.address,
+        phoneNumber: formData.phone,
+        email: formData.email,
+        password: formData.password,
+        creditCardNumber: cleanedCardNumber || "",
+      });
+
+      // 로컬 스토리지에도 저장 (기존 로직 유지)
+      const newUser = {
+        email: userResponse.email,
+        password: formData.password, // API 응답에는 비밀번호가 없으므로 폼 데이터 사용
+        name: userResponse.name,
+        phone: userResponse.phoneNumber,
+        address: userResponse.address,
+        cardNumber: userResponse.creditCardNumber,
+        isRegularCustomer: true, // 회원가입한 사용자는 자동으로 단골 고객
+      };
+
+      saveUserInfo(newUser);
+      alert("회원가입이 완료되었습니다! 단골 고객 10% 할인이 자동으로 적용됩니다.");
+
+      // Redirect to home page with full page reload to update header
+      window.location.href = "/";
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "회원가입 중 오류가 발생했습니다.";
+      setErrors((prev) => ({
+        ...prev,
+        email: errorMessage.includes("이메일") ? errorMessage : "",
+        submit: errorMessage,
+      }));
+      alert(errorMessage);
+    }
   };
 
   const handleCancel = () => {
@@ -307,34 +337,26 @@ export default function SignupForm() {
     setErrors((prev) => ({ ...prev, email: "" }));
 
     try {
-      // TODO: API 연동 시 여기에 API 호출 코드 추가
-      // const response = await checkEmailDuplicate(formData.email);
-      // if (response.isDuplicate) {
-      //   setEmailCheckStatus("duplicate");
-      //   setErrors((prev) => ({
-      //     ...prev,
-      //     email: "이미 사용 중인 이메일입니다.",
-      //   }));
-      // } else {
-      //   setEmailCheckStatus("available");
-      // }
+      const response = await userApi.checkEmail(formData.email);
 
-      // 임시: 로컬 스토리지에서 중복 체크 (API 연동 전까지)
-      const existingUser = getUserInfo();
-      if (existingUser && existingUser.email === formData.email) {
+      if (response.available) {
+        setEmailCheckStatus("available");
+      } else {
         setEmailCheckStatus("duplicate");
         setErrors((prev) => ({
           ...prev,
           email: "이미 사용 중인 이메일입니다.",
         }));
-      } else {
-        setEmailCheckStatus("available");
       }
     } catch (error) {
       setEmailCheckStatus("idle");
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "중복 확인 중 오류가 발생했습니다.";
       setErrors((prev) => ({
         ...prev,
-        email: "중복 확인 중 오류가 발생했습니다.",
+        email: errorMessage,
       }));
     }
   };
