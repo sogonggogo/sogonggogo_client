@@ -53,15 +53,6 @@ const Input = styled.input`
   }
 `;
 
-const DateTimeRow = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: ${({ theme }) => theme.spacing.md};
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    grid-template-columns: 1fr;
-  }
-`;
 
 const Select = styled.select`
   width: 100%;
@@ -177,7 +168,7 @@ export default function DeliveryForm({
               savedDeliveryInfo.cardNumber
             : formattedCardNumber,
         });
-      } catch (error) {
+      } catch {
         // API 실패 시 로컬 스토리지에서 가져오기
         const savedDeliveryInfo = getDeliveryInfo();
         const localUserInfo = getUserInfo();

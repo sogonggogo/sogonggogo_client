@@ -15,7 +15,7 @@ import { dinnerMenus } from "@/data/menus";
 import { ServingStyleType } from "@/data/styles";
 import { getItemsForMenu, SelectedItem } from "@/data/additionalOptions";
 import { saveOrders } from "@/utils/orderStorage";
-import { saveDeliveryInfo, getDeliveryInfo } from "@/utils/deliveryStorage";
+import { saveDeliveryInfo } from "@/utils/deliveryStorage";
 
 const VoiceCard = styled.div`
   width: 100%;
@@ -159,13 +159,6 @@ const ErrorMessage = styled.div`
   text-align: center;
 `;
 
-const InstructionText = styled.p`
-  font-size: ${({ theme }) => theme.fontSize.sm};
-  color: ${({ theme }) => theme.colors.accentAlpha70};
-  text-align: center;
-  max-width: 500px;
-  line-height: 1.6;
-`;
 
 const InterimText = styled.div`
   font-size: ${({ theme }) => theme.fontSize.md};
@@ -307,8 +300,10 @@ export default function VoiceRecorder() {
       );
 
       setIsRecording(true);
-    } catch (err: any) {
-      setError(err.message || "음성 인식을 시작할 수 없습니다.");
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "음성 인식을 시작할 수 없습니다.";
+      setError(errorMessage);
       console.error("Recording error:", err);
     }
   };
@@ -401,8 +396,12 @@ export default function VoiceRecorder() {
           }, 2000);
         }
       }
-    } catch (err: any) {
-      setError(err.message || "메시지 전송 중 오류가 발생했습니다.");
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "메시지 전송 중 오류가 발생했습니다.";
+      setError(errorMessage);
       console.error("Send text error:", err);
       setIsProcessing(false);
     }

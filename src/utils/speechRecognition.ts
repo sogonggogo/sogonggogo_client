@@ -6,8 +6,11 @@ export interface SpeechRecognitionResult {
   isFinal: boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SpeechRecognitionType = any;
+
 export class SpeechRecognitionService {
-  private recognition: any;
+  private recognition: SpeechRecognitionType;
   private isListening: boolean = false;
   private silenceTimer: NodeJS.Timeout | null = null;
   private onEndCallback: (() => void) | null = null;
@@ -15,7 +18,9 @@ export class SpeechRecognitionService {
   constructor() {
     // Check if browser supports Speech Recognition
     const SpeechRecognition =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window as any).SpeechRecognition ||
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
@@ -55,6 +60,7 @@ export class SpeechRecognitionService {
 
     this.onEndCallback = onEnd || null;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.recognition.onresult = (event: any) => {
       const last = event.results.length - 1;
       const result = event.results[last];
@@ -77,6 +83,7 @@ export class SpeechRecognitionService {
       }
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.recognition.onerror = (event: any) => {
       console.error("Speech recognition error:", event.error);
       this.isListening = false;
@@ -200,6 +207,9 @@ export const getSpeechRecognition = (): SpeechRecognitionService => {
 // Check if browser supports speech recognition
 export const isSpeechRecognitionSupported = (): boolean => {
   return !!(
-    (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).SpeechRecognition ||
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).webkitSpeechRecognition
   );
 };

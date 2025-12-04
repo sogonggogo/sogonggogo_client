@@ -143,7 +143,7 @@ export default function UpdateInfoForm() {
           address: userResponse.address || "",
           cardNumber: userResponse.creditCardNumber || "",
         });
-      } catch (error) {
+      } catch {
         // API 실패 시 로컬 스토리지에서 로드
         const userInfo = getUserInfo();
         if (userInfo) {
@@ -264,7 +264,13 @@ export default function UpdateInfoForm() {
 
     try {
       // API 호출 - 변경된 필드만 전송
-      const updateData: any = {
+      const updateData: {
+        name: string;
+        address: string;
+        phone: string;
+        cardNumber?: string;
+        password?: string;
+      } = {
         name: formData.name,
         address: formData.address,
         phone: formData.phone,

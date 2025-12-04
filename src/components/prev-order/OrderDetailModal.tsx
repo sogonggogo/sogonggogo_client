@@ -8,9 +8,6 @@ import {
   Clock,
   CreditCard,
   Package,
-  User,
-  Phone,
-  Mail,
 } from "lucide-react";
 import { OrderHistory } from "@/utils/orderHistoryStorage";
 import { dinnerMenus, formatPrice } from "@/data/menus";

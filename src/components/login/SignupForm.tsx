@@ -3,7 +3,6 @@
 import styled from "@emotion/styled";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { saveUserInfo, getUserInfo } from "@/utils/userStorage";
 import { userApi } from "@/services/userApi";
 
 const FormCard = styled.div`
@@ -98,13 +97,6 @@ const Button = styled.button<{ variant?: "primary" | "secondary" }>`
   }
 `;
 
-const InfoText = styled.p`
-  font-size: ${({ theme }) => theme.fontSize.sm};
-  color: ${({ theme }) => theme.colors.accentAlpha70};
-  margin-bottom: ${({ theme }) => theme.spacing.lg};
-  font-family: ${({ theme }) => theme.fontFamily.miwon};
-  line-height: 1.5;
-`;
 
 const EmailInputWrapper = styled.div`
   display: flex;

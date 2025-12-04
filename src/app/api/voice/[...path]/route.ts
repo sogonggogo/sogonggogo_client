@@ -70,7 +70,7 @@ async function handler(request: NextRequest) {
     );
 
     return nextResponse;
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { detail: "Voice API 프록시 오류가 발생했습니다." },
       { status: 500 }
@@ -98,7 +98,7 @@ export async function DELETE(request: NextRequest) {
   return handler(request);
 }
 
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS() {
   return new NextResponse(null, {
     status: 200,
     headers: {

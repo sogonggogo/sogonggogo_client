@@ -4,7 +4,10 @@ import styled from "@emotion/styled";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle } from "lucide-react";
-import { getOrderHistory } from "@/utils/orderHistoryStorage";
+import {
+  getOrderHistory,
+  type OrderHistory,
+} from "@/utils/orderHistoryStorage";
 import OrderCompleteSummary from "@/components/order/order-complete/OrderCompleteSummary";
 
 const Container = styled.div`
@@ -93,7 +96,7 @@ const ErrorMessage = styled.div`
 
 export default function OrderCompletePage() {
   const router = useRouter();
-  const [latestOrder, setLatestOrder] = useState<any>(null);
+  const [latestOrder, setLatestOrder] = useState<OrderHistory | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

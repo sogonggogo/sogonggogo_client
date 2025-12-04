@@ -15,7 +15,6 @@ import {
   getOrders,
   updateOrder,
   deleteOrder,
-  clearOrders,
   OrderItem,
 } from "@/utils/orderStorage";
 import { getItemsForMenu } from "@/data/additionalOptions";

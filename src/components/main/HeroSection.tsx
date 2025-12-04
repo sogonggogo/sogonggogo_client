@@ -19,16 +19,6 @@ const fadeInLeft = keyframes`
   }
 `;
 
-const fadeInRight = keyframes`
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-`;
 
 const fadeIn = keyframes`
   from {

@@ -160,7 +160,7 @@ export default function Header() {
         setLoggedIn(false);
         alert("로그아웃 되었습니다.");
         window.location.href = "/";
-      } catch (error) {
+      } catch {
         // 로그아웃 실패해도 로컬 스토리지는 정리
         clearUserInfo();
         setLoggedIn(false);

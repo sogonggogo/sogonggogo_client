@@ -15,7 +15,7 @@ import { dinnerMenus } from "@/data/menus";
 import { servingStyles, ServingStyleType } from "@/data/styles";
 import { getItemsForMenu, SelectedItem } from "@/data/additionalOptions";
 import { saveOrders } from "@/utils/orderStorage";
-import { orderApi, OrderResponse } from "@/services/orderApi";
+import { orderApi } from "@/services/orderApi";
 
 const Container = styled.div`
   min-height: 100vh;

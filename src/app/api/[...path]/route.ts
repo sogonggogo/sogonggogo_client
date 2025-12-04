@@ -69,7 +69,7 @@ async function handleRequest(
       if (text) {
         body = text;
       }
-    } catch (error) {
+    } catch {
       // 본문이 없는 경우 무시
     }
   }

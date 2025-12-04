@@ -7,7 +7,7 @@ import { Clock } from "lucide-react";
 import { dinnerMenus, formatPrice } from "@/data/menus";
 import { servingStyles, ServingStyleType } from "@/data/styles";
 import { OrderHistory as OrderHistoryType } from "@/utils/orderHistoryStorage";
-import { orderApi, OrderResponse } from "@/services/orderApi";
+import { orderApi } from "@/services/orderApi";
 import { SelectedItem, getItemsForMenu } from "@/data/additionalOptions";
 import { saveOrders } from "@/utils/orderStorage";
 

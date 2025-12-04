@@ -65,7 +65,6 @@ interface StyleSelectorProps {
 export default function StyleSelector({
   currentStyle,
   availableStyles,
-  basePrice,
   onSelectStyle,
 }: StyleSelectorProps) {
   return (

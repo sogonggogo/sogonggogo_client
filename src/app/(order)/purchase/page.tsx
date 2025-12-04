@@ -203,7 +203,7 @@ export default function PurchasePage() {
       let customerInfo;
       try {
         customerInfo = await userApi.getMe();
-      } catch (error) {
+      } catch {
         // API 실패 시 로컬 스토리지에서 가져오기
         const localUser = getUserInfo();
         if (!localUser) {
