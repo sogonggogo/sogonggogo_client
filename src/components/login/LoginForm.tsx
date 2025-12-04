@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveUserInfo } from "@/utils/userStorage";
+import { userApi } from "@/services/userApi";
 
 const LoginCard = styled.div`
   width: 100%;
@@ -81,23 +82,53 @@ const StyledLink = styled(Link)`
   }
 `;
 
+const ErrorMessage = styled.p`
+  color: ${({ theme }) => theme.colors.primary};
+  font-size: ${({ theme }) => theme.fontSize.sm};
+  margin-top: ${({ theme }) => theme.spacing.sm};
+  font-family: ${({ theme }) => theme.fontFamily.miwon};
+  text-align: center;
+`;
+
 export default function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Save user info - all logged in users are regular customers (10% discount)
-    saveUserInfo({
-      email,
-      isRegularCustomer: true, // 로그인한 모든 사용자는 자동으로 단골 고객
-    });
-    
-    alert("로그인 되었습니다! 단골 고객 10% 할인이 자동으로 적용됩니다.");
-    
-    // Use window.location to ensure full page reload and Header update
-    window.location.href = "/";
+    setIsLoading(true);
+    setError("");
+
+    try {
+      // API 호출
+      const userResponse = await userApi.login(email, password);
+
+      // 로컬 스토리지에 저장
+      saveUserInfo({
+        email: userResponse.email,
+        password: password, // 로컬 스토리지용
+        name: userResponse.name,
+        phone: userResponse.phone,
+        address: userResponse.address,
+        cardNumber: userResponse.creditCardNumber,
+        isRegularCustomer: userResponse.isRegularCustomer,
+      });
+
+      alert("로그인 되었습니다! 단골 고객 10% 할인이 자동으로 적용됩니다.");
+
+      // Use window.location to ensure full page reload and Header update
+      window.location.href = "/";
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "로그인 중 오류가 발생했습니다.";
+      setError(errorMessage);
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -121,11 +152,17 @@ export default function LoginForm() {
             type="password"
             id="password"
             placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
         </FormGroup>
 
-        <LoginButton type="submit">로그인</LoginButton>
+        {error && <ErrorMessage>{error}</ErrorMessage>}
+
+        <LoginButton type="submit" disabled={isLoading}>
+          {isLoading ? "로그인 중..." : "로그인"}
+        </LoginButton>
 
         <LinksContainer>
           <StyledLink href="/login/signup">회원가입</StyledLink>
@@ -134,4 +171,3 @@ export default function LoginForm() {
     </LoginCard>
   );
 }
-

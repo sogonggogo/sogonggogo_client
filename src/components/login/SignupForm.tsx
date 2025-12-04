@@ -277,7 +277,7 @@ export default function SignupForm() {
       const userResponse = await userApi.signup({
         name: formData.name,
         address: formData.address,
-        phoneNumber: formData.phone,
+        phone: formData.phone,
         email: formData.email,
         password: formData.password,
         creditCardNumber: cleanedCardNumber || "",
@@ -288,20 +288,24 @@ export default function SignupForm() {
         email: userResponse.email,
         password: formData.password, // API 응답에는 비밀번호가 없으므로 폼 데이터 사용
         name: userResponse.name,
-        phone: userResponse.phoneNumber,
+        phone: userResponse.phone,
         address: userResponse.address,
         cardNumber: userResponse.creditCardNumber,
-        isRegularCustomer: true, // 회원가입한 사용자는 자동으로 단골 고객
+        isRegularCustomer: userResponse.isRegularCustomer,
       };
 
       saveUserInfo(newUser);
-      alert("회원가입이 완료되었습니다! 단골 고객 10% 할인이 자동으로 적용됩니다.");
+      alert(
+        "회원가입이 완료되었습니다! 단골 고객 10% 할인이 자동으로 적용됩니다."
+      );
 
       // Redirect to home page with full page reload to update header
       window.location.href = "/";
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "회원가입 중 오류가 발생했습니다.";
+        error instanceof Error
+          ? error.message
+          : "회원가입 중 오류가 발생했습니다.";
       setErrors((prev) => ({
         ...prev,
         email: errorMessage.includes("이메일") ? errorMessage : "",
@@ -364,7 +368,8 @@ export default function SignupForm() {
   return (
     <FormCard>
       <InfoText>
-        회원가입을 하시면 자동으로 단골 고객으로 등록되어 모든 주문에서 10% 할인 혜택을 받으실 수 있습니다.
+        회원가입을 하시면 자동으로 단골 고객으로 등록되어 모든 주문에서 10% 할인
+        혜택을 받으실 수 있습니다.
       </InfoText>
 
       <form onSubmit={handleSubmit}>
@@ -485,7 +490,7 @@ export default function SignupForm() {
           </FormColumn>
 
           <FormColumn>
-            <Label htmlFor="cardNumber">신용카드 번호 (선택사항)</Label>
+            <Label htmlFor="cardNumber">신용카드 번호</Label>
             <Input
               type="text"
               id="cardNumber"
@@ -513,6 +518,3 @@ export default function SignupForm() {
     </FormCard>
   );
 }
-
-
-

@@ -4,6 +4,7 @@ import styled from "@emotion/styled";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getUserInfo, saveUserInfo } from "@/utils/userStorage";
+import { userApi } from "@/services/userApi";
 
 const FormCard = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -110,21 +111,40 @@ export default function UpdateInfoForm() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Load current user info
-    const userInfo = getUserInfo();
-    if (userInfo) {
-      setFormData({
-        email: userInfo.email || "",
-        password: "",
-        confirmPassword: "",
-        name: userInfo.name || "",
-        phone: userInfo.phone || "",
-        address: userInfo.address || "",
-        cardNumber: userInfo.cardNumber || "",
-      });
-    }
+    // Load current user info from API
+    const loadUserInfo = async () => {
+      try {
+        const userResponse = await userApi.getMe();
+        setFormData({
+          email: userResponse.email || "",
+          password: "",
+          confirmPassword: "",
+          name: userResponse.name || "",
+          phone: userResponse.phone || "",
+          address: userResponse.address || "",
+          cardNumber: userResponse.creditCardNumber || "",
+        });
+      } catch (error) {
+        // API 실패 시 로컬 스토리지에서 로드
+        const userInfo = getUserInfo();
+        if (userInfo) {
+          setFormData({
+            email: userInfo.email || "",
+            password: "",
+            confirmPassword: "",
+            name: userInfo.name || "",
+            phone: userInfo.phone || "",
+            address: userInfo.address || "",
+            cardNumber: userInfo.cardNumber || "",
+          });
+        }
+      }
+    };
+
+    loadUserInfo();
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -195,37 +215,67 @@ export default function UpdateInfoForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
       return;
     }
 
-    // Get current user info
-    const currentUser = getUserInfo();
-    if (!currentUser) {
-      alert("로그인 정보를 찾을 수 없습니다.");
-      return;
+    setIsLoading(true);
+
+    try {
+      // API 호출 - 변경된 필드만 전송
+      const updateData: any = {
+        name: formData.name,
+        address: formData.address,
+        phone: formData.phone,
+      };
+
+      // 카드 번호가 있으면 추가 (공백 제거)
+      if (formData.cardNumber && formData.cardNumber.trim()) {
+        updateData.creditCardNumber = formData.cardNumber.replace(/\s/g, "");
+      }
+
+      // 비밀번호가 입력되었으면 추가
+      if (formData.password) {
+        updateData.password = formData.password;
+      }
+
+      const userResponse = await userApi.updateMe(updateData);
+
+      // 로컬 스토리지 업데이트
+      const currentUser = getUserInfo();
+      const updatedUser = {
+        ...currentUser,
+        email: userResponse.email,
+        name: userResponse.name,
+        phone: userResponse.phone,
+        address: userResponse.address,
+        cardNumber: userResponse.creditCardNumber,
+        isRegularCustomer: userResponse.isRegularCustomer,
+      };
+
+      // 비밀번호가 변경되었으면 업데이트
+      if (formData.password) {
+        updatedUser.password = formData.password;
+      }
+
+      saveUserInfo(updatedUser);
+      alert("정보가 수정되었습니다!");
+      router.push("/");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "정보 수정 중 오류가 발생했습니다.";
+      setErrors((prev) => ({
+        ...prev,
+        submit: errorMessage,
+      }));
+      alert(errorMessage);
+      setIsLoading(false);
     }
-
-    // Update user info
-    const updatedUser = {
-      ...currentUser,
-      name: formData.name,
-      phone: formData.phone,
-      address: formData.address,
-      cardNumber: formData.cardNumber,
-    };
-
-    // Update password only if provided
-    if (formData.password) {
-      updatedUser.password = formData.password;
-    }
-
-    saveUserInfo(updatedUser);
-    alert("정보가 수정되었습니다!");
-    router.push("/");
   };
 
   const handleCancel = () => {
@@ -328,7 +378,7 @@ export default function UpdateInfoForm() {
           </FormColumn>
 
           <FormColumn>
-            <Label htmlFor="cardNumber">신용카드 번호 (선택사항)</Label>
+            <Label htmlFor="cardNumber">신용카드 번호</Label>
             <Input
               type="text"
               id="cardNumber"
@@ -345,11 +395,11 @@ export default function UpdateInfoForm() {
         </FormRow>
 
         <ButtonGroup>
-          <Button type="button" onClick={handleCancel}>
+          <Button type="button" onClick={handleCancel} disabled={isLoading}>
             취소
           </Button>
-          <Button type="submit" variant="primary">
-            수정하기
+          <Button type="submit" variant="primary" disabled={isLoading}>
+            {isLoading ? "수정 중..." : "수정하기"}
           </Button>
         </ButtonGroup>
       </form>

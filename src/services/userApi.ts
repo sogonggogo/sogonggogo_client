@@ -10,15 +10,16 @@ export interface UserResponse {
   id: number;
   name: string;
   address: string;
-  phoneNumber: string;
+  phone: string;
   email: string;
   creditCardNumber: string;
+  isRegularCustomer: boolean;
 }
 
 export interface SignupRequest {
   name: string;
   address: string;
-  phoneNumber: string;
+  phone: string;
   email: string;
   password: string;
   creditCardNumber: string;
@@ -72,7 +73,7 @@ class UserApiService {
         throw new Error("이미 사용 중인 이메일입니다.");
       }
       if (response.status === 400) {
-        throw new Error("입력 정보가 올바르지 않습니다.");
+        throw new Error("검증 실패.");
       }
       throw new Error(`회원가입 실패: ${response.statusText}`);
     }
