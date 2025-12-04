@@ -66,7 +66,7 @@ const LoginButton = styled.button`
 
 const LinksContainer = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   margin-top: ${({ theme }) => theme.spacing.lg};
   font-size: ${({ theme }) => theme.fontSize.sm};
 `;
@@ -128,8 +128,7 @@ export default function LoginForm() {
         <LoginButton type="submit">로그인</LoginButton>
 
         <LinksContainer>
-          <StyledLink href="/signup">회원가입</StyledLink>
-          <StyledLink href="/forgot-password">비밀번호 찾기</StyledLink>
+          <StyledLink href="/login/signup">회원가입</StyledLink>
         </LinksContainer>
       </form>
     </LoginCard>

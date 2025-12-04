@@ -185,6 +185,9 @@ const ActionButton = styled.button<{ variant?: "primary" | "secondary" }>`
   }
 `;
 
+// 테스트 모드 활성화 (API 통신 없이 음성 인식만 테스트)
+const TEST_MODE = true;
+
 export default function VoiceRecorder() {
   const router = useRouter();
   const [isRecording, setIsRecording] = useState(false);
@@ -200,7 +203,20 @@ export default function VoiceRecorder() {
   useEffect(() => {
     setIsSupported(isSpeechRecognitionSupported());
     if (isSpeechRecognitionSupported()) {
-      initializeChat();
+      if (TEST_MODE) {
+        // 테스트 모드: API 호출 없이 초기화
+        console.log("🧪 [TEST MODE] 음성 인식 테스트 모드 활성화");
+        setSessionId("test-session-id");
+        setConversation([
+          {
+            role: "assistant",
+            text: "테스트 모드입니다. 음성을 말씀하시면 변환된 텍스트가 콘솔에 출력됩니다.",
+            timestamp: new Date(),
+          },
+        ]);
+      } else {
+        initializeChat();
+      }
     }
   }, []);
 
@@ -276,35 +292,67 @@ export default function VoiceRecorder() {
       setIsProcessing(true);
       setError(null);
 
-      // Send text to server
-      const response = await voiceOrderApi.sendTextMessage(sessionId, text);
+      if (TEST_MODE) {
+        // 테스트 모드: 콘솔에 출력만 하고 API 호출 안함
+        console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        console.log("🎤 [음성 인식 결과]");
+        console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        console.log("📝 변환된 텍스트:", text);
+        console.log("📅 시간:", new Date().toLocaleString("ko-KR"));
+        console.log("📏 텍스트 길이:", text.length, "자");
+        console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
-      // Add messages to conversation
-      setConversation((prev) => [
-        ...prev,
-        {
-          role: "user",
-          text: text,
-          timestamp: new Date(),
-        },
-        {
-          role: "assistant",
-          text: response.text,
-          timestamp: new Date(),
-        },
-      ]);
+        // 대화 내역에 추가 (테스트용 응답 포함)
+        setConversation((prev) => [
+          ...prev,
+          {
+            role: "user",
+            text: text,
+            timestamp: new Date(),
+          },
+          {
+            role: "assistant",
+            text: `✅ 음성 인식 성공!\n인식된 텍스트: "${text}"\n\n(테스트 모드: 실제 API 호출 없음)`,
+            timestamp: new Date(),
+          },
+        ]);
 
-      // Check if order is completed
-      if (response.is_completed && response.order_data) {
-        setOrderData(response.order_data);
+        // 짧은 지연 후 처리 완료
         setTimeout(() => {
-          handleOrderComplete(response.order_data!);
-        }, 2000);
+          setIsProcessing(false);
+        }, 500);
+      } else {
+        // 실제 모드: API 호출
+        const response = await voiceOrderApi.sendTextMessage(sessionId, text);
+
+        // Add messages to conversation
+        setConversation((prev) => [
+          ...prev,
+          {
+            role: "user",
+            text: text,
+            timestamp: new Date(),
+          },
+          {
+            role: "assistant",
+            text: response.text,
+            timestamp: new Date(),
+          },
+        ]);
+
+        // Check if order is completed
+        if (response.is_completed && response.order_data) {
+          setOrderData(response.order_data);
+          setTimeout(() => {
+            handleOrderComplete(response.order_data!);
+          }, 2000);
+        }
+        
+        setIsProcessing(false);
       }
     } catch (err: any) {
       setError(err.message || "메시지 전송 중 오류가 발생했습니다.");
       console.error("Send text error:", err);
-    } finally {
       setIsProcessing(false);
     }
   };
@@ -321,11 +369,27 @@ export default function VoiceRecorder() {
 
     try {
       setError(null);
-      await voiceOrderApi.resetChat(sessionId);
-      setConversation([]);
-      setOrderData(null);
-      setInterimText("");
-      await initializeChat();
+      
+      if (TEST_MODE) {
+        // 테스트 모드: API 호출 없이 초기화
+        console.log("🔄 [TEST MODE] 대화 초기화");
+        setConversation([
+          {
+            role: "assistant",
+            text: "테스트 모드입니다. 음성을 말씀하시면 변환된 텍스트가 콘솔에 출력됩니다.",
+            timestamp: new Date(),
+          },
+        ]);
+        setOrderData(null);
+        setInterimText("");
+      } else {
+        // 실제 모드: API 호출
+        await voiceOrderApi.resetChat(sessionId);
+        setConversation([]);
+        setOrderData(null);
+        setInterimText("");
+        await initializeChat();
+      }
     } catch (err) {
       setError("대화 초기화에 실패했습니다.");
       console.error("Reset error:", err);
@@ -378,6 +442,14 @@ export default function VoiceRecorder() {
         예시: "발렌타인 디너 디럭스 스타일로 내일 저녁 6시에 주문하고 싶어요"
         <br />
         <small>💡 브라우저에서 직접 음성을 텍스트로 변환합니다</small>
+        {TEST_MODE && (
+          <>
+            <br />
+            <strong style={{ color: "#ffa500" }}>
+              🧪 테스트 모드: 변환된 텍스트가 콘솔에 출력됩니다
+            </strong>
+          </>
+        )}
       </InstructionText>
 
       {error && <ErrorMessage>{error}</ErrorMessage>}
