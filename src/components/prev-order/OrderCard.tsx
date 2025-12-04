@@ -35,19 +35,42 @@ const OrderDate = styled.div`
   font-weight: ${({ theme }) => theme.fontWeight.medium};
 `;
 
+type OrderStatusType =
+  | "PENDING"
+  | "APPROVED"
+  | "COOKING"
+  | "READY_FOR_DELIVERY"
+  | "IN_DELIVERY"
+  | "COMPLETED"
+  | "REJECTED";
+
 const OrderStatus = styled.span<{
-  status: "completed" | "pending" | "cancelled";
+  status: OrderStatusType;
 }>`
   font-size: ${({ theme }) => theme.fontSize.sm};
   padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
   border-radius: ${({ theme }) => theme.borderRadius.sm};
   font-weight: ${({ theme }) => theme.fontWeight.bold};
-  background: ${({ status, theme }) =>
-    status === "completed"
-      ? theme.colors.primary
-      : status === "pending"
-      ? theme.colors.secondary
-      : theme.colors.accent};
+  background: ${({ status, theme }) => {
+    switch (status) {
+      case "COMPLETED":
+        return theme.colors.primary; // 완료 - 주황색
+      case "PENDING":
+        return "#FFA500"; // 승인 대기중 - 오렌지
+      case "APPROVED":
+        return "#4169E1"; // 조리 대기중 - 로얄블루
+      case "COOKING":
+        return "#FF6347"; // 조리중 - 토마토
+      case "READY_FOR_DELIVERY":
+        return "#32CD32"; // 배달 대기중 - 라임그린
+      case "IN_DELIVERY":
+        return "#1E90FF"; // 배달중 - 다저블루
+      case "REJECTED":
+        return theme.colors.accent; // 주문 거절 - 갈색
+      default:
+        return theme.colors.secondary;
+    }
+  }};
   color: ${({ theme }) => theme.colors.white};
 `;
 
@@ -159,6 +182,27 @@ const FooterButton = styled.button<{ variant?: "primary" | "secondary" }>`
   }
 `;
 
+const getStatusLabel = (status: OrderStatusType): string => {
+  switch (status) {
+    case "PENDING":
+      return "승인 대기중";
+    case "APPROVED":
+      return "조리 대기중";
+    case "COOKING":
+      return "조리중";
+    case "READY_FOR_DELIVERY":
+      return "배달 대기중";
+    case "IN_DELIVERY":
+      return "배달중";
+    case "COMPLETED":
+      return "완료";
+    case "REJECTED":
+      return "주문 거절";
+    default:
+      return "알 수 없음";
+  }
+};
+
 interface Order {
   id: string | number;
   date: string;
@@ -166,7 +210,7 @@ interface Order {
   style: string;
   items: string[];
   price: number;
-  status: "completed" | "pending" | "cancelled";
+  status: OrderStatusType;
   deliveryAddress?: string;
   deliveryDate?: string;
   deliveryTime?: string;
@@ -191,7 +235,7 @@ export default function OrderCard({
           <span>{order.date}</span>
         </OrderDate>
         <OrderStatus status={order.status}>
-          {order.status === "completed" ? "완료" : "진행중"}
+          {getStatusLabel(order.status)}
         </OrderStatus>
       </OrderHeader>
 

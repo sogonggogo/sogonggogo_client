@@ -6,7 +6,11 @@ import { useRouter } from "next/navigation";
 import { Clock } from "lucide-react";
 import OrderCard from "@/components/prev-order/OrderCard";
 import OrderDetailModal from "@/components/prev-order/OrderDetailModal";
-import { OrderHistory, addOrderHistory } from "@/utils/orderHistoryStorage";
+import {
+  OrderHistory,
+  addOrderHistory,
+  OrderStatusType,
+} from "@/utils/orderHistoryStorage";
 import { dinnerMenus } from "@/data/menus";
 import { servingStyles, ServingStyleType } from "@/data/styles";
 import { getItemsForMenu, SelectedItem } from "@/data/additionalOptions";
@@ -130,7 +134,9 @@ const convertToOrderCardFormat = (history: OrderHistory) => {
         : servingStyles[history.orders[0]?.style]?.name || "스타일",
     items: allItems,
     price: history.total,
-    status: history.status,
+    status: (typeof history.status === "string"
+      ? history.status.toUpperCase()
+      : history.status) as OrderStatusType,
     deliveryAddress: history.deliveryInfo.address,
     deliveryDate: formatDeliveryDate(history.deliveryInfo.date),
     deliveryTime: history.deliveryInfo.time,
@@ -199,10 +205,7 @@ export default function PrevOrderPage() {
             discount: order.pricing.discount,
             total: order.pricing.total,
             isRegularCustomer: order.customer.isRegularCustomer,
-            status: order.status.toLowerCase() as
-              | "completed"
-              | "pending"
-              | "cancelled",
+            status: order.status.toUpperCase() as OrderStatusType,
           };
         });
 

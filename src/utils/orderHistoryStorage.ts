@@ -1,6 +1,15 @@
 import { OrderItem } from "./orderStorage";
 import { DeliveryInfo } from "./deliveryStorage";
 
+export type OrderStatusType =
+  | "PENDING"
+  | "APPROVED"
+  | "COOKING"
+  | "READY_FOR_DELIVERY"
+  | "IN_DELIVERY"
+  | "COMPLETED"
+  | "REJECTED";
+
 export interface OrderHistory {
   id: string;
   orderDate: string; // ISO date string
@@ -10,7 +19,7 @@ export interface OrderHistory {
   discount: number;
   total: number;
   isRegularCustomer: boolean;
-  status: "completed" | "pending" | "cancelled";
+  status: OrderStatusType | string; // string for backward compatibility
 }
 
 const STORAGE_KEY = "mr-daebak-order-history";
@@ -36,7 +45,9 @@ export const saveOrderHistory = (orderHistories: OrderHistory[]): void => {
   }
 };
 
-export const addOrderHistory = (orderHistory: Omit<OrderHistory, "id">): void => {
+export const addOrderHistory = (
+  orderHistory: Omit<OrderHistory, "id">
+): void => {
   const histories = getOrderHistory();
   const newHistory: OrderHistory = {
     ...orderHistory,
@@ -51,4 +62,3 @@ export const clearOrderHistory = (): void => {
   if (typeof window === "undefined") return;
   localStorage.removeItem(STORAGE_KEY);
 };
-
