@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { CreditCard, Tag } from "lucide-react";
 import { getOrders, clearOrders } from "@/utils/orderStorage";
 import { getDeliveryInfo, clearDeliveryInfo } from "@/utils/deliveryStorage";
-import { isRegularCustomer } from "@/utils/userStorage";
+import { getUserInfo, isRegularCustomer } from "@/utils/userStorage";
 import { addOrderHistory } from "@/utils/orderHistoryStorage";
 import { dinnerMenus, formatPrice } from "@/data/menus";
 import { calculatePriceWithStyle } from "@/data/styles";
@@ -14,6 +14,8 @@ import { getItemsForMenu } from "@/data/additionalOptions";
 import OrderSummary from "@/components/order/purchase/OrderSummary";
 import DeliveryInfoDisplay from "@/components/order/purchase/DeliveryInfoDisplay";
 import PriceSummary from "@/components/order/purchase/PriceSummary";
+import { orderApi, OrderRequest } from "@/services/orderApi";
+import { userApi } from "@/services/userApi";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -135,7 +137,7 @@ export default function PurchasePage() {
   useEffect(() => {
     const savedOrders = getOrders();
     const savedDelivery = getDeliveryInfo();
-    
+
     if (savedOrders.length === 0 || !savedDelivery) {
       router.push("/select-dish");
       return;
@@ -196,29 +198,154 @@ export default function PurchasePage() {
   const handlePayment = async () => {
     setIsProcessing(true);
 
-    // Simulate payment process
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      // 사용자 정보 가져오기
+      let customerInfo;
+      try {
+        customerInfo = await userApi.getMe();
+      } catch (error) {
+        // API 실패 시 로컬 스토리지에서 가져오기
+        const localUser = getUserInfo();
+        if (!localUser) {
+          alert("사용자 정보를 찾을 수 없습니다. 로그인 후 다시 시도해주세요.");
+          setIsProcessing(false);
+          return;
+        }
+        customerInfo = {
+          email: localUser.email || "",
+          name: localUser.name || "",
+          phone: localUser.phone || "",
+          isRegularCustomer: localUser.isRegularCustomer || false,
+        };
+      }
 
-    // Save order to history before clearing
-    if (deliveryInfo) {
-      addOrderHistory({
-        orderDate: new Date().toISOString(),
-        orders: orders,
-        deliveryInfo: deliveryInfo,
-        subtotal: subtotal,
-        discount: discount,
-        total: total,
-        isRegularCustomer: isRegular,
-        status: "completed",
+      // 주문 아이템 변환
+      const orderItems = orders.map((order) => {
+        const menu = dinnerMenus.find((m) => m.id === order.menuId);
+        if (!menu) throw new Error("메뉴를 찾을 수 없습니다.");
+
+        const basePrice = calculatePriceWithStyle(menu.basePrice, order.style);
+        const availableItems = getItemsForMenu(order.menuId);
+        const selectedItems =
+          order.selectedItems ||
+          availableItems.map((item) => ({
+            name: item.name,
+            quantity: item.defaultQuantity || 1,
+          }));
+
+        // selectedItems를 API 형식으로 변환
+        const apiSelectedItems = selectedItems
+          .filter((si) => si.quantity > 0)
+          .map((si) => {
+            const itemData = availableItems.find((i) => i.name === si.name);
+            if (!itemData)
+              throw new Error(`아이템을 찾을 수 없습니다: ${si.name}`);
+
+            const defaultQty = itemData.defaultQuantity || 1;
+            const additionalQty = si.quantity - defaultQty;
+            const additionalPrice =
+              Math.max(0, additionalQty) * itemData.basePrice;
+
+            return {
+              name: si.name,
+              quantity: si.quantity,
+              unitPrice: itemData.basePrice,
+              defaultQuantity: defaultQty,
+              additionalPrice: additionalPrice,
+            };
+          });
+
+        // 아이템 추가 가격 계산
+        const itemsPrice = apiSelectedItems.reduce(
+          (sum, item) => sum + item.additionalPrice,
+          0
+        );
+
+        const unitPrice = basePrice + itemsPrice;
+        const totalPrice = unitPrice * order.quantity;
+
+        return {
+          menuId: order.menuId,
+          menuName: menu.name,
+          style: order.style,
+          quantity: order.quantity,
+          unitPrice: unitPrice,
+          totalPrice: totalPrice,
+          selectedItems: apiSelectedItems,
+        };
       });
+
+      // clientOrderId 생성
+      const clientOrderId = `order-${Date.now()}-${Math.random()}`;
+
+      // API 요청 데이터 생성
+      const orderRequest: OrderRequest = {
+        customer: {
+          email: customerInfo.email,
+          name: customerInfo.name,
+          phone: customerInfo.phone,
+          isRegularCustomer: customerInfo.isRegularCustomer,
+        },
+        deliveryInfo: {
+          address: deliveryInfo!.address,
+          date: deliveryInfo!.date,
+          time: deliveryInfo!.time,
+          cardNumber: deliveryInfo!.cardNumber.replace(/\s/g, ""), // 공백 제거
+        },
+        pricing: {
+          subtotal: subtotal,
+          discount: discount,
+          total: total,
+        },
+        metadata: {
+          orderDate: new Date().toISOString(),
+          clientOrderId: clientOrderId,
+        },
+        orderItems: orderItems,
+      };
+
+      // API 호출
+      const orderResponse = await orderApi.createOrder(orderRequest);
+
+      // 로컬 스토리지에도 저장 (주문 내역 페이지용)
+      if (deliveryInfo) {
+        // API 응답의 status를 로컬 타입으로 변환
+        const localStatus = orderResponse.status.toLowerCase() as
+          | "completed"
+          | "pending"
+          | "cancelled";
+
+        addOrderHistory({
+          orderDate: orderResponse.metadata.orderDate,
+          orders: orders,
+          deliveryInfo: deliveryInfo,
+          subtotal: orderResponse.pricing.subtotal,
+          discount: orderResponse.pricing.discount,
+          total: orderResponse.pricing.total,
+          isRegularCustomer: orderResponse.customer.isRegularCustomer,
+          status:
+            localStatus === "completed" ||
+            localStatus === "pending" ||
+            localStatus === "cancelled"
+              ? localStatus
+              : "pending",
+        });
+      }
+
+      // Clear all stored data
+      clearOrders();
+      clearDeliveryInfo();
+
+      // Redirect to order complete page
+      router.push("/order-complete");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "주문 처리 중 오류가 발생했습니다.";
+      alert(errorMessage);
+      setIsProcessing(false);
     }
-
-    // Clear all stored data
-    clearOrders();
-    clearDeliveryInfo();
-
-    // Redirect to order complete page
-    router.push("/order-complete");
   };
 
   return (
@@ -269,7 +396,9 @@ export default function PurchasePage() {
                 onClick={handlePayment}
                 disabled={isProcessing}
               >
-                {isProcessing ? "결제 진행 중..." : formatPrice(total) + " 결제하기"}
+                {isProcessing
+                  ? "결제 진행 중..."
+                  : formatPrice(total) + " 결제하기"}
               </Button>
             </ButtonGroup>
           </SectionContainer>
@@ -278,4 +407,3 @@ export default function PurchasePage() {
     </Container>
   );
 }
-
