@@ -218,6 +218,7 @@ export default function OrderCard({
             src={menu.image}
             alt={menu.name}
             fill
+            sizes="120px"
             style={{ objectFit: "cover" }}
           />
         )}

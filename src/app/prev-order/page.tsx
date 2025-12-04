@@ -2,12 +2,14 @@
 
 import styled from "@emotion/styled";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Clock } from "lucide-react";
 import OrderCard from "@/components/prev-order/OrderCard";
 import { getOrderHistory, OrderHistory } from "@/utils/orderHistoryStorage";
 import { dinnerMenus } from "@/data/menus";
 import { servingStyles } from "@/data/styles";
 import { getItemsForMenu } from "@/data/additionalOptions";
+import { saveOrders } from "@/utils/orderStorage";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -134,6 +136,7 @@ const convertToOrderCardFormat = (history: OrderHistory) => {
 };
 
 export default function PrevOrderPage() {
+  const router = useRouter();
   const [orderHistory, setOrderHistory] = useState<OrderHistory[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -147,9 +150,38 @@ export default function PrevOrderPage() {
   const hasOrders = orderHistory.length > 0;
 
   const handleReorder = (menuName: string, style: string) => {
-    alert(
-      `재주문: ${menuName} (${style})\n재주문 기능은 추후 구현될 예정입니다.`
-    );
+    // 해당 주문 내역 찾기
+    // 복수 주문의 경우 style이 "복수 주문"으로 표시되므로 다른 방식으로 찾기
+    const orderToReorder = orderHistory.find((history) => {
+      // 복수 주문인 경우
+      if (style === "복수 주문" && history.orders.length > 1) {
+        const historyMenuNames = history.orders
+          .map((order) => {
+            const menu = dinnerMenus.find((m) => m.id === order.menuId);
+            return menu?.name || "";
+          })
+          .join(", ");
+        return historyMenuNames === menuName;
+      }
+
+      // 단일 주문인 경우
+      return history.orders.some((order) => {
+        const menu = dinnerMenus.find((m) => m.id === order.menuId);
+        const orderStyle = servingStyles[order.style];
+        return menu?.name === menuName && orderStyle?.name === style;
+      });
+    });
+
+    if (!orderToReorder) {
+      alert("주문 정보를 찾을 수 없습니다.");
+      return;
+    }
+
+    // 주문 정보를 orderStorage에 저장
+    saveOrders(orderToReorder.orders);
+
+    // change-option 페이지로 이동
+    router.push("/change-option");
   };
 
   const handleViewDetails = (id: string | number) => {
