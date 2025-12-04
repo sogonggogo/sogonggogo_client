@@ -236,6 +236,7 @@ export default function OrderCompleteSummary({
           배달 정보
         </SectionTitle>
         <InfoRow>
+          <MapPin size={18} />
           <InfoLabel>배달 주소:</InfoLabel>
           <InfoValue>{order.deliveryInfo.address}</InfoValue>
         </InfoRow>
@@ -269,7 +270,9 @@ export default function OrderCompleteSummary({
               단골 고객 할인 (10%)
               <DiscountBadge>단골 혜택</DiscountBadge>
             </span>
-            <span style={{ color: "#ffa500" }}>- {formatPrice(order.discount)}</span>
+            <span style={{ color: "#ffa500" }}>
+              - {formatPrice(order.discount)}
+            </span>
           </PriceRow>
         )}
 
@@ -281,4 +284,3 @@ export default function OrderCompleteSummary({
     </SummaryContainer>
   );
 }
-

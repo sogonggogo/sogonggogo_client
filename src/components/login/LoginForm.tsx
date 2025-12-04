@@ -117,7 +117,7 @@ export default function LoginForm() {
         isRegularCustomer: userResponse.isRegularCustomer,
       });
 
-      alert("로그인 되었습니다! 단골 고객 10% 할인이 자동으로 적용됩니다.");
+      alert("로그인 되었습니다!");
 
       // Use window.location to ensure full page reload and Header update
       window.location.href = "/";

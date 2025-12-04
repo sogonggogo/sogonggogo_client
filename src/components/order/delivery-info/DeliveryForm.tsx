@@ -1,9 +1,11 @@
 "use client";
 
 import styled from "@emotion/styled";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MapPin, Calendar, Clock, CreditCard } from "lucide-react";
 import type { DeliveryInfo } from "@/utils/deliveryStorage";
+import { getUserInfo } from "@/utils/userStorage";
+import { userApi } from "@/services/userApi";
 
 const FormContainer = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -147,6 +149,42 @@ export default function DeliveryForm({
   });
 
   const [errors, setErrors] = useState<Partial<DeliveryInfo>>({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  // 사용자 정보 불러오기
+  useEffect(() => {
+    const loadUserInfo = async () => {
+      try {
+        // API에서 사용자 정보 가져오기 시도
+        const userResponse = await userApi.getMe();
+
+        // 카드 번호 포맷팅 (공백 추가)
+        const formattedCardNumber = userResponse.creditCardNumber
+          ? userResponse.creditCardNumber.match(/.{1,4}/g)?.join(" ") || ""
+          : "";
+
+        setFormData((prev) => ({
+          ...prev,
+          address: userResponse.address || "",
+          cardNumber: formattedCardNumber,
+        }));
+      } catch (error) {
+        // API 실패 시 로컬 스토리지에서 가져오기
+        const localUserInfo = getUserInfo();
+        if (localUserInfo) {
+          setFormData((prev) => ({
+            ...prev,
+            address: localUserInfo.address || "",
+            cardNumber: localUserInfo.cardNumber || "",
+          }));
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadUserInfo();
+  }, []);
 
   // Generate time slots (30-minute intervals) between 11:00 and 22:00
   const generateTimeSlots = () => {
@@ -222,6 +260,17 @@ export default function DeliveryForm({
       onSubmit(formData);
     }
   };
+
+  // 로딩 중일 때 표시
+  if (isLoading) {
+    return (
+      <FormContainer>
+        <p style={{ textAlign: "center", padding: "2rem" }}>
+          사용자 정보를 불러오는 중...
+        </p>
+      </FormContainer>
+    );
+  }
 
   return (
     <FormContainer>
