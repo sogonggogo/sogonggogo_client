@@ -96,10 +96,33 @@ class OrderApiService {
   }
 
   /**
+   * 내 주문 목록 조회 (고객용)
+   * GET /api/orders
+   */
+  async getMyOrders(): Promise<OrderResponse[]> {
+    const response = await fetch(`${this.baseUrl}/api/orders`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include", // 세션 쿠키 포함
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error("로그인이 필요합니다.");
+      }
+      throw new Error(`주문 목록 조회 실패: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  /**
    * 주문 목록 조회 (Staff용)
    * GET /api/staff/orders?status=PENDING
    */
-  async getOrders(status?: string): Promise<OrderResponse[]> {
+  async getStaffOrders(status?: string): Promise<OrderResponse[]> {
     const url = status
       ? `${this.baseUrl}/api/staff/orders?status=${status}`
       : `${this.baseUrl}/api/staff/orders`;
@@ -123,4 +146,3 @@ class OrderApiService {
 export const orderApi = new OrderApiService();
 
 export default orderApi;
-
