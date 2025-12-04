@@ -8,8 +8,8 @@ import {
   ApiError,
 } from "@/types/voiceOrderTypes";
 
-// TODO: Replace with actual backend URL when available
-const API_BASE_URL = process.env.NEXT_PUBLIC_VOICE_API_URL || "http://localhost:8000";
+// Voice Order API Base URL - 프록시를 통해 접근
+const API_BASE_URL = process.env.NEXT_PUBLIC_VOICE_API_URL || "/api/voice";
 
 class VoiceOrderApiService {
   private baseUrl: string;
@@ -85,20 +85,22 @@ class VoiceOrderApiService {
   }
 
   /**
-   * 3-1. POST /api/chat/message - 텍스트 메시지 전송 (음성 인식 후)
-   * Note: 백엔드가 텍스트 전송을 지원하는 경우 사용
+   * 3-1. POST /api/chat/message - 텍스트 메시지 전송
+   * PDF 명세에 따라 JSON 형식으로 전송
    */
   async sendTextMessage(
     sessionId: string,
     text: string
   ): Promise<SendMessageResponse> {
-    const formData = new FormData();
-    formData.append("session_id", sessionId);
-    formData.append("text", text);
-
-    const response = await fetch(`${this.baseUrl}/api/chat/message/text`, {
+    const response = await fetch(`${this.baseUrl}/api/chat/message`, {
       method: "POST",
-      body: formData,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        session_id: sessionId,
+        text: text,
+      }),
     });
 
     if (!response.ok) {
@@ -176,5 +178,3 @@ class VoiceOrderApiService {
 export const voiceOrderApi = new VoiceOrderApiService();
 
 export default voiceOrderApi;
-
-

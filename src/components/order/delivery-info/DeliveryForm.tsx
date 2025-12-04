@@ -6,6 +6,7 @@ import { MapPin, Calendar, Clock, CreditCard } from "lucide-react";
 import type { DeliveryInfo } from "@/utils/deliveryStorage";
 import { getUserInfo } from "@/utils/userStorage";
 import { userApi } from "@/services/userApi";
+import { getDeliveryInfo } from "@/utils/deliveryStorage";
 
 const FormContainer = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -151,11 +152,14 @@ export default function DeliveryForm({
   const [errors, setErrors] = useState<Partial<DeliveryInfo>>({});
   const [isLoading, setIsLoading] = useState(true);
 
-  // 사용자 정보 불러오기
+  // 사용자 정보 및 배달 정보 불러오기
   useEffect(() => {
     const loadUserInfo = async () => {
       try {
-        // API에서 사용자 정보 가져오기 시도
+        // 1. 먼저 저장된 배달 정보 확인 (음성 주문에서 저장한 정보)
+        const savedDeliveryInfo = getDeliveryInfo();
+
+        // 2. API에서 사용자 정보 가져오기 시도
         const userResponse = await userApi.getMe();
 
         // 카드 번호 포맷팅 (공백 추가)
@@ -163,20 +167,29 @@ export default function DeliveryForm({
           ? userResponse.creditCardNumber.match(/.{1,4}/g)?.join(" ") || ""
           : "";
 
-        setFormData((prev) => ({
-          ...prev,
-          address: userResponse.address || "",
-          cardNumber: formattedCardNumber,
-        }));
+        // 3. 저장된 배달 정보가 있으면 우선 사용, 없으면 사용자 정보 사용
+        setFormData({
+          address: savedDeliveryInfo?.address || userResponse.address || "",
+          date: savedDeliveryInfo?.date || "",
+          time: savedDeliveryInfo?.time || "",
+          cardNumber: savedDeliveryInfo?.cardNumber
+            ? savedDeliveryInfo.cardNumber.match(/.{1,4}/g)?.join(" ") ||
+              savedDeliveryInfo.cardNumber
+            : formattedCardNumber,
+        });
       } catch (error) {
         // API 실패 시 로컬 스토리지에서 가져오기
+        const savedDeliveryInfo = getDeliveryInfo();
         const localUserInfo = getUserInfo();
-        if (localUserInfo) {
-          setFormData((prev) => ({
-            ...prev,
-            address: localUserInfo.address || "",
-            cardNumber: localUserInfo.cardNumber || "",
-          }));
+
+        if (savedDeliveryInfo || localUserInfo) {
+          setFormData({
+            address: savedDeliveryInfo?.address || localUserInfo?.address || "",
+            date: savedDeliveryInfo?.date || "",
+            time: savedDeliveryInfo?.time || "",
+            cardNumber:
+              savedDeliveryInfo?.cardNumber || localUserInfo?.cardNumber || "",
+          });
         }
       } finally {
         setIsLoading(false);

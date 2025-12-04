@@ -10,10 +10,12 @@ import {
   getSpeechRecognition,
   isSpeechRecognitionSupported,
 } from "@/utils/speechRecognition";
-import type {
-  ConversationMessage,
-  OrderData,
-} from "@/types/voiceOrderTypes";
+import type { ConversationMessage, OrderData } from "@/types/voiceOrderTypes";
+import { dinnerMenus } from "@/data/menus";
+import { ServingStyleType } from "@/data/styles";
+import { getItemsForMenu, SelectedItem } from "@/data/additionalOptions";
+import { saveOrders } from "@/utils/orderStorage";
+import { saveDeliveryInfo, getDeliveryInfo } from "@/utils/deliveryStorage";
 
 const VoiceCard = styled.div`
   width: 100%;
@@ -58,7 +60,8 @@ const MicButton = styled.button<{ isRecording: boolean }>`
   `}
 
   @keyframes pulse {
-    0%, 100% {
+    0%,
+    100% {
       transform: scale(1);
     }
     50% {
@@ -108,11 +111,11 @@ const LoadingIndicator = styled.div`
   gap: ${({ theme }) => theme.spacing.sm};
   color: ${({ theme }) => theme.colors.accent};
   font-size: ${({ theme }) => theme.fontSize.sm};
-  
+
   svg {
     animation: spin 1s linear infinite;
   }
-  
+
   @keyframes spin {
     from {
       transform: rotate(0deg);
@@ -162,7 +165,9 @@ const ActionButtons = styled.div`
 const ActionButton = styled.button<{ variant?: "primary" | "secondary" }>`
   flex: 1;
   background: ${({ variant, theme }) =>
-    variant === "primary" ? theme.colors.primary : theme.colors.buttonBackground};
+    variant === "primary"
+      ? theme.colors.primary
+      : theme.colors.buttonBackground};
   color: ${({ variant, theme }) =>
     variant === "primary" ? theme.colors.white : theme.colors.accent};
   border: none;
@@ -185,8 +190,8 @@ const ActionButton = styled.button<{ variant?: "primary" | "secondary" }>`
   }
 `;
 
-// 테스트 모드 활성화 (API 통신 없이 음성 인식만 테스트)
-const TEST_MODE = true;
+// 테스트 모드 비활성화 (실제 API 통신)
+const TEST_MODE = false;
 
 export default function VoiceRecorder() {
   const router = useRouter();
@@ -205,7 +210,6 @@ export default function VoiceRecorder() {
     if (isSpeechRecognitionSupported()) {
       if (TEST_MODE) {
         // 테스트 모드: API 호출 없이 초기화
-        console.log("🧪 [TEST MODE] 음성 인식 테스트 모드 활성화");
         setSessionId("test-session-id");
         setConversation([
           {
@@ -228,7 +232,7 @@ export default function VoiceRecorder() {
 
       const response = await voiceOrderApi.startChat(customerName);
       setSessionId(response.session_id);
-      
+
       // Add greeting to conversation
       setConversation([
         {
@@ -292,15 +296,14 @@ export default function VoiceRecorder() {
       setIsProcessing(true);
       setError(null);
 
+      // 한글 스타일을 영어로 변환
+      const convertedText = text
+        .replace(/심플\s*스타일/gi, "simple")
+        .replace(/그랜드\s*스타일/gi, "grand")
+        .replace(/디럭스\s*스타일/gi, "deluxe");
+
       if (TEST_MODE) {
         // 테스트 모드: 콘솔에 출력만 하고 API 호출 안함
-        console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        console.log("🎤 [음성 인식 결과]");
-        console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        console.log("📝 변환된 텍스트:", text);
-        console.log("📅 시간:", new Date().toLocaleString("ko-KR"));
-        console.log("📏 텍스트 길이:", text.length, "자");
-        console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
         // 대화 내역에 추가 (테스트용 응답 포함)
         setConversation((prev) => [
@@ -312,7 +315,7 @@ export default function VoiceRecorder() {
           },
           {
             role: "assistant",
-            text: `✅ 음성 인식 성공!\n인식된 텍스트: "${text}"\n\n(테스트 모드: 실제 API 호출 없음)`,
+            text: `✅ 음성 인식 성공!\n인식된 텍스트: "${text}"\n변환된 텍스트: "${convertedText}"\n\n(테스트 모드: 실제 API 호출 없음)`,
             timestamp: new Date(),
           },
         ]);
@@ -322,10 +325,13 @@ export default function VoiceRecorder() {
           setIsProcessing(false);
         }, 500);
       } else {
-        // 실제 모드: API 호출
-        const response = await voiceOrderApi.sendTextMessage(sessionId, text);
+        // 실제 모드: API 호출 (변환된 텍스트 전송)
+        const response = await voiceOrderApi.sendTextMessage(
+          sessionId,
+          convertedText
+        );
 
-        // Add messages to conversation
+        // Add messages to conversation (원본 텍스트로 표시)
         setConversation((prev) => [
           ...prev,
           {
@@ -347,7 +353,7 @@ export default function VoiceRecorder() {
             handleOrderComplete(response.order_data!);
           }, 2000);
         }
-        
+
         setIsProcessing(false);
       }
     } catch (err: any) {
@@ -358,10 +364,145 @@ export default function VoiceRecorder() {
   };
 
   const handleOrderComplete = (orderData: OrderData) => {
-    // TODO: Convert order data to the format expected by the app
-    // For now, show alert and redirect
-    alert("주문이 완료되었습니다! 주문 내역을 확인해주세요.");
-    router.push("/prev-order");
+    try {
+      // 1. 디너 타입을 메뉴 ID로 매핑
+      const menuMap: Record<string, number> = {
+        "발렌타인 디너": 1,
+        "프렌치 디너": 2,
+        "잉글리시 디너": 3,
+        "샴페인 축제 디너": 4,
+      };
+
+      const menuId = menuMap[orderData.dinner_type];
+      if (!menuId) {
+        throw new Error(`알 수 없는 디너 타입: ${orderData.dinner_type}`);
+      }
+
+      const menu = dinnerMenus.find((m) => m.id === menuId);
+      if (!menu) {
+        throw new Error("메뉴를 찾을 수 없습니다.");
+      }
+
+      // 2. serving_style 매핑 및 검증
+      // API에서 받은 값을 소문자로 변환하고 매핑
+      const normalizedStyle = orderData.serving_style?.toLowerCase().trim();
+
+      const styleMap: Record<string, ServingStyleType> = {
+        simple: "simple",
+        grand: "grand",
+        deluxe: "deluxe",
+        // 한글도 지원 (혹시 한글로 오는 경우 대비)
+        심플: "simple",
+        그랜드: "grand",
+        디럭스: "deluxe",
+      };
+
+      const style = styleMap[normalizedStyle];
+
+      if (!style) {
+        throw new Error(
+          `알 수 없는 서빙 스타일: "${orderData.serving_style}" (정규화: "${normalizedStyle}")`
+        );
+      }
+
+      // 3. 메뉴별 아이템 수량 매핑
+      const availableItems = getItemsForMenu(menuId);
+
+      // 음성 주문 API의 필드명을 프론트엔드 아이템명으로 매핑
+      const voiceToItemMap: Record<number, Record<string, string>> = {
+        1: {
+          // 발렌타인 디너
+          wine_count: "와인",
+          steak_count: "스테이크",
+          napkin_count: "하트 장식", // napkin_count를 하트 장식으로 매핑
+        },
+        2: {
+          // 프렌치 디너
+          coffee_cup_count: "커피",
+          wine_count: "와인",
+          salad_count: "샐러드",
+          steak_count: "스테이크",
+        },
+        3: {
+          // 잉글리시 디너
+          egg_scramble_count: "에그 스크램블",
+          bacon_count: "베이컨",
+          bread_count: "빵",
+          steak_count: "스테이크",
+        },
+        4: {
+          // 샴페인 축제 디너
+          champagne_count: "샴페인",
+          baguette_count: "바게트 빵",
+          coffee_pot_count: "커피",
+          wine_count: "와인",
+          steak_count: "스테이크",
+        },
+      };
+
+      const itemMapping = voiceToItemMap[menuId];
+
+      const selectedItems: SelectedItem[] = availableItems.map((item) => {
+        let quantity = item.defaultQuantity || 1;
+
+        // 음성 주문 데이터에서 해당 아이템의 수량 찾기
+        if (itemMapping) {
+          for (const [voiceField, itemName] of Object.entries(itemMapping)) {
+            if (item.name === itemName) {
+              const voiceQuantity = orderData[voiceField as keyof OrderData];
+              if (typeof voiceQuantity === "number") {
+                quantity = voiceQuantity;
+              }
+              break;
+            }
+          }
+        }
+
+        return {
+          name: item.name,
+          quantity,
+        };
+      });
+
+      // 4. 주문 정보 저장
+      const order = {
+        id: `voice-order-${Date.now()}`,
+        menuId,
+        style,
+        quantity: 1, // 음성 주문은 기본 1개
+        selectedItems,
+      };
+
+      saveOrders([order]);
+
+      // 5. 배달 정보 저장 (사용자 정보 기반)
+      const userInfo = getUserInfo();
+      if (userInfo) {
+        // delivery_date 파싱: "2025-12-06T00:00:00" → "2025-12-06"
+        const formattedDate = orderData.delivery_date.split("T")[0];
+
+        saveDeliveryInfo({
+          address: userInfo.address || "",
+          date: formattedDate,
+          time: "18:00", // 기본 시간
+          cardNumber: userInfo.cardNumber || "",
+        });
+      } else {
+        alert("로그인 후 주문을 진행해주세요.");
+        router.push("/login");
+        return;
+      }
+
+      // 6. 주문 페이지로 이동
+      alert("음성 주문이 완료되었습니다! 배달 정보를 확인해주세요.");
+      router.push("/delivery-info");
+    } catch (error) {
+      alert(
+        `주문 처리 중 오류가 발생했습니다.\n${
+          error instanceof Error ? error.message : "다시 시도해주세요."
+        }`
+      );
+    }
   };
 
   const handleReset = async () => {
@@ -369,10 +510,9 @@ export default function VoiceRecorder() {
 
     try {
       setError(null);
-      
+
       if (TEST_MODE) {
         // 테스트 모드: API 호출 없이 초기화
-        console.log("🔄 [TEST MODE] 대화 초기화");
         setConversation([
           {
             role: "assistant",
@@ -454,11 +594,7 @@ export default function VoiceRecorder() {
 
       {error && <ErrorMessage>{error}</ErrorMessage>}
 
-      {interimText && (
-        <InterimText>
-          🎤 {interimText}
-        </InterimText>
-      )}
+      {interimText && <InterimText>🎤 {interimText}</InterimText>}
 
       {isProcessing && (
         <LoadingIndicator>
@@ -494,4 +630,3 @@ export default function VoiceRecorder() {
     </VoiceCard>
   );
 }
-

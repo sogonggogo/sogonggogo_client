@@ -59,6 +59,8 @@ export const calculatePriceWithStyle = (
   styleType: ServingStyleType
 ): number => {
   const style = servingStyles[styleType];
+  if (!style) {
+    return basePrice; // 스타일을 찾을 수 없으면 기본 가격만 반환
+  }
   return basePrice + style.additionalPrice;
 };
-

@@ -304,6 +304,8 @@ export default function PrevOrderPage() {
   }
 
   if (error) {
+    const isLoginError = error.includes("로그인");
+
     return (
       <Container>
         <Main>
@@ -313,10 +315,21 @@ export default function PrevOrderPage() {
               주문내역
             </PageTitle>
             <EmptyState>
-              {error}
-              <br />
-              <br />
-              로그인 후 다시 시도해주세요.
+              {isLoginError ? (
+                <>
+                  로그인이 필요합니다
+                  <br />
+                  <br />
+                  주문 내역을 확인하려면 로그인해주세요
+                </>
+              ) : (
+                <>
+                  {error}
+                  <br />
+                  <br />
+                  다시 시도해주세요.
+                </>
+              )}
             </EmptyState>
           </ContentWrapper>
         </Main>

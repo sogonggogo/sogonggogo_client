@@ -225,11 +225,13 @@ export default function OrderHistory() {
   const router = useRouter();
   const [orderHistory, setOrderHistory] = useState<OrderHistoryType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [needsLogin, setNeedsLogin] = useState(false);
 
   useEffect(() => {
     const loadOrderHistory = async () => {
       try {
         setLoading(true);
+        setNeedsLogin(false);
 
         // API에서 주문 내역 가져오기
         const orders = await orderApi.getMyOrders();
@@ -295,7 +297,10 @@ export default function OrderHistory() {
         setOrderHistory(sortedHistory);
       } catch (error) {
         console.error("Failed to load order history:", error);
-        // 에러 발생 시 빈 배열 표시 (로그인 안 한 경우 등)
+        // 401 에러 (로그인 필요) 확인
+        if (error instanceof Error && error.message.includes("로그인")) {
+          setNeedsLogin(true);
+        }
         setOrderHistory([]);
       } finally {
         setLoading(false);
@@ -322,6 +327,20 @@ export default function OrderHistory() {
         <Content>
           {loading ? (
             <EmptyState>로딩 중...</EmptyState>
+          ) : needsLogin ? (
+            <EmptyState>
+              로그인이 필요합니다
+              <br />
+              <small
+                style={{
+                  fontSize: "0.9em",
+                  marginTop: "8px",
+                  display: "block",
+                }}
+              >
+                주문 내역을 확인하려면 로그인해주세요
+              </small>
+            </EmptyState>
           ) : hasOrders ? (
             orderHistory.map((order) => (
               <OrderCard key={order.id}>
