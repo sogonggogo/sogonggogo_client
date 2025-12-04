@@ -148,6 +148,13 @@ const CheckStatusMessage = styled.p<{ status: "available" | "duplicate" }>`
   font-family: ${({ theme }) => theme.fontFamily.miwon};
 `;
 
+const PasswordMatchMessage = styled.p<{ isMatch: boolean }>`
+  font-size: ${({ theme }) => theme.fontSize.sm};
+  color: ${({ isMatch }) => (isMatch ? "#22c55e" : "#ef4444")};
+  margin-top: ${({ theme }) => theme.spacing.xs};
+  font-family: ${({ theme }) => theme.fontFamily.miwon};
+`;
+
 export default function SignupForm() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -164,6 +171,7 @@ export default function SignupForm() {
   const [emailCheckStatus, setEmailCheckStatus] = useState<
     "idle" | "checking" | "available" | "duplicate"
   >("idle");
+  const [passwordMatch, setPasswordMatch] = useState<boolean | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -198,6 +206,19 @@ export default function SignupForm() {
     // Reset email check status when email changes
     if (name === "email") {
       setEmailCheckStatus("idle");
+    }
+
+    // Check password match in real-time
+    if (name === "password" || name === "confirmPassword") {
+      const newPassword = name === "password" ? value : formData.password;
+      const newConfirmPassword =
+        name === "confirmPassword" ? value : formData.confirmPassword;
+
+      if (newConfirmPassword.length > 0) {
+        setPasswordMatch(newPassword === newConfirmPassword);
+      } else {
+        setPasswordMatch(null);
+      }
     }
   };
 
@@ -437,6 +458,13 @@ export default function SignupForm() {
             />
             {errors.confirmPassword && (
               <ErrorMessage>{errors.confirmPassword}</ErrorMessage>
+            )}
+            {!errors.confirmPassword && passwordMatch !== null && (
+              <PasswordMatchMessage isMatch={passwordMatch}>
+                {passwordMatch
+                  ? "✓ 비밀번호가 일치합니다."
+                  : "✗ 비밀번호가 일치하지 않습니다."}
+              </PasswordMatchMessage>
             )}
           </FormColumn>
         </FormRow>

@@ -69,6 +69,13 @@ const ErrorMessage = styled.p`
   font-family: ${({ theme }) => theme.fontFamily.miwon};
 `;
 
+const PasswordMatchMessage = styled.p<{ isMatch: boolean }>`
+  font-size: ${({ theme }) => theme.fontSize.sm};
+  color: ${({ isMatch }) => (isMatch ? "#22c55e" : "#ef4444")};
+  margin-top: ${({ theme }) => theme.spacing.xs};
+  font-family: ${({ theme }) => theme.fontFamily.miwon};
+`;
+
 const ButtonGroup = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing.md};
@@ -112,6 +119,7 @@ export default function UpdateInfoForm() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordMatch, setPasswordMatch] = useState<boolean | null>(null);
 
   useEffect(() => {
     // Load current user info from API
@@ -176,6 +184,19 @@ export default function UpdateInfoForm() {
 
     // Clear error for this field
     setErrors((prev) => ({ ...prev, [name]: "" }));
+
+    // Check password match in real-time
+    if (name === "password" || name === "confirmPassword") {
+      const newPassword = name === "password" ? value : formData.password;
+      const newConfirmPassword =
+        name === "confirmPassword" ? value : formData.confirmPassword;
+
+      if (newConfirmPassword.length > 0) {
+        setPasswordMatch(newPassword === newConfirmPassword);
+      } else {
+        setPasswordMatch(null);
+      }
+    }
   };
 
   const validateForm = (): boolean => {
@@ -325,6 +346,13 @@ export default function UpdateInfoForm() {
             />
             {errors.confirmPassword && (
               <ErrorMessage>{errors.confirmPassword}</ErrorMessage>
+            )}
+            {!errors.confirmPassword && passwordMatch !== null && (
+              <PasswordMatchMessage isMatch={passwordMatch}>
+                {passwordMatch
+                  ? "✓ 비밀번호가 일치합니다."
+                  : "✗ 비밀번호가 일치하지 않습니다."}
+              </PasswordMatchMessage>
             )}
           </FormColumn>
         </FormRow>
