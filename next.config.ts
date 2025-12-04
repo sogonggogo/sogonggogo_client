@@ -14,14 +14,6 @@ const nextConfig: NextConfig = {
   compiler: {
     emotion: true,
   },
-  async rewrites() {
-    return [
-      {
-        source: "/api/:path*",
-        destination: "http://uoscholar-server.store/sogong-api/api/:path*",
-      },
-    ];
-  },
 };
 
 export default nextConfig;

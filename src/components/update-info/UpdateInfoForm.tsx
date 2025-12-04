@@ -76,6 +76,13 @@ const PasswordMatchMessage = styled.p<{ isMatch: boolean }>`
   font-family: ${({ theme }) => theme.fontFamily.miwon};
 `;
 
+const PasswordValidMessage = styled.p<{ isValid: boolean }>`
+  font-size: ${({ theme }) => theme.fontSize.sm};
+  color: ${({ isValid }) => (isValid ? "#22c55e" : "#ef4444")};
+  margin-top: ${({ theme }) => theme.spacing.xs};
+  font-family: ${({ theme }) => theme.fontFamily.miwon};
+`;
+
 const ButtonGroup = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing.md};
@@ -120,6 +127,7 @@ export default function UpdateInfoForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [passwordMatch, setPasswordMatch] = useState<boolean | null>(null);
+  const [passwordValid, setPasswordValid] = useState<boolean | null>(null);
 
   useEffect(() => {
     // Load current user info from API
@@ -185,6 +193,15 @@ export default function UpdateInfoForm() {
     // Clear error for this field
     setErrors((prev) => ({ ...prev, [name]: "" }));
 
+    // Check password length in real-time
+    if (name === "password") {
+      if (value.length > 0) {
+        setPasswordValid(value.length >= 8);
+      } else {
+        setPasswordValid(null);
+      }
+    }
+
     // Check password match in real-time
     if (name === "password" || name === "confirmPassword") {
       const newPassword = name === "password" ? value : formData.password;
@@ -217,8 +234,8 @@ export default function UpdateInfoForm() {
     }
 
     if (formData.password) {
-      if (formData.password.length < 6) {
-        newErrors.password = "비밀번호는 최소 6자 이상이어야 합니다.";
+      if (formData.password.length < 8) {
+        newErrors.password = "비밀번호는 최소 8자 이상이어야 합니다.";
       }
       if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = "비밀번호가 일치하지 않습니다.";
@@ -332,6 +349,13 @@ export default function UpdateInfoForm() {
               placeholder="새 비밀번호 (선택사항)"
             />
             {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
+            {!errors.password && passwordValid !== null && (
+              <PasswordValidMessage isValid={passwordValid}>
+                {passwordValid
+                  ? "✓ 사용 가능한 비밀번호입니다."
+                  : "✗ 비밀번호는 최소 8자 이상이어야 합니다."}
+              </PasswordValidMessage>
+            )}
           </FormColumn>
 
           <FormColumn>

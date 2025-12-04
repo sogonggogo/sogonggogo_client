@@ -155,6 +155,13 @@ const PasswordMatchMessage = styled.p<{ isMatch: boolean }>`
   font-family: ${({ theme }) => theme.fontFamily.miwon};
 `;
 
+const PasswordValidMessage = styled.p<{ isValid: boolean }>`
+  font-size: ${({ theme }) => theme.fontSize.sm};
+  color: ${({ isValid }) => (isValid ? "#22c55e" : "#ef4444")};
+  margin-top: ${({ theme }) => theme.spacing.xs};
+  font-family: ${({ theme }) => theme.fontFamily.miwon};
+`;
+
 export default function SignupForm() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -172,6 +179,7 @@ export default function SignupForm() {
     "idle" | "checking" | "available" | "duplicate"
   >("idle");
   const [passwordMatch, setPasswordMatch] = useState<boolean | null>(null);
+  const [passwordValid, setPasswordValid] = useState<boolean | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -208,6 +216,15 @@ export default function SignupForm() {
       setEmailCheckStatus("idle");
     }
 
+    // Check password length in real-time
+    if (name === "password") {
+      if (value.length > 0) {
+        setPasswordValid(value.length >= 8);
+      } else {
+        setPasswordValid(null);
+      }
+    }
+
     // Check password match in real-time
     if (name === "password" || name === "confirmPassword") {
       const newPassword = name === "password" ? value : formData.password;
@@ -237,8 +254,8 @@ export default function SignupForm() {
     // Password validation
     if (!formData.password.trim()) {
       newErrors.password = "비밀번호를 입력해주세요.";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "비밀번호는 최소 6자 이상이어야 합니다.";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "비밀번호는 최소 8자 이상이어야 합니다.";
     }
 
     if (formData.password !== formData.confirmPassword) {
@@ -316,9 +333,7 @@ export default function SignupForm() {
       };
 
       saveUserInfo(newUser);
-      alert(
-        "회원가입이 완료되었습니다! 단골 고객 10% 할인이 자동으로 적용됩니다."
-      );
+      alert("회원가입이 완료되었습니다!");
 
       // Redirect to home page with full page reload to update header
       window.location.href = "/";
@@ -388,11 +403,6 @@ export default function SignupForm() {
 
   return (
     <FormCard>
-      <InfoText>
-        회원가입을 하시면 자동으로 단골 고객으로 등록되어 모든 주문에서 10% 할인
-        혜택을 받으실 수 있습니다.
-      </InfoText>
-
       <form onSubmit={handleSubmit}>
         {/* Email - Full Width */}
         <FormGroup>
@@ -439,10 +449,17 @@ export default function SignupForm() {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="최소 6자 이상"
+              placeholder="최소 8자 이상"
               required
             />
             {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
+            {!errors.password && passwordValid !== null && (
+              <PasswordValidMessage isValid={passwordValid}>
+                {passwordValid
+                  ? "✓ 사용 가능한 비밀번호입니다."
+                  : "✗ 비밀번호는 최소 8자 이상이어야 합니다."}
+              </PasswordValidMessage>
+            )}
           </FormColumn>
 
           <FormColumn>
