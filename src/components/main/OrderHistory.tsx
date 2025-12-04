@@ -2,13 +2,14 @@
 
 import styled from "@emotion/styled";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Clock } from "lucide-react";
 import { dinnerMenus, formatPrice } from "@/data/menus";
-import { servingStyles } from "@/data/styles";
-import {
-  getOrderHistory,
-  OrderHistory as OrderHistoryType,
-} from "@/utils/orderHistoryStorage";
+import { servingStyles, ServingStyleType } from "@/data/styles";
+import { OrderHistory as OrderHistoryType } from "@/utils/orderHistoryStorage";
+import { orderApi, OrderResponse } from "@/services/orderApi";
+import { SelectedItem } from "@/data/additionalOptions";
+import { saveOrders } from "@/utils/orderStorage";
 
 const Container = styled.div`
   width: 100%;
@@ -176,12 +177,80 @@ const getOrderSummary = (history: OrderHistoryType): string => {
 };
 
 export default function OrderHistory() {
+  const router = useRouter();
   const [orderHistory, setOrderHistory] = useState<OrderHistoryType[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const history = getOrderHistory();
-    setOrderHistory(history);
+    const loadOrderHistory = async () => {
+      try {
+        setLoading(true);
+
+        // API에서 주문 내역 가져오기
+        const orders = await orderApi.getMyOrders();
+
+        // API 응답을 OrderHistory 형식으로 변환
+        const convertedHistory: OrderHistoryType[] = orders.map((order) => {
+          // orderItems를 로컬 OrderItem 형식으로 변환
+          const localOrders = order.orderItems.map((item) => ({
+            id: `order-${order.id}-${item.menuId}`,
+            menuId: item.menuId,
+            style: item.style as ServingStyleType,
+            quantity: item.quantity,
+            selectedItems: item.selectedItems.map((si) => ({
+              name: si.name,
+              quantity: si.quantity,
+            })) as SelectedItem[],
+          }));
+
+          return {
+            id: order.id.toString(),
+            orderDate: order.metadata.orderDate,
+            orders: localOrders,
+            deliveryInfo: {
+              address: order.deliveryInfo.address,
+              date: order.deliveryInfo.date,
+              time: order.deliveryInfo.time,
+              cardNumber: order.deliveryInfo.cardNumber,
+            },
+            subtotal: order.pricing.subtotal,
+            discount: order.pricing.discount,
+            total: order.pricing.total,
+            isRegularCustomer: order.customer.isRegularCustomer,
+            status: order.status.toLowerCase() as
+              | "completed"
+              | "pending"
+              | "cancelled",
+          };
+        });
+
+        // 최신순으로 정렬하고 최대 5개만 표시
+        const sortedHistory = convertedHistory
+          .sort(
+            (a, b) =>
+              new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime()
+          )
+          .slice(0, 5);
+
+        setOrderHistory(sortedHistory);
+      } catch (error) {
+        console.error("Failed to load order history:", error);
+        // 에러 발생 시 빈 배열 표시 (로그인 안 한 경우 등)
+        setOrderHistory([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadOrderHistory();
   }, []);
+
+  const handleReorder = (order: OrderHistoryType) => {
+    // 주문 정보를 orderStorage에 저장
+    saveOrders(order.orders);
+    // change-option 페이지로 이동
+    router.push("/change-option");
+  };
 
   const hasOrders = orderHistory.length > 0;
 
@@ -191,7 +260,9 @@ export default function OrderHistory() {
         <Title>이전 주문 목록</Title>
 
         <Content>
-          {hasOrders ? (
+          {loading ? (
+            <EmptyState>로딩 중...</EmptyState>
+          ) : hasOrders ? (
             orderHistory.map((order) => (
               <OrderCard key={order.id}>
                 <OrderHeader>
@@ -210,15 +281,7 @@ export default function OrderHistory() {
                 <OrderItems>{getOrderSummary(order)}</OrderItems>
                 <OrderFooter>
                   <OrderPrice>{formatPrice(order.total)}</OrderPrice>
-                  <ReorderButton
-                    onClick={() =>
-                      alert(
-                        `재주문 기능은 추후 제공 예정입니다. (주문: ${getOrderSummary(
-                          order
-                        )})`
-                      )
-                    }
-                  >
+                  <ReorderButton onClick={() => handleReorder(order)}>
                     바로 주문하기
                   </ReorderButton>
                 </OrderFooter>
