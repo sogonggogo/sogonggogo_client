@@ -159,7 +159,6 @@ const ErrorMessage = styled.div`
   text-align: center;
 `;
 
-
 const InterimText = styled.div`
   font-size: ${({ theme }) => theme.fontSize.md};
   color: ${({ theme }) => theme.colors.primary};

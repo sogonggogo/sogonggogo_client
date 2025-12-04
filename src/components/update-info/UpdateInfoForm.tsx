@@ -268,7 +268,7 @@ export default function UpdateInfoForm() {
         name: string;
         address: string;
         phone: string;
-        cardNumber?: string;
+        creditCardNumber?: string;
         password?: string;
       } = {
         name: formData.name,

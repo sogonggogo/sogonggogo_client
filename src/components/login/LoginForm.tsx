@@ -3,7 +3,6 @@
 import styled from "@emotion/styled";
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { saveUserInfo } from "@/utils/userStorage";
 import { userApi } from "@/services/userApi";
 
@@ -91,7 +90,6 @@ const ErrorMessage = styled.p`
 `;
 
 export default function LoginForm() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
