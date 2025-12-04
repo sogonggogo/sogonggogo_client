@@ -8,7 +8,7 @@ import { dinnerMenus, formatPrice } from "@/data/menus";
 import { servingStyles, ServingStyleType } from "@/data/styles";
 import { OrderHistory as OrderHistoryType } from "@/utils/orderHistoryStorage";
 import { orderApi, OrderResponse } from "@/services/orderApi";
-import { SelectedItem } from "@/data/additionalOptions";
+import { SelectedItem, getItemsForMenu } from "@/data/additionalOptions";
 import { saveOrders } from "@/utils/orderStorage";
 
 const Container = styled.div`
@@ -192,16 +192,34 @@ export default function OrderHistory() {
         // API 응답을 OrderHistory 형식으로 변환
         const convertedHistory: OrderHistoryType[] = orders.map((order) => {
           // orderItems를 로컬 OrderItem 형식으로 변환
-          const localOrders = order.orderItems.map((item) => ({
-            id: `order-${order.id}-${item.menuId}`,
-            menuId: item.menuId,
-            style: item.style as ServingStyleType,
-            quantity: item.quantity,
-            selectedItems: item.selectedItems.map((si) => ({
-              name: si.name,
-              quantity: si.quantity,
-            })) as SelectedItem[],
-          }));
+          const localOrders = order.orderItems.map((item) => {
+            // 해당 메뉴의 기본 아이템 정보 가져오기
+            const availableItems = getItemsForMenu(item.menuId);
+
+            // API의 selectedItems를 로컬 형식으로 변환
+            // 모든 아이템을 포함하되, API에 있는 수량을 사용
+            const selectedItems: SelectedItem[] = availableItems.map(
+              (availableItem) => {
+                const apiItem = item.selectedItems.find(
+                  (si) => si.name === availableItem.name
+                );
+                return {
+                  name: availableItem.name,
+                  quantity: apiItem
+                    ? apiItem.quantity
+                    : availableItem.defaultQuantity || 1,
+                };
+              }
+            );
+
+            return {
+              id: `order-${order.id}-${item.menuId}`,
+              menuId: item.menuId,
+              style: item.style as ServingStyleType,
+              quantity: item.quantity,
+              selectedItems,
+            };
+          });
 
           return {
             id: order.id.toString(),

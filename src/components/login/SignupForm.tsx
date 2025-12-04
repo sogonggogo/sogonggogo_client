@@ -312,7 +312,7 @@ export default function SignupForm() {
       const cleanedCardNumber = formData.cardNumber.replace(/\s/g, "");
 
       // API 호출
-      const userResponse = await userApi.signup({
+      await userApi.signup({
         name: formData.name,
         address: formData.address,
         phone: formData.phone,
@@ -321,21 +321,9 @@ export default function SignupForm() {
         creditCardNumber: cleanedCardNumber || "",
       });
 
-      // 로컬 스토리지에도 저장 (기존 로직 유지)
-      const newUser = {
-        email: userResponse.email,
-        password: formData.password, // API 응답에는 비밀번호가 없으므로 폼 데이터 사용
-        name: userResponse.name,
-        phone: userResponse.phone,
-        address: userResponse.address,
-        cardNumber: userResponse.creditCardNumber,
-        isRegularCustomer: userResponse.isRegularCustomer,
-      };
+      alert("회원가입이 완료되었습니다! 로그인 후 이용해주세요.");
 
-      saveUserInfo(newUser);
-      alert("회원가입이 완료되었습니다!");
-
-      // Redirect to home page with full page reload to update header
+      // Redirect to home page (without auto-login)
       window.location.href = "/";
     } catch (error) {
       const errorMessage =

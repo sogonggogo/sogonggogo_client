@@ -156,16 +156,34 @@ export default function PrevOrderPage() {
         // API 응답을 OrderHistory 형식으로 변환
         const convertedHistory: OrderHistory[] = orders.map((order) => {
           // orderItems를 로컬 OrderItem 형식으로 변환
-          const localOrders = order.orderItems.map((item) => ({
-            id: `order-${order.id}-${item.menuId}`,
-            menuId: item.menuId,
-            style: item.style as ServingStyleType,
-            quantity: item.quantity,
-            selectedItems: item.selectedItems.map((si) => ({
-              name: si.name,
-              quantity: si.quantity,
-            })) as SelectedItem[],
-          }));
+          const localOrders = order.orderItems.map((item) => {
+            // 해당 메뉴의 기본 아이템 정보 가져오기
+            const availableItems = getItemsForMenu(item.menuId);
+
+            // API의 selectedItems를 로컬 형식으로 변환
+            // 모든 아이템을 포함하되, API에 있는 수량을 사용
+            const selectedItems: SelectedItem[] = availableItems.map(
+              (availableItem) => {
+                const apiItem = item.selectedItems.find(
+                  (si) => si.name === availableItem.name
+                );
+                return {
+                  name: availableItem.name,
+                  quantity: apiItem
+                    ? apiItem.quantity
+                    : availableItem.defaultQuantity || 1,
+                };
+              }
+            );
+
+            return {
+              id: `order-${order.id}-${item.menuId}`,
+              menuId: item.menuId,
+              style: item.style as ServingStyleType,
+              quantity: item.quantity,
+              selectedItems,
+            };
+          });
 
           return {
             id: order.id.toString(),

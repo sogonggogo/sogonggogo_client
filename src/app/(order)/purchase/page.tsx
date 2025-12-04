@@ -234,26 +234,25 @@ export default function PurchasePage() {
           }));
 
         // selectedItems를 API 형식으로 변환
-        const apiSelectedItems = selectedItems
-          .filter((si) => si.quantity > 0)
-          .map((si) => {
-            const itemData = availableItems.find((i) => i.name === si.name);
-            if (!itemData)
-              throw new Error(`아이템을 찾을 수 없습니다: ${si.name}`);
+        // 수량이 0인 아이템도 포함 (재주문 시 정확한 복원을 위해)
+        const apiSelectedItems = selectedItems.map((si) => {
+          const itemData = availableItems.find((i) => i.name === si.name);
+          if (!itemData)
+            throw new Error(`아이템을 찾을 수 없습니다: ${si.name}`);
 
-            const defaultQty = itemData.defaultQuantity || 1;
-            const additionalQty = si.quantity - defaultQty;
-            const additionalPrice =
-              Math.max(0, additionalQty) * itemData.basePrice;
+          const defaultQty = itemData.defaultQuantity || 1;
+          const additionalQty = si.quantity - defaultQty;
+          const additionalPrice =
+            Math.max(0, additionalQty) * itemData.basePrice;
 
-            return {
-              name: si.name,
-              quantity: si.quantity,
-              unitPrice: itemData.basePrice,
-              defaultQuantity: defaultQty,
-              additionalPrice: additionalPrice,
-            };
-          });
+          return {
+            name: si.name,
+            quantity: si.quantity,
+            unitPrice: itemData.basePrice,
+            defaultQuantity: defaultQty,
+            additionalPrice: additionalPrice,
+          };
+        });
 
         // 아이템 추가 가격 계산
         const itemsPrice = apiSelectedItems.reduce(
