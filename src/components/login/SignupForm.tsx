@@ -105,6 +105,48 @@ const InfoText = styled.p`
   line-height: 1.5;
 `;
 
+const EmailInputWrapper = styled.div`
+  display: flex;
+  gap: ${({ theme }) => theme.spacing.sm};
+  align-items: flex-start;
+`;
+
+const EmailInput = styled(Input)`
+  flex: 1;
+`;
+
+const CheckButton = styled.button<{ isChecking?: boolean }>`
+  padding: ${({ theme }) => theme.spacing.md};
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.white};
+  border: none;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  font-size: ${({ theme }) => theme.fontSize.sm};
+  font-weight: ${({ theme }) => theme.fontWeight.bold};
+  font-family: ${({ theme }) => theme.fontFamily.miwon};
+  cursor: ${({ isChecking }) => (isChecking ? "not-allowed" : "pointer")};
+  white-space: nowrap;
+  transition: all ${({ theme }) => theme.transition.fast};
+  opacity: ${({ isChecking }) => (isChecking ? 0.7 : 1)};
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+`;
+
+const CheckStatusMessage = styled.p<{ status: "available" | "duplicate" }>`
+  font-size: ${({ theme }) => theme.fontSize.sm};
+  color: ${({ status, theme }) =>
+    status === "available" ? "#22c55e" : theme.colors.primary};
+  margin-top: ${({ theme }) => theme.spacing.xs};
+  font-family: ${({ theme }) => theme.fontFamily.miwon};
+`;
+
 export default function SignupForm() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -118,6 +160,9 @@ export default function SignupForm() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [emailCheckStatus, setEmailCheckStatus] = useState<
+    "idle" | "checking" | "available" | "duplicate"
+  >("idle");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -148,6 +193,11 @@ export default function SignupForm() {
 
     // Clear error for this field
     setErrors((prev) => ({ ...prev, [name]: "" }));
+
+    // Reset email check status when email changes
+    if (name === "email") {
+      setEmailCheckStatus("idle");
+    }
   };
 
   const validateForm = (): boolean => {
@@ -235,6 +285,60 @@ export default function SignupForm() {
     router.push("/login");
   };
 
+  const handleEmailCheck = async () => {
+    // 이메일 형식 검증
+    if (!formData.email.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        email: "이메일을 입력해주세요.",
+      }));
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setErrors((prev) => ({
+        ...prev,
+        email: "올바른 이메일 형식이 아닙니다.",
+      }));
+      return;
+    }
+
+    setEmailCheckStatus("checking");
+    setErrors((prev) => ({ ...prev, email: "" }));
+
+    try {
+      // TODO: API 연동 시 여기에 API 호출 코드 추가
+      // const response = await checkEmailDuplicate(formData.email);
+      // if (response.isDuplicate) {
+      //   setEmailCheckStatus("duplicate");
+      //   setErrors((prev) => ({
+      //     ...prev,
+      //     email: "이미 사용 중인 이메일입니다.",
+      //   }));
+      // } else {
+      //   setEmailCheckStatus("available");
+      // }
+
+      // 임시: 로컬 스토리지에서 중복 체크 (API 연동 전까지)
+      const existingUser = getUserInfo();
+      if (existingUser && existingUser.email === formData.email) {
+        setEmailCheckStatus("duplicate");
+        setErrors((prev) => ({
+          ...prev,
+          email: "이미 사용 중인 이메일입니다.",
+        }));
+      } else {
+        setEmailCheckStatus("available");
+      }
+    } catch (error) {
+      setEmailCheckStatus("idle");
+      setErrors((prev) => ({
+        ...prev,
+        email: "중복 확인 중 오류가 발생했습니다.",
+      }));
+    }
+  };
+
   return (
     <FormCard>
       <InfoText>
@@ -245,16 +349,36 @@ export default function SignupForm() {
         {/* Email - Full Width */}
         <FormGroup>
           <Label htmlFor="email">이메일 *</Label>
-          <Input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="example@email.com"
-            required
-          />
+          <EmailInputWrapper>
+            <EmailInput
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="example@email.com"
+              required
+            />
+            <CheckButton
+              type="button"
+              onClick={handleEmailCheck}
+              disabled={emailCheckStatus === "checking"}
+              isChecking={emailCheckStatus === "checking"}
+            >
+              {emailCheckStatus === "checking" ? "확인 중..." : "중복 확인"}
+            </CheckButton>
+          </EmailInputWrapper>
           {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
+          {emailCheckStatus === "available" && (
+            <CheckStatusMessage status="available">
+              사용 가능한 이메일입니다.
+            </CheckStatusMessage>
+          )}
+          {emailCheckStatus === "duplicate" && (
+            <CheckStatusMessage status="duplicate">
+              이미 사용 중인 이메일입니다.
+            </CheckStatusMessage>
+          )}
         </FormGroup>
 
         {/* Password Row - 2 columns */}
