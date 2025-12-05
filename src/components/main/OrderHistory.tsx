@@ -9,7 +9,7 @@ import { formatPrice } from "@/utils/format";
 import { servingStyles } from "@/constants/styles";
 import { ServingStyleType } from "@/types/domain/style";
 import { OrderHistory as OrderHistoryType } from "@/storage/orderHistory";
-import { orderApi } from "@/api/order";
+import { orderApi } from "@/services/order";
 import { getItemsForMenu } from "@/utils/menu";
 import type { SelectedItem } from "@/types/domain/menu";
 import { saveOrders } from "@/storage/order";

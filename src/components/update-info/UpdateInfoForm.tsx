@@ -4,7 +4,7 @@ import styled from "@emotion/styled";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getUserInfo, saveUserInfo } from "@/storage/user";
-import { userApi } from "@/api/user";
+import { userApi } from "@/services/user";
 
 const FormCard = styled.div`
   background: ${({ theme }) => theme.colors.white};

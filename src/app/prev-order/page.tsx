@@ -16,7 +16,7 @@ import { ServingStyleType } from "@/types/domain/style";
 import { getItemsForMenu } from "@/utils/menu";
 import type { SelectedItem } from "@/types/domain/menu";
 import { saveOrders } from "@/storage/order";
-import { orderApi } from "@/api/order";
+import { orderApi } from "@/services/order";
 
 const Container = styled.div`
   min-height: 100vh;

@@ -4,7 +4,7 @@ import styled from "@emotion/styled";
 import Link from "next/link";
 import { useState } from "react";
 import { saveUserInfo } from "@/storage/user";
-import { userApi } from "@/api/user";
+import { userApi } from "@/services/user";
 
 const LoginCard = styled.div`
   width: 100%;

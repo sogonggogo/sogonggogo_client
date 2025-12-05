@@ -4,12 +4,12 @@ import styled from "@emotion/styled";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Mic, MicOff, RotateCcw, Loader2 } from "lucide-react";
-import voiceOrderApi from "@/api/voice";
+import voiceOrderApi from "@/services/voice";
 import { getUserInfo } from "@/storage/user";
 import {
   getSpeechRecognition,
   isSpeechRecognitionSupported,
-} from "@/lib/speechRecognition";
+} from "@/utils/speechRecognition";
 import type { ConversationMessage, OrderData } from "@/types/api/voice";
 import { dinnerMenus } from "@/constants/menus";
 import type { ServingStyleType } from "@/types/domain/style";

@@ -15,9 +15,9 @@ import { getItemsForMenu } from "@/utils/menu";
 import OrderSummary from "@/components/order/purchase/OrderSummary";
 import DeliveryInfoDisplay from "@/components/order/purchase/DeliveryInfoDisplay";
 import PriceSummary from "@/components/order/purchase/PriceSummary";
-import { orderApi } from "@/api/order";
+import { orderApi } from "@/services/order";
 import type { OrderRequest } from "@/types/api/order";
-import { userApi } from "@/api/user";
+import { userApi } from "@/services/user";
 
 const Container = styled.div`
   min-height: 100vh;

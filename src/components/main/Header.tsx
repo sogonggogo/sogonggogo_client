@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { User, Settings, LogOut } from "lucide-react";
 import { isLoggedIn, clearUserInfo } from "@/storage/user";
-import { userApi } from "@/api/user";
+import { userApi } from "@/services/user";
 
 const HeaderContainer = styled.header`
   position: fixed;
