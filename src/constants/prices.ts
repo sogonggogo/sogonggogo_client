@@ -1,17 +1,9 @@
-import { dinnerMenus } from "./menus";
-
-export interface MenuItemOption {
-  name: string;
-  basePrice: number;
-  defaultQuantity?: number; // 기본 수량 (지정하지 않으면 1)
-}
-
 interface ItemPriceConfig {
   unitPrice: number;
   defaultQuantity: number;
 }
 
-const itemPrices: Record<string, ItemPriceConfig> = {
+export const itemPrices: Record<string, ItemPriceConfig> = {
   "발렌타인-와인": { unitPrice: 25000, defaultQuantity: 1 },
   "발렌타인-스테이크": { unitPrice: 35000, defaultQuantity: 1 },
   "하트 장식": { unitPrice: 14500, defaultQuantity: 1 },
@@ -38,7 +30,7 @@ const itemPrices: Record<string, ItemPriceConfig> = {
 };
 
 // 메뉴별 아이템 키 매핑
-const getItemPriceKey = (menuId: number, itemName: string): string => {
+export const getItemPriceKey = (menuId: number, itemName: string): string => {
   switch (menuId) {
     case 1: // 발렌타인
       if (itemName === "와인") return "발렌타인-와인";
@@ -62,26 +54,3 @@ const getItemPriceKey = (menuId: number, itemName: string): string => {
   }
 };
 
-// 메뉴 ID에 따른 세부 메뉴 옵션 가져오기
-export const getItemsForMenu = (menuId: number): MenuItemOption[] => {
-  const menu = dinnerMenus.find((m) => m.id === menuId);
-  if (!menu) return [];
-
-  return menu.items.map((itemName) => {
-    const priceKey = getItemPriceKey(menuId, itemName);
-    const config = itemPrices[priceKey] || {
-      unitPrice: 10000,
-      defaultQuantity: 1,
-    };
-    return {
-      name: itemName,
-      basePrice: config.unitPrice,
-      defaultQuantity: config.defaultQuantity,
-    };
-  });
-};
-
-export interface SelectedItem {
-  name: string;
-  quantity: number;
-}

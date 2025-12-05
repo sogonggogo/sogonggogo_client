@@ -1,9 +1,6 @@
-export interface DeliveryInfo {
-  address: string;
-  date: string;
-  time: string;
-  cardNumber: string;
-}
+import type { DeliveryInfo } from "@/types/domain/order";
+
+export type { DeliveryInfo };
 
 const STORAGE_KEY = "mr-daebak-delivery";
 

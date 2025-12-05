@@ -1,65 +1,6 @@
+import type { OrderRequest, OrderResponse } from "@/types/api/order";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-
-export interface OrderCustomer {
-  email: string;
-  name: string;
-  phone: string;
-  isRegularCustomer: boolean;
-}
-
-export interface OrderDeliveryInfo {
-  address: string;
-  date: string;
-  time: string;
-  cardNumber: string;
-}
-
-export interface OrderPricing {
-  subtotal: number;
-  discount: number;
-  total: number;
-}
-
-export interface OrderMetadata {
-  orderDate: string;
-  clientOrderId: string;
-}
-
-export interface OrderSelectedItem {
-  name: string;
-  quantity: number;
-  unitPrice: number;
-  defaultQuantity: number;
-  additionalPrice: number;
-}
-
-export interface OrderItem {
-  menuId: number;
-  menuName: string;
-  style: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-  selectedItems: OrderSelectedItem[];
-}
-
-export interface OrderRequest {
-  customer: OrderCustomer;
-  deliveryInfo: OrderDeliveryInfo;
-  pricing: OrderPricing;
-  metadata: OrderMetadata;
-  orderItems: OrderItem[];
-}
-
-export interface OrderResponse {
-  id: number;
-  status: string;
-  customer: OrderCustomer;
-  deliveryInfo: OrderDeliveryInfo;
-  pricing: OrderPricing;
-  metadata: OrderMetadata;
-  orderItems: (OrderItem & { id: number })[];
-}
 
 class OrderApiService {
   private baseUrl: string;
@@ -146,3 +87,4 @@ class OrderApiService {
 export const orderApi = new OrderApiService();
 
 export default orderApi;
+

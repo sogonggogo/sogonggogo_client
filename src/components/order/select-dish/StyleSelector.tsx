@@ -2,12 +2,11 @@
 
 import styled from "@emotion/styled";
 import Image from "next/image";
-import {
-  servingStyles,
-  calculatePriceWithStyle,
-  ServingStyleType,
-} from "@/data/styles";
-import { formatPrice, MenuItem } from "@/data/menus";
+import { servingStyles } from "@/constants/styles";
+import { calculatePriceWithStyle } from "@/utils/calculations";
+import type { ServingStyleType } from "@/types/domain/style";
+import type { MenuItem } from "@/types/domain/menu";
+import { formatPrice } from "@/utils/format";
 
 const StyleSection = styled.div`
   background: ${({ theme }) => theme.colors.white};

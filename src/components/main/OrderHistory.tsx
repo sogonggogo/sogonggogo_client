@@ -4,12 +4,15 @@ import styled from "@emotion/styled";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Clock } from "lucide-react";
-import { dinnerMenus, formatPrice } from "@/data/menus";
-import { servingStyles, ServingStyleType } from "@/data/styles";
-import { OrderHistory as OrderHistoryType } from "@/utils/orderHistoryStorage";
-import { orderApi } from "@/services/orderApi";
-import { SelectedItem, getItemsForMenu } from "@/data/additionalOptions";
-import { saveOrders } from "@/utils/orderStorage";
+import { dinnerMenus } from "@/constants/menus";
+import { formatPrice } from "@/utils/format";
+import { servingStyles } from "@/constants/styles";
+import { ServingStyleType } from "@/types/domain/style";
+import { OrderHistory as OrderHistoryType } from "@/storage/orderHistory";
+import { orderApi } from "@/api/order";
+import { getItemsForMenu } from "@/utils/menu";
+import type { SelectedItem } from "@/types/domain/menu";
+import { saveOrders } from "@/storage/order";
 
 const Container = styled.div`
   width: 100%;

@@ -3,8 +3,8 @@
 import styled from "@emotion/styled";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getUserInfo, saveUserInfo } from "@/utils/userStorage";
-import { userApi } from "@/services/userApi";
+import { getUserInfo, saveUserInfo } from "@/storage/user";
+import { userApi } from "@/api/user";
 
 const FormCard = styled.div`
   background: ${({ theme }) => theme.colors.white};

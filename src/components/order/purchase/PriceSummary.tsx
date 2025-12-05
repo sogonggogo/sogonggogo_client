@@ -1,7 +1,7 @@
 "use client";
 
 import styled from "@emotion/styled";
-import { formatPrice } from "@/data/menus";
+import { formatPrice } from "@/utils/format";
 
 const SummaryContainer = styled.div`
   margin-top: ${({ theme }) => theme.spacing.xl};

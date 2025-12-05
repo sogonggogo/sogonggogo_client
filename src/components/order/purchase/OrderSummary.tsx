@@ -1,10 +1,12 @@
 "use client";
 
 import styled from "@emotion/styled";
-import { OrderItem } from "@/utils/orderStorage";
-import { dinnerMenus, formatPrice } from "@/data/menus";
-import { servingStyles, calculatePriceWithStyle } from "@/data/styles";
-import { getItemsForMenu } from "@/data/additionalOptions";
+import { OrderItem } from "@/storage/order";
+import { dinnerMenus } from "@/constants/menus";
+import { formatPrice } from "@/utils/format";
+import { servingStyles } from "@/constants/styles";
+import { calculatePriceWithStyle } from "@/utils/calculations";
+import { getItemsForMenu } from "@/utils/menu";
 
 const OrderList = styled.div`
   display: flex;

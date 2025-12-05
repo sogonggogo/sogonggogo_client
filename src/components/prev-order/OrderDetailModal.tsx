@@ -9,10 +9,11 @@ import {
   CreditCard,
   Package,
 } from "lucide-react";
-import { OrderHistory } from "@/utils/orderHistoryStorage";
-import { dinnerMenus, formatPrice } from "@/data/menus";
-import { servingStyles } from "@/data/styles";
-import { getItemsForMenu } from "@/data/additionalOptions";
+import { OrderHistory } from "@/storage/orderHistory";
+import { dinnerMenus } from "@/constants/menus";
+import { formatPrice } from "@/utils/format";
+import { servingStyles } from "@/constants/styles";
+import { getItemsForMenu } from "@/utils/menu";
 
 const ModalOverlay = styled.div`
   position: fixed;

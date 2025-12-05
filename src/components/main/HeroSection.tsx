@@ -5,7 +5,7 @@ import styled from "@emotion/styled";
 import { keyframes } from "@emotion/react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
-import { dinnerMenus } from "@/data/menus";
+import { dinnerMenus } from "@/constants/menus";
 
 // 애니메이션 정의
 const fadeInLeft = keyframes`

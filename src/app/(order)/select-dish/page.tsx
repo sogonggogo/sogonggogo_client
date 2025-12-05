@@ -3,14 +3,14 @@
 import styled from "@emotion/styled";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { dinnerMenus } from "@/data/menus";
-import { ServingStyleType } from "@/data/styles";
+import { dinnerMenus } from "@/constants/menus";
+import { ServingStyleType } from "@/types/domain/style";
 import { ShoppingCart } from "lucide-react";
 import MenuGrid from "@/components/order/select-dish/MenuGrid";
 import StyleSelector from "@/components/order/select-dish/StyleSelector";
 import OrderButton from "@/components/order/select-dish/OrderButton";
-import { addOrder } from "@/utils/orderStorage";
-import { getItemsForMenu } from "@/data/additionalOptions";
+import { addOrder } from "@/storage/order";
+import { getItemsForMenu } from "@/utils/menu";
 
 const Container = styled.div`
   min-height: 100vh;

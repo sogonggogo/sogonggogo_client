@@ -1,29 +1,12 @@
+import type {
+  CheckEmailResponse,
+  UserResponse,
+  SignupRequest,
+} from "@/types/api/user";
+
 // CORS 이슈 해결을 위해 Next.js rewrites를 통한 프록시 사용
 // next.config.ts에서 /api/* 요청을 실제 서버로 프록시 설정
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-
-export interface CheckEmailResponse {
-  available: boolean;
-}
-
-export interface UserResponse {
-  id: number;
-  name: string;
-  address: string;
-  phone: string;
-  email: string;
-  creditCardNumber: string;
-  isRegularCustomer: boolean;
-}
-
-export interface SignupRequest {
-  name: string;
-  address: string;
-  phone: string;
-  email: string;
-  password: string;
-  creditCardNumber: string;
-}
 
 class UserApiService {
   private baseUrl: string;
@@ -181,3 +164,4 @@ class UserApiService {
 export const userApi = new UserApiService();
 
 export default userApi;
+

@@ -1,26 +1,6 @@
-import { OrderItem } from "./orderStorage";
-import { DeliveryInfo } from "./deliveryStorage";
+import type { OrderHistory, OrderStatusType } from "@/types/domain/order";
 
-export type OrderStatusType =
-  | "PENDING"
-  | "APPROVED"
-  | "COOKING"
-  | "READY_FOR_DELIVERY"
-  | "IN_DELIVERY"
-  | "COMPLETED"
-  | "REJECTED";
-
-export interface OrderHistory {
-  id: string;
-  orderDate: string; // ISO date string
-  orders: OrderItem[];
-  deliveryInfo: DeliveryInfo;
-  subtotal: number;
-  discount: number;
-  total: number;
-  isRegularCustomer: boolean;
-  status: OrderStatusType | string; // string for backward compatibility
-}
+export type { OrderHistory, OrderStatusType };
 
 const STORAGE_KEY = "mr-daebak-order-history";
 

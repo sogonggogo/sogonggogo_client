@@ -3,8 +3,8 @@
 import styled from "@emotion/styled";
 import Link from "next/link";
 import { useState } from "react";
-import { saveUserInfo } from "@/utils/userStorage";
-import { userApi } from "@/services/userApi";
+import { saveUserInfo } from "@/storage/user";
+import { userApi } from "@/api/user";
 
 const LoginCard = styled.div`
   width: 100%;

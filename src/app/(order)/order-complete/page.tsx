@@ -7,7 +7,7 @@ import { CheckCircle } from "lucide-react";
 import {
   getOrderHistory,
   type OrderHistory,
-} from "@/utils/orderHistoryStorage";
+} from "@/storage/orderHistory";
 import OrderCompleteSummary from "@/components/order/order-complete/OrderCompleteSummary";
 
 const Container = styled.div`

@@ -1,8 +1,8 @@
 "use client";
 
 import styled from "@emotion/styled";
-import { formatPrice } from "@/data/menus";
-import { MenuItemOption, SelectedItem } from "@/data/additionalOptions";
+import { formatPrice } from "@/utils/format";
+import type { MenuItemOption, SelectedItem } from "@/types/domain/menu";
 import { Minus, Plus, Trash2 } from "lucide-react";
 
 const MenuSection = styled.div``;

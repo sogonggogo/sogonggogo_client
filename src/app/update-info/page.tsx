@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Settings } from "lucide-react";
 import UpdateInfoForm from "@/components/update-info/UpdateInfoForm";
-import { isLoggedIn } from "@/utils/userStorage";
+import { isLoggedIn } from "@/storage/user";
 
 const Container = styled.div`
   min-height: 100vh;

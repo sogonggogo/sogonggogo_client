@@ -1,13 +1,8 @@
-import { ServingStyleType } from "@/data/styles";
-import { SelectedItem } from "@/data/additionalOptions";
+import type { OrderItem } from "@/types/domain/order";
+import type { ServingStyleType } from "@/types/domain/style";
+import type { SelectedItem } from "@/types/domain/menu";
 
-export interface OrderItem {
-  id: string;
-  menuId: number;
-  style: ServingStyleType;
-  quantity: number;
-  selectedItems: SelectedItem[]; // 변경: 세부 메뉴 수량
-}
+export type { OrderItem };
 
 const STORAGE_KEY = "mr-daebak-orders";
 

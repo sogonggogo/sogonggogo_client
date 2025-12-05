@@ -1,7 +1,7 @@
 "use client";
 
 import styled from "@emotion/styled";
-import { formatPrice } from "@/data/menus";
+import { formatPrice } from "@/utils/format";
 import { Clock, MapPin, Calendar } from "lucide-react";
 
 const Card = styled.div`

@@ -1,15 +1,4 @@
-import { ServingStyleType } from "./styles";
-
-export interface MenuItem {
-  id: number;
-  name: string;
-  nameEn: string;
-  description: string;
-  items: string[];
-  basePrice: number;
-  availableStyles: ServingStyleType[];
-  image?: string;
-}
+import type { MenuItem } from "@/types/domain/menu";
 
 export const dinnerMenus: MenuItem[] = [
   {
@@ -54,6 +43,3 @@ export const dinnerMenus: MenuItem[] = [
   },
 ];
 
-export const formatPrice = (price: number): string => {
-  return `${price.toLocaleString("ko-KR")}원`;
-};

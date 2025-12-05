@@ -9,12 +9,14 @@ import OrderDetailModal from "@/components/prev-order/OrderDetailModal";
 import {
   OrderHistory,
   OrderStatusType,
-} from "@/utils/orderHistoryStorage";
-import { dinnerMenus } from "@/data/menus";
-import { servingStyles, ServingStyleType } from "@/data/styles";
-import { getItemsForMenu, SelectedItem } from "@/data/additionalOptions";
-import { saveOrders } from "@/utils/orderStorage";
-import { orderApi } from "@/services/orderApi";
+} from "@/storage/orderHistory";
+import { dinnerMenus } from "@/constants/menus";
+import { servingStyles } from "@/constants/styles";
+import { ServingStyleType } from "@/types/domain/style";
+import { getItemsForMenu } from "@/utils/menu";
+import type { SelectedItem } from "@/types/domain/menu";
+import { saveOrders } from "@/storage/order";
+import { orderApi } from "@/api/order";
 
 const Container = styled.div`
   min-height: 100vh;

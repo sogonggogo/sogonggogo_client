@@ -3,8 +3,10 @@
 import styled from "@emotion/styled";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { dinnerMenus, formatPrice } from "@/data/menus";
-import { servingStyles, calculatePriceWithStyle } from "@/data/styles";
+import { dinnerMenus } from "@/constants/menus";
+import { servingStyles } from "@/constants/styles";
+import { formatPrice } from "@/utils/format";
+import { calculatePriceWithStyle } from "@/utils/calculations";
 import { CheckCircle } from "lucide-react";
 import OrderCard from "@/components/order/change-option/OrderCard";
 import MenuItemOptions from "@/components/order/change-option/MenuItemOptions";
@@ -16,9 +18,9 @@ import {
   updateOrder,
   deleteOrder,
   OrderItem,
-} from "@/utils/orderStorage";
-import { getItemsForMenu } from "@/data/additionalOptions";
-import { ServingStyleType } from "@/data/styles";
+} from "@/storage/order";
+import { getItemsForMenu } from "@/utils/menu";
+import { ServingStyleType } from "@/types/domain/style";
 
 const Container = styled.div`
   min-height: 100vh;

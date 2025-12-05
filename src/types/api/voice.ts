@@ -1,4 +1,4 @@
-// Voice Order API Types based on API specification
+// Voice Order API Types
 
 export interface StartChatRequest {
   customer_name: string;
@@ -71,5 +71,4 @@ export interface ConversationMessage {
 export interface ApiError {
   detail: string;
 }
-
 

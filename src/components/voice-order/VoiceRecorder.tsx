@@ -4,18 +4,19 @@ import styled from "@emotion/styled";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Mic, MicOff, RotateCcw, Loader2 } from "lucide-react";
-import voiceOrderApi from "@/services/voiceOrderApi";
-import { getUserInfo } from "@/utils/userStorage";
+import voiceOrderApi from "@/api/voice";
+import { getUserInfo } from "@/storage/user";
 import {
   getSpeechRecognition,
   isSpeechRecognitionSupported,
-} from "@/utils/speechRecognition";
-import type { ConversationMessage, OrderData } from "@/types/voiceOrderTypes";
-import { dinnerMenus } from "@/data/menus";
-import { ServingStyleType } from "@/data/styles";
-import { getItemsForMenu, SelectedItem } from "@/data/additionalOptions";
-import { saveOrders } from "@/utils/orderStorage";
-import { saveDeliveryInfo } from "@/utils/deliveryStorage";
+} from "@/lib/speechRecognition";
+import type { ConversationMessage, OrderData } from "@/types/api/voice";
+import { dinnerMenus } from "@/constants/menus";
+import type { ServingStyleType } from "@/types/domain/style";
+import { getItemsForMenu } from "@/utils/menu";
+import type { SelectedItem } from "@/types/domain/menu";
+import { saveOrders } from "@/storage/order";
+import { saveDeliveryInfo } from "@/storage/delivery";
 
 const VoiceCard = styled.div`
   width: 100%;

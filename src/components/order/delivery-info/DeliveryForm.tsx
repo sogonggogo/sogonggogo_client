@@ -3,10 +3,10 @@
 import styled from "@emotion/styled";
 import { useState, useEffect } from "react";
 import { MapPin, Calendar, Clock, CreditCard } from "lucide-react";
-import type { DeliveryInfo } from "@/utils/deliveryStorage";
-import { getUserInfo } from "@/utils/userStorage";
-import { userApi } from "@/services/userApi";
-import { getDeliveryInfo } from "@/utils/deliveryStorage";
+import type { DeliveryInfo } from "@/storage/delivery";
+import { getUserInfo } from "@/storage/user";
+import { userApi } from "@/api/user";
+import { getDeliveryInfo } from "@/storage/delivery";
 
 const FormContainer = styled.div`
   background: ${({ theme }) => theme.colors.white};

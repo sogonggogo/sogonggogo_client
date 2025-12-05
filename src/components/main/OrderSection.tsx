@@ -4,7 +4,7 @@ import styled from "@emotion/styled";
 import Link from "next/link";
 import { ShoppingCart, Mic, Clock } from "lucide-react";
 import { useState, useEffect } from "react";
-import { isLoggedIn } from "@/utils/userStorage";
+import { isLoggedIn } from "@/storage/user";
 
 const Section = styled.section`
   grid-column: 1 / -1;

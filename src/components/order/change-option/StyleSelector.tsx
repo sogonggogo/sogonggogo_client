@@ -1,8 +1,9 @@
 "use client";
 
 import styled from "@emotion/styled";
-import { servingStyles, ServingStyleType } from "@/data/styles";
-import { formatPrice } from "@/data/menus";
+import { servingStyles } from "@/constants/styles";
+import { ServingStyleType } from "@/types/domain/style";
+import { formatPrice } from "@/utils/format";
 
 const StyleSection = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing.xl};

@@ -2,7 +2,7 @@
 
 import styled from "@emotion/styled";
 import Image from "next/image";
-import { MenuItem } from "@/data/menus";
+import { MenuItem } from "@/types/domain/menu";
 
 const Grid = styled.div`
   display: grid;

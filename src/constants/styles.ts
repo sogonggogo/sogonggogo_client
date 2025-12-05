@@ -1,18 +1,4 @@
-export type ServingStyleType = "simple" | "grand" | "deluxe";
-
-export interface ServingStyle {
-  name: string;
-  nameEn: string;
-  description: string;
-  features: {
-    plate: string;
-    napkin: string;
-    wineGlass: string;
-    extras?: string[];
-  };
-  additionalPrice: number;
-  image: string;
-}
+import type { ServingStyle, ServingStyleType } from "@/types/domain/style";
 
 export const servingStyles: Record<ServingStyleType, ServingStyle> = {
   simple: {
@@ -54,13 +40,3 @@ export const servingStyles: Record<ServingStyleType, ServingStyle> = {
   },
 };
 
-export const calculatePriceWithStyle = (
-  basePrice: number,
-  styleType: ServingStyleType
-): number => {
-  const style = servingStyles[styleType];
-  if (!style) {
-    return basePrice; // 스타일을 찾을 수 없으면 기본 가격만 반환
-  }
-  return basePrice + style.additionalPrice;
-};

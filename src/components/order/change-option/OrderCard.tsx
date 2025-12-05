@@ -2,9 +2,9 @@
 
 import styled from "@emotion/styled";
 import Image from "next/image";
-import { MenuItem, formatPrice } from "@/data/menus";
-import { ServingStyle } from "@/data/styles";
-import { SelectedItem, MenuItemOption } from "@/data/additionalOptions";
+import { formatPrice } from "@/utils/format";
+import type { MenuItem, MenuItemOption, SelectedItem } from "@/types/domain/menu";
+import type { ServingStyle } from "@/types/domain/style";
 import { Minus, Plus, Trash2 } from "lucide-react";
 
 const Card = styled.div`
