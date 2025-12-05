@@ -44,4 +44,3 @@ export const isRegularCustomer = (): boolean => {
   const user = getUserInfo();
   return user?.isRegularCustomer ?? false;
 };
-

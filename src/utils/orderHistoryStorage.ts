@@ -35,7 +35,7 @@ export const getOrderHistory = (): OrderHistory[] => {
   }
 };
 
-export const saveOrderHistory = (orderHistories: OrderHistory[]): void => {
+const saveOrderHistory = (orderHistories: OrderHistory[]): void => {
   if (typeof window === "undefined") return;
 
   try {
@@ -56,9 +56,4 @@ export const addOrderHistory = (
 
   histories.unshift(newHistory); // Add to the beginning of the array
   saveOrderHistory(histories);
-};
-
-export const clearOrderHistory = (): void => {
-  if (typeof window === "undefined") return;
-  localStorage.removeItem(STORAGE_KEY);
 };

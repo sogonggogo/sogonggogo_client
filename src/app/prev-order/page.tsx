@@ -8,7 +8,6 @@ import OrderCard from "@/components/prev-order/OrderCard";
 import OrderDetailModal from "@/components/prev-order/OrderDetailModal";
 import {
   OrderHistory,
-  addOrderHistory,
   OrderStatusType,
 } from "@/utils/orderHistoryStorage";
 import { dinnerMenus } from "@/data/menus";
@@ -210,20 +209,6 @@ export default function PrevOrderPage() {
         });
 
         setOrderHistory(convertedHistory);
-
-        // 로컬 스토리지에도 저장 (오프라인 대비)
-        convertedHistory.forEach((history) => {
-          addOrderHistory({
-            orderDate: history.orderDate,
-            orders: history.orders,
-            deliveryInfo: history.deliveryInfo,
-            subtotal: history.subtotal,
-            discount: history.discount,
-            total: history.total,
-            isRegularCustomer: history.isRegularCustomer,
-            status: history.status,
-          });
-        });
       } catch (error) {
         console.error("Failed to load order history:", error);
         const errorMessage =
