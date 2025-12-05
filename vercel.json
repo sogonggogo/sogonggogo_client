@@ -1,0 +1,13 @@
+{
+  "rewrites": [
+    {
+      "source": "/staff",
+      "destination": "https://sogonggogo-staff.vercel.app/staff"
+    },
+    {
+      "source": "/staff/:path*",
+      "destination": "https://sogonggogo-staff.vercel.app/staff/:path*"
+    }
+  ]
+}
+

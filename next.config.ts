@@ -14,6 +14,18 @@ const nextConfig: NextConfig = {
   compiler: {
     emotion: true,
   },
+  async rewrites() {
+    return [
+      {
+        source: "/staff",
+        destination: "https://sogonggogo-staff.vercel.app/staff",
+      },
+      {
+        source: "/staff/:path*",
+        destination: "https://sogonggogo-staff.vercel.app/staff/:path*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
