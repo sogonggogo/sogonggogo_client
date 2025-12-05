@@ -1,7 +1,7 @@
 "use client";
 
 import styled from "@emotion/styled";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Mic, MicOff, RotateCcw, Loader2 } from "lucide-react";
 import voiceOrderApi from "@/services/voiceOrderApi";
@@ -224,6 +224,7 @@ export default function VoiceRecorder() {
   const [orderData, setOrderData] = useState<OrderData | null>(null);
   const [interimText, setInterimText] = useState<string>("");
   const [isSupported, setIsSupported] = useState(true);
+  const conversationEndRef = useRef<HTMLDivElement>(null);
 
   // Initialize chat session on component mount
   useEffect(() => {
@@ -244,6 +245,13 @@ export default function VoiceRecorder() {
       }
     }
   }, []);
+
+  // Auto-scroll to bottom when conversation updates
+  useEffect(() => {
+    if (conversationEndRef.current) {
+      conversationEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [conversation, interimText]);
 
   const initializeChat = async () => {
     try {
@@ -640,6 +648,12 @@ export default function VoiceRecorder() {
                 {message.text}
               </MessageBubble>
             ))}
+            {interimText && (
+              <MessageBubble role="user" style={{ opacity: 0.6 }}>
+                {interimText}
+              </MessageBubble>
+            )}
+            <div ref={conversationEndRef} />
           </ConversationBox>
 
           <ActionButtons>
