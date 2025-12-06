@@ -34,13 +34,13 @@ export class SpeechRecognitionService {
   private setupRecognition() {
     // 한국어 설정
     this.recognition.lang = "ko-KR";
-
+    
     // 연속 인식 (true: 계속 인식)
     this.recognition.continuous = true;
-
+    
     // 중간 결과 반환 여부
     this.recognition.interimResults = true;
-
+    
     // 최대 대안 개수
     this.recognition.maxAlternatives = 1;
   }
@@ -88,9 +88,9 @@ export class SpeechRecognitionService {
       console.error("Speech recognition error:", event.error);
       this.isListening = false;
       this.clearSilenceTimer();
-
+      
       let errorMessage = "음성 인식 중 오류가 발생했습니다.";
-
+      
       switch (event.error) {
         case "no-speech":
           errorMessage = "음성이 감지되지 않았습니다.";
@@ -105,7 +105,7 @@ export class SpeechRecognitionService {
           errorMessage = "네트워크 오류가 발생했습니다.";
           break;
       }
-
+      
       if (onError) {
         onError(errorMessage);
       }
