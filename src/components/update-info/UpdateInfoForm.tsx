@@ -134,15 +134,32 @@ export default function UpdateInfoForm() {
     const loadUserInfo = async () => {
       try {
         const userResponse = await userApi.getMe();
-        setFormData({
-          email: userResponse.email || "",
-          password: "",
-          confirmPassword: "",
-          name: userResponse.name || "",
-          phone: userResponse.phone || "",
-          address: userResponse.address || "",
-          cardNumber: userResponse.creditCardNumber || "",
-        });
+        if (userResponse) {
+          // 로그인 상태인 경우
+          setFormData({
+            email: userResponse.email || "",
+            password: "",
+            confirmPassword: "",
+            name: userResponse.name || "",
+            phone: userResponse.phone || "",
+            address: userResponse.address || "",
+            cardNumber: userResponse.creditCardNumber || "",
+          });
+        } else {
+          // 로그아웃 상태인 경우 로컬 스토리지에서 로드
+          const userInfo = getUserInfo();
+          if (userInfo) {
+            setFormData({
+              email: userInfo.email || "",
+              password: "",
+              confirmPassword: "",
+              name: userInfo.name || "",
+              phone: userInfo.phone || "",
+              address: userInfo.address || "",
+              cardNumber: userInfo.cardNumber || "",
+            });
+          }
+        }
       } catch {
         // API 실패 시 로컬 스토리지에서 로드
         const userInfo = getUserInfo();

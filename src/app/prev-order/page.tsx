@@ -160,6 +160,13 @@ export default function PrevOrderPage() {
         // API에서 주문 내역 가져오기
         const orders = await orderApi.getMyOrders();
 
+        // 주문이 없으면 (로그아웃 상태 포함) 빈 배열 처리
+        if (orders.length === 0) {
+          setOrderHistory([]);
+          setLoading(false);
+          return;
+        }
+
         // API 응답을 OrderHistory 형식으로 변환
         const convertedHistory: OrderHistory[] = orders.map((order) => {
           // orderItems를 로컬 OrderItem 형식으로 변환
@@ -213,6 +220,7 @@ export default function PrevOrderPage() {
         setOrderHistory(convertedHistory);
       } catch (error) {
         console.error("Failed to load order history:", error);
+        // 401 에러는 서비스 레벨에서 처리되므로 일반 에러만 표시
         const errorMessage =
           error instanceof Error
             ? error.message
@@ -291,8 +299,6 @@ export default function PrevOrderPage() {
   }
 
   if (error) {
-    const isLoginError = error.includes("로그인");
-
     return (
       <Container>
         <Main>
@@ -302,21 +308,10 @@ export default function PrevOrderPage() {
               주문내역
             </PageTitle>
             <EmptyState>
-              {isLoginError ? (
-                <>
-                  로그인이 필요합니다
-                  <br />
-                  <br />
-                  주문 내역을 확인하려면 로그인해주세요
-                </>
-              ) : (
-                <>
-                  {error}
-                  <br />
-                  <br />
-                  다시 시도해주세요.
-                </>
-              )}
+              {error}
+              <br />
+              <br />
+              다시 시도해주세요.
             </EmptyState>
           </ContentWrapper>
         </Main>

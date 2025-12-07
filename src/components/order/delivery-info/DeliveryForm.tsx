@@ -154,13 +154,13 @@ export default function DeliveryForm({
         const userResponse = await userApi.getMe();
 
         // 카드 번호 포맷팅 (공백 추가)
-        const formattedCardNumber = userResponse.creditCardNumber
+        const formattedCardNumber = userResponse?.creditCardNumber
           ? userResponse.creditCardNumber.match(/.{1,4}/g)?.join(" ") || ""
           : "";
 
         // 3. 저장된 배달 정보가 있으면 우선 사용, 없으면 사용자 정보 사용
         setFormData({
-          address: savedDeliveryInfo?.address || userResponse.address || "",
+          address: savedDeliveryInfo?.address || userResponse?.address || "",
           date: savedDeliveryInfo?.date || "",
           time: savedDeliveryInfo?.time || "",
           cardNumber: savedDeliveryInfo?.cardNumber

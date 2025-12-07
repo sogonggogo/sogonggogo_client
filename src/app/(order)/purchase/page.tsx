@@ -204,7 +204,25 @@ export default function PurchasePage() {
       // 사용자 정보 가져오기
       let customerInfo;
       try {
-        customerInfo = await userApi.getMe();
+        const userResponse = await userApi.getMe();
+        if (userResponse) {
+          // 로그인 상태인 경우
+          customerInfo = userResponse;
+        } else {
+          // 로그아웃 상태인 경우 로컬 스토리지에서 가져오기
+          const localUser = getUserInfo();
+          if (!localUser) {
+            alert("사용자 정보를 찾을 수 없습니다. 로그인 후 다시 시도해주세요.");
+            setIsProcessing(false);
+            return;
+          }
+          customerInfo = {
+            email: localUser.email || "",
+            name: localUser.name || "",
+            phone: localUser.phone || "",
+            isRegularCustomer: localUser.isRegularCustomer || false,
+          };
+        }
       } catch {
         // API 실패 시 로컬 스토리지에서 가져오기
         const localUser = getUserInfo();

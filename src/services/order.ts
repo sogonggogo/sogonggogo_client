@@ -39,6 +39,7 @@ class OrderApiService {
   /**
    * 내 주문 목록 조회 (고객용)
    * GET /api/orders
+   * 로그아웃 상태(401)에서는 빈 배열을 반환합니다.
    */
   async getMyOrders(): Promise<OrderResponse[]> {
     const response = await fetch(`${this.baseUrl}/api/orders`, {
@@ -51,7 +52,8 @@ class OrderApiService {
 
     if (!response.ok) {
       if (response.status === 401) {
-        throw new Error("로그인이 필요합니다.");
+        // 로그아웃 상태는 정상적인 상태이므로 에러를 throw하지 않고 빈 배열 반환
+        return [];
       }
       throw new Error(`주문 목록 조회 실패: ${response.statusText}`);
     }

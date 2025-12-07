@@ -315,8 +315,8 @@ export default function SignupForm() {
 
       alert("회원가입이 완료되었습니다! 로그인 후 이용해주세요.");
 
-      // Redirect to home page (without auto-login)
-      window.location.href = "/";
+      // Redirect to login page
+      router.push("/login");
     } catch (error) {
       const errorMessage =
         error instanceof Error

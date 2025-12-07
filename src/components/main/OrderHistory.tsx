@@ -239,6 +239,13 @@ export default function OrderHistory() {
         // API에서 주문 내역 가져오기
         const orders = await orderApi.getMyOrders();
 
+        // 주문이 없으면 (로그아웃 상태 포함) 빈 배열 처리
+        if (orders.length === 0) {
+          setOrderHistory([]);
+          setLoading(false);
+          return;
+        }
+
         // API 응답을 OrderHistory 형식으로 변환
         const convertedHistory: OrderHistoryType[] = orders.map((order) => {
           // orderItems를 로컬 OrderItem 형식으로 변환
@@ -300,10 +307,7 @@ export default function OrderHistory() {
         setOrderHistory(sortedHistory);
       } catch (error) {
         console.error("Failed to load order history:", error);
-        // 401 에러 (로그인 필요) 확인
-        if (error instanceof Error && error.message.includes("로그인")) {
-          setNeedsLogin(true);
-        }
+        // 401 에러는 서비스 레벨에서 처리되므로 여기서는 일반 에러만 처리
         setOrderHistory([]);
       } finally {
         setLoading(false);

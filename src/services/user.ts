@@ -94,8 +94,9 @@ class UserApiService {
   /**
    * 내 정보 조회
    * GET /api/users/me (세션 필요)
+   * 로그아웃 상태(401)에서는 null을 반환합니다.
    */
-  async getMe(): Promise<UserResponse> {
+  async getMe(): Promise<UserResponse | null> {
     const response = await fetch(`${this.baseUrl}/api/users/me`, {
       method: "GET",
       headers: {
@@ -106,7 +107,8 @@ class UserApiService {
 
     if (!response.ok) {
       if (response.status === 401) {
-        throw new Error("로그인이 필요합니다.");
+        // 로그아웃 상태는 정상적인 상태이므로 에러를 throw하지 않고 null 반환
+        return null;
       }
       throw new Error(`정보 조회 실패: ${response.statusText}`);
     }
