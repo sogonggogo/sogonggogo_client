@@ -16,7 +16,7 @@ import type { ServingStyleType } from "@/types/domain/style";
 import { getItemsForMenu } from "@/utils/menu";
 import type { SelectedItem } from "@/types/domain/menu";
 import { saveOrders } from "@/storage/order";
-import { saveDeliveryInfo } from "@/storage/delivery";
+import { saveDeliveryInfo, getDeliveryInfo } from "@/storage/delivery";
 
 const VoiceCard = styled.div`
   width: 100%;
@@ -529,23 +529,75 @@ export default function VoiceRecorder() {
 
       // 5. 배달 정보 저장 (사용자 정보 기반)
       const userInfo = getUserInfo();
+      let deliveryInfo;
       if (userInfo) {
         // delivery_date 파싱: "2025-12-06T00:00:00" → "2025-12-06"
-        const formattedDate = orderData.delivery_date.split("T")[0];
+        let formattedDate = "";
+        if (orderData.delivery_date) {
+          // ISO 8601 형식 파싱: "2025-12-06T00:00:00" 또는 "2025-12-06"
+          if (orderData.delivery_date.includes("T")) {
+            formattedDate = orderData.delivery_date.split("T")[0];
+          } else {
+            formattedDate = orderData.delivery_date;
+          }
+        } else {
+          console.warn("⚠️ orderData.delivery_date가 없습니다. 기본 날짜를 사용합니다.");
+          // 기본값: 오늘 날짜
+          const today = new Date();
+          formattedDate = today.toISOString().split("T")[0];
+        }
 
-        saveDeliveryInfo({
+        deliveryInfo = {
           address: userInfo.address || "",
           date: formattedDate,
           time: "18:00", // 기본 시간
           cardNumber: userInfo.cardNumber || "",
-        });
+        };
+
+        console.log("📅 배달 날짜 정보:");
+        console.log("  - 원본 delivery_date:", orderData.delivery_date);
+        console.log("  - 변환된 date:", formattedDate);
+        console.log("  - 저장할 deliveryInfo:", deliveryInfo);
+
+        saveDeliveryInfo(deliveryInfo);
+        
+        // 저장 확인
+        const savedInfo = getDeliveryInfo();
+        console.log("  - 저장 확인 (getDeliveryInfo):", savedInfo);
       } else {
         alert("로그인 후 주문을 진행해주세요.");
         router.push("/login");
         return;
       }
 
-      // 6. 주문 페이지로 이동
+      // 6. 최종 주문 정보 로그 출력 (delivery-info로 이동하기 전)
+      console.group("🎤 음성 주문 완료 - 최종 주문 정보");
+      console.log("=".repeat(50));
+      console.log("📋 주문 상세 정보");
+      console.log("=".repeat(50));
+      console.log("메뉴:", menu.name);
+      console.log("디너 타입:", orderData.dinner_type);
+      console.log("서빙 스타일:", style, `(${orderData.serving_style})`);
+      console.log("수량:", order.quantity);
+      console.log("\n📦 선택된 아이템:");
+      selectedItems.forEach((item) => {
+        if (item.quantity > 0) {
+          console.log(`  - ${item.name}: ${item.quantity}개`);
+        }
+      });
+      console.log("\n📦 원본 API 주문 데이터:");
+      console.log(JSON.stringify(orderData, null, 2));
+      console.log("\n🚚 배달 정보:");
+      console.log("  - 주소:", deliveryInfo.address);
+      console.log("  - 배달 날짜:", deliveryInfo.date);
+      console.log("  - 배달 시간:", deliveryInfo.time);
+      console.log("  - 카드 번호:", deliveryInfo.cardNumber ? "****-****-****-" + deliveryInfo.cardNumber.slice(-4) : "없음");
+      console.log("\n💾 저장된 주문 객체:");
+      console.log(JSON.stringify(order, null, 2));
+      console.log("=".repeat(50));
+      console.groupEnd();
+
+      // 7. 주문 페이지로 이동
       alert("음성 주문이 완료되었습니다! 배달 정보를 확인해주세요.");
       router.push("/delivery-info");
     } catch (error) {

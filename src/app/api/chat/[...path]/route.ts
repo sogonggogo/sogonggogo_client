@@ -5,8 +5,11 @@ const VOICE_API_BASE_URL = "http://uoscholar-server.store/sogong-ai";
 async function handler(request: NextRequest) {
   const { pathname } = new URL(request.url);
 
-  // Extract the path after /api/voice/
-  const apiPath = pathname.replace(/^\/api\/voice/, "");
+  // Extract the path after /api/chat/
+  // 프론트엔드: /api/chat/start -> 백엔드: /api/chat/start
+  // 프론트엔드: /api/chat/message -> 백엔드: /api/chat/message
+  // 프론트엔드: /api/chat/reset/{session_id} -> 백엔드: /api/chat/reset/{session_id}
+  const apiPath = pathname.replace(/^\/api\/chat/, "/api/chat");
 
   // Construct the target URL
   const targetUrl = `${VOICE_API_BASE_URL}${apiPath}`;
@@ -108,3 +111,4 @@ export async function OPTIONS() {
     },
   });
 }
+

@@ -149,6 +149,10 @@ export default function DeliveryForm({
       try {
         // 1. 먼저 저장된 배달 정보 확인 (음성 주문에서 저장한 정보)
         const savedDeliveryInfo = getDeliveryInfo();
+        
+        console.log("📦 DeliveryForm - 저장된 배달 정보:", savedDeliveryInfo);
+        console.log("📅 DeliveryForm - 저장된 날짜 (원본):", savedDeliveryInfo?.date);
+        console.log("📅 DeliveryForm - 저장된 날짜 타입:", typeof savedDeliveryInfo?.date);
 
         // 2. API에서 사용자 정보 가져오기 시도
         const userResponse = await userApi.getMe();
@@ -158,29 +162,82 @@ export default function DeliveryForm({
           ? userResponse.creditCardNumber.match(/.{1,4}/g)?.join(" ") || ""
           : "";
 
-        // 3. 저장된 배달 정보가 있으면 우선 사용, 없으면 사용자 정보 사용
-        setFormData({
+        // 3. 날짜 형식 정규화 (YYYY-MM-DD 형식으로 변환)
+        let normalizedDate = "";
+        if (savedDeliveryInfo?.date) {
+          const dateStr = savedDeliveryInfo.date.trim();
+          // 이미 YYYY-MM-DD 형식인지 확인
+          if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+            normalizedDate = dateStr;
+          } else if (dateStr.includes("T")) {
+            // ISO 8601 형식: "2025-12-06T00:00:00" → "2025-12-06"
+            normalizedDate = dateStr.split("T")[0];
+          } else {
+            // 다른 형식 시도
+            try {
+              const date = new Date(dateStr);
+              if (!isNaN(date.getTime())) {
+                normalizedDate = date.toISOString().split("T")[0];
+              }
+            } catch (e) {
+              console.warn("⚠️ 날짜 파싱 실패:", dateStr, e);
+            }
+          }
+          console.log("📅 DeliveryForm - 정규화된 날짜:", normalizedDate);
+        }
+
+        // 4. 저장된 배달 정보가 있으면 우선 사용, 없으면 사용자 정보 사용
+        const formDataToSet = {
           address: savedDeliveryInfo?.address || userResponse?.address || "",
-          date: savedDeliveryInfo?.date || "",
+          date: normalizedDate, // 정규화된 날짜 사용
           time: savedDeliveryInfo?.time || "",
           cardNumber: savedDeliveryInfo?.cardNumber
             ? savedDeliveryInfo.cardNumber.match(/.{1,4}/g)?.join(" ") ||
               savedDeliveryInfo.cardNumber
             : formattedCardNumber,
-        });
+        };
+        
+        console.log("📝 DeliveryForm - 설정할 폼 데이터:", formDataToSet);
+        console.log("📅 DeliveryForm - 최종 설정할 날짜:", formDataToSet.date);
+        console.log("📅 DeliveryForm - 날짜 길이:", formDataToSet.date.length);
+        console.log("📅 DeliveryForm - 날짜가 비어있나?", !formDataToSet.date);
+        
+        setFormData(formDataToSet);
       } catch {
         // API 실패 시 로컬 스토리지에서 가져오기
         const savedDeliveryInfo = getDeliveryInfo();
         const localUserInfo = getUserInfo();
 
+        // 날짜 정규화
+        let normalizedDate = "";
+        if (savedDeliveryInfo?.date) {
+          const dateStr = savedDeliveryInfo.date.trim();
+          if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+            normalizedDate = dateStr;
+          } else if (dateStr.includes("T")) {
+            normalizedDate = dateStr.split("T")[0];
+          } else {
+            try {
+              const date = new Date(dateStr);
+              if (!isNaN(date.getTime())) {
+                normalizedDate = date.toISOString().split("T")[0];
+              }
+            } catch (e) {
+              console.warn("⚠️ 날짜 파싱 실패:", dateStr, e);
+            }
+          }
+        }
+
         if (savedDeliveryInfo || localUserInfo) {
-          setFormData({
+          const formDataToSet = {
             address: savedDeliveryInfo?.address || localUserInfo?.address || "",
-            date: savedDeliveryInfo?.date || "",
+            date: normalizedDate,
             time: savedDeliveryInfo?.time || "",
             cardNumber:
               savedDeliveryInfo?.cardNumber || localUserInfo?.cardNumber || "",
-          });
+          };
+          console.log("📝 DeliveryForm (catch) - 설정할 폼 데이터:", formDataToSet);
+          setFormData(formDataToSet);
         }
       } finally {
         setIsLoading(false);
