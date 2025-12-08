@@ -52,8 +52,8 @@ export const calculateOrderItemPrice = (order: OrderItem): number => {
     }
 
     // constants/prices.ts에서 실제 가격 데이터 참고
-    let baseItemPrice: number;
-    let defaultQty: number;
+    let baseItemPrice: number = 10000; // 기본값으로 초기화
+    let defaultQty: number = 1; // 기본값으로 초기화
 
     if (itemData) {
       // itemData가 있으면 그 가격 사용
@@ -74,11 +74,7 @@ export const calculateOrderItemPrice = (order: OrderItem): number => {
         }
       }
 
-      // 여전히 없으면 기본값 사용
-      if (!foundPrice) {
-        baseItemPrice = 10000;
-        defaultQty = 1;
-      }
+      // foundPrice가 false면 기본값이 이미 설정되어 있음
     }
 
     const quantity = selectedItem.quantity;
