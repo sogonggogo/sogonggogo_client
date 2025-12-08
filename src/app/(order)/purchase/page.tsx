@@ -152,6 +152,19 @@ export default function PurchasePage() {
     setIsRegular(isRegularCustomer());
   }, [router]);
 
+  // OrderSummary와 동일한 로직으로 각 order의 subtotal 계산 및 업데이트
+  // Hooks는 early return 이전에 호출되어야 함
+  useEffect(() => {
+    if (orders.length === 0) return;
+
+    orders.forEach((order) => {
+      const calculatedSubtotal = calculateOrderItemPrice(order);
+      if (order.subtotal !== calculatedSubtotal) {
+        updateOrder(order.id, { subtotal: calculatedSubtotal });
+      }
+    });
+  }, [orders]);
+
   if (orders.length === 0 || !deliveryInfo) {
     return (
       <Container>
@@ -163,16 +176,6 @@ export default function PurchasePage() {
       </Container>
     );
   }
-
-  // OrderSummary와 동일한 로직으로 각 order의 subtotal 계산 및 업데이트
-  useEffect(() => {
-    orders.forEach((order) => {
-      const calculatedSubtotal = calculateOrderItemPrice(order);
-      if (order.subtotal !== calculatedSubtotal) {
-        updateOrder(order.id, { subtotal: calculatedSubtotal });
-      }
-    });
-  }, [orders]);
 
   // Calculate total price using order.subtotal (OrderSummary와 동기화)
   const subtotal = orders.reduce((total, order) => {

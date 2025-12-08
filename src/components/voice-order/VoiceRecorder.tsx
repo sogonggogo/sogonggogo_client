@@ -426,7 +426,7 @@ export default function VoiceRecorder() {
       };
 
       let menuId = menuMap[orderData.dinner_type];
-      let menu = menuId ? dinnerMenus.find((m) => m.id === menuId) : null;
+      const menu = menuId ? dinnerMenus.find((m) => m.id === menuId) : null;
       let menuName = orderData.dinner_type; // 기본값으로 dinner_type 사용
 
       // 기존 메뉴에 없는 경우 (추가 옵션으로 추가된 메뉴)

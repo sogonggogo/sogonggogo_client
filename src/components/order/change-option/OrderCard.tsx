@@ -86,15 +86,6 @@ const TotalPrice = styled.div`
   color: ${({ theme }) => theme.colors.accent};
 `;
 
-const OptionsText = styled.div`
-  font-size: ${({ theme }) => theme.fontSize.md};
-  color: ${({ theme }) => theme.colors.accentAlpha70};
-  margin-top: ${({ theme }) => theme.spacing.xs};
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
 const BottomRow = styled.div`
   display: flex;
   justify-content: flex-end;
@@ -196,23 +187,6 @@ export default function OrderCard({
     const defaultQty = itemData?.defaultQuantity || 1;
     return item.quantity !== defaultQty;
   });
-
-  const itemsText =
-    modifiedItems.length > 0
-      ? modifiedItems
-          .map((item) => {
-            const itemData = availableItems.find((i) => i.name === item.name);
-            const defaultQty = itemData?.defaultQuantity || 1;
-            if (item.quantity === 0) {
-              return `${item.name} 제거`;
-            } else if (item.quantity > defaultQty) {
-              return `${item.name} +${item.quantity - defaultQty}`;
-            } else {
-              return `${item.name} ${item.quantity}/${defaultQty}`;
-            }
-          })
-          .join(", ")
-      : "기본 구성";
 
   return (
     <Card>

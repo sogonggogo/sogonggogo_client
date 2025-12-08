@@ -76,22 +76,6 @@ const Quantity = styled.span`
   border-radius: ${({ theme }) => theme.borderRadius.full};
 `;
 
-const ItemsList = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: ${({ theme }) => theme.spacing.xs};
-  margin-top: ${({ theme }) => theme.spacing.sm};
-`;
-
-const ItemTag = styled.span`
-  font-size: ${({ theme }) => theme.fontSize.xs};
-  color: ${({ theme }) => theme.colors.accent};
-  background: ${({ theme }) => theme.colors.white};
-  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
-  border-radius: ${({ theme }) => theme.borderRadius.xs};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-`;
-
 const InfoRow = styled.div`
   display: flex;
   align-items: center;
@@ -193,12 +177,6 @@ export default function OrderCompleteSummary({
           if (!menu || !style) return null;
 
           const availableItems = getItemsForMenu(orderItem.menuId);
-          const selectedItems =
-            orderItem.selectedItems ||
-            availableItems.map((item) => ({
-              name: item.name,
-              quantity: item.defaultQuantity || 1,
-            }));
 
           return (
             <OrderItem key={index}>
