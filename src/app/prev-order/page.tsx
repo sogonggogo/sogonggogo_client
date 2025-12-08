@@ -308,10 +308,10 @@ export default function PrevOrderPage() {
               주문내역
             </PageTitle>
             <EmptyState>
-              {error}
-              <br />
-              <br />
-              다시 시도해주세요.
+                  {error}
+                  <br />
+                  <br />
+                  다시 시도해주세요.
             </EmptyState>
           </ContentWrapper>
         </Main>

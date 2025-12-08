@@ -13,7 +13,7 @@ import {
 import type { ConversationMessage, OrderData } from "@/types/api/voice";
 import { dinnerMenus } from "@/constants/menus";
 import type { ServingStyleType } from "@/types/domain/style";
-import { getItemsForMenu } from "@/utils/menu";
+import { getItemsForMenu, getAllMenuItems } from "@/utils/menu";
 import type { SelectedItem } from "@/types/domain/menu";
 import { saveOrders } from "@/storage/order";
 import { saveDeliveryInfo, getDeliveryInfo } from "@/storage/delivery";
@@ -425,14 +425,19 @@ export default function VoiceRecorder() {
         "샴페인 축제 디너": 4,
       };
 
-      const menuId = menuMap[orderData.dinner_type];
-      if (!menuId) {
-        throw new Error(`알 수 없는 디너 타입: ${orderData.dinner_type}`);
-      }
+      let menuId = menuMap[orderData.dinner_type];
+      let menu = menuId ? dinnerMenus.find((m) => m.id === menuId) : null;
+      let menuName = orderData.dinner_type; // 기본값으로 dinner_type 사용
 
-      const menu = dinnerMenus.find((m) => m.id === menuId);
-      if (!menu) {
-        throw new Error("메뉴를 찾을 수 없습니다.");
+      // 기존 메뉴에 없는 경우 (추가 옵션으로 추가된 메뉴)
+      if (!menuId || !menu) {
+        // 기존 메뉴에 없으면 menuId를 -1로 설정하고 menuName 사용
+        menuId = -1;
+        menuName = orderData.dinner_type;
+        console.log(`⚠️ 기존 메뉴에 없는 디너 타입: "${orderData.dinner_type}" - menuName으로 저장`);
+      } else {
+        // 기존 메뉴에 있으면 메뉴 이름 사용
+        menuName = menu.name;
       }
 
       // 2. serving_style 매핑 및 검증
@@ -458,68 +463,155 @@ export default function VoiceRecorder() {
       }
 
       // 3. 메뉴별 아이템 수량 매핑
-      const availableItems = getItemsForMenu(menuId);
+      let availableItems: MenuItemOption[] = [];
+      let selectedItems: SelectedItem[] = [];
 
-      // 음성 주문 API의 필드명을 프론트엔드 아이템명으로 매핑
-      const voiceToItemMap: Record<number, Record<string, string>> = {
-        1: {
-          // 발렌타인 디너
-          wine_count: "와인",
-          steak_count: "스테이크",
-          napkin_count: "하트 장식", // napkin_count를 하트 장식으로 매핑
-        },
-        2: {
-          // 프렌치 디너
-          coffee_cup_count: "커피",
-          wine_count: "와인",
-          salad_count: "샐러드",
-          steak_count: "스테이크",
-        },
-        3: {
-          // 잉글리시 디너
-          egg_scramble_count: "에그 스크램블",
-          bacon_count: "베이컨",
-          bread_count: "빵",
-          steak_count: "스테이크",
-        },
-        4: {
-          // 샴페인 축제 디너
-          champagne_count: "샴페인",
-          baguette_count: "바게트 빵",
-          coffee_pot_count: "커피",
-          wine_count: "와인",
-          steak_count: "스테이크",
-        },
+      // 모든 디너의 아이템 매핑 (통합)
+      const allVoiceToItemMap: Record<string, string> = {
+        wine_count: "와인",
+        steak_count: "스테이크",
+        napkin_count: "하트 장식",
+        coffee_cup_count: "커피",
+        coffee_pot_count: "커피",
+        salad_count: "샐러드",
+        egg_scramble_count: "에그 스크램블",
+        bacon_count: "베이컨",
+        bread_count: "빵",
+        champagne_count: "샴페인",
+        baguette_count: "바게트 빵",
       };
 
-      const itemMapping = voiceToItemMap[menuId];
+      if (menuId > 0 && menu) {
+        // 기존 메뉴인 경우
+        availableItems = getItemsForMenu(menuId);
+        const allMenuItems = getAllMenuItems(); // 모든 디너의 세부 항목
 
-      const selectedItems: SelectedItem[] = availableItems.map((item) => {
-        let quantity = item.defaultQuantity || 1;
+        // 음성 주문 API의 필드명을 프론트엔드 아이템명으로 매핑 (기존 메뉴용)
+        const voiceToItemMap: Record<number, Record<string, string>> = {
+          1: {
+            // 발렌타인 디너
+            wine_count: "와인",
+            steak_count: "스테이크",
+            napkin_count: "하트 장식", // napkin_count를 하트 장식으로 매핑
+          },
+          2: {
+            // 프렌치 디너
+            coffee_cup_count: "커피",
+            wine_count: "와인",
+            salad_count: "샐러드",
+            steak_count: "스테이크",
+          },
+          3: {
+            // 잉글리시 디너
+            egg_scramble_count: "에그 스크램블",
+            bacon_count: "베이컨",
+            bread_count: "빵",
+            steak_count: "스테이크",
+          },
+          4: {
+            // 샴페인 축제 디너
+            champagne_count: "샴페인",
+            baguette_count: "바게트 빵",
+            coffee_pot_count: "커피",
+            wine_count: "와인",
+            steak_count: "스테이크",
+          },
+        };
 
-        // 음성 주문 데이터에서 해당 아이템의 수량 찾기
-        if (itemMapping) {
-          for (const [voiceField, itemName] of Object.entries(itemMapping)) {
-            if (item.name === itemName) {
-              const voiceQuantity = orderData[voiceField as keyof OrderData];
-              if (typeof voiceQuantity === "number") {
-                quantity = voiceQuantity;
+        const itemMapping = voiceToItemMap[menuId];
+
+        // 1. 기본 메뉴의 아이템 처리
+        const defaultMenuItems = availableItems.map((item) => {
+          let quantity = item.defaultQuantity || 1;
+
+          // 음성 주문 데이터에서 해당 아이템의 수량 찾기
+          if (itemMapping) {
+            for (const [voiceField, itemName] of Object.entries(itemMapping)) {
+              if (item.name === itemName) {
+                const voiceQuantity = orderData[voiceField as keyof OrderData];
+                if (typeof voiceQuantity === "number") {
+                  quantity = voiceQuantity;
+                }
+                break;
               }
-              break;
+            }
+          }
+
+          return {
+            name: item.name,
+            quantity,
+          };
+        });
+
+        // 2. 기본 메뉴에 없는 추가 아이템 처리 (다른 디너의 세부 메뉴)
+        const defaultMenuItemNames = new Set(availableItems.map((item) => item.name));
+        const additionalItems: SelectedItem[] = [];
+
+        // orderData의 모든 _count 필드 확인
+        const itemFields = Object.keys(orderData).filter(
+          (key) => key.endsWith("_count") && typeof orderData[key as keyof OrderData] === "number"
+        );
+
+        for (const field of itemFields) {
+          const quantity = orderData[field as keyof OrderData] as number;
+          if (quantity > 0) {
+            const itemName = allVoiceToItemMap[field];
+            if (itemName && !defaultMenuItemNames.has(itemName)) {
+              // 기본 메뉴에 없는 아이템이고, 모든 디너의 아이템 목록에 있는 경우만 추가
+              const existsInAllMenus = allMenuItems.some((item) => item.name === itemName);
+              if (existsInAllMenus) {
+                additionalItems.push({
+                  name: itemName,
+                  quantity,
+                });
+              }
             }
           }
         }
 
-        return {
-          name: item.name,
-          quantity,
-        };
-      });
+        // 기본 메뉴 아이템과 추가 아이템 합치기
+        selectedItems = [...defaultMenuItems, ...additionalItems];
+      } else {
+        // 추가 옵션으로 추가된 메뉴인 경우
+        // orderData에서 모든 아이템 필드를 추출하여 selectedItems 생성
+        const allMenuItems = getAllMenuItems(); // 모든 디너의 세부 항목
+        const itemFields = Object.keys(orderData).filter(
+          (key) => key.endsWith("_count") && typeof orderData[key as keyof OrderData] === "number"
+        );
+
+        selectedItems = itemFields
+          .map((field) => {
+            const quantity = orderData[field as keyof OrderData] as number;
+            if (quantity <= 0) return null;
+
+            // 통합 매핑 테이블에서 찾기
+            const itemName = allVoiceToItemMap[field];
+            if (itemName) {
+              // 모든 디너의 아이템 목록에 있는 경우만 추가
+              const existsInAllMenus = allMenuItems.some((item) => item.name === itemName);
+              if (existsInAllMenus) {
+                return {
+                  name: itemName,
+                  quantity,
+                };
+              }
+            }
+
+            // 매핑 테이블에 없으면 필드명을 변환 (fallback)
+            const fallbackName = field.replace(/_count$/, "").replace(/_/g, " ");
+            return {
+              name: fallbackName,
+              quantity,
+            };
+          })
+          .filter((item): item is SelectedItem => item !== null); // null 제거
+      }
 
       // 4. 주문 정보 저장
       const order = {
         id: `voice-order-${Date.now()}`,
         menuId,
+        menuName: menuName, // 메뉴 이름 저장 (기존 메뉴가 아닌 경우)
         style,
         quantity: 1, // 음성 주문은 기본 1개
         selectedItems,

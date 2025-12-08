@@ -5,8 +5,8 @@ import { OrderItem } from "@/storage/order";
 import { dinnerMenus } from "@/constants/menus";
 import { formatPrice } from "@/utils/format";
 import { servingStyles } from "@/constants/styles";
-import { calculatePriceWithStyle } from "@/utils/calculations";
-import { getItemsForMenu } from "@/utils/menu";
+import { getItemsForMenu, getAllMenuItems } from "@/utils/menu";
+import { calculateOrderItemPrice } from "@/utils/orderPrice";
 
 const OrderList = styled.div`
   display: flex;
@@ -89,13 +89,67 @@ export default function OrderSummary({ orders }: OrderSummaryProps) {
   return (
     <OrderList>
       {orders.map((order) => {
-        const menu = dinnerMenus.find((m) => m.id === order.menuId);
+        // voice-order에서 추가된 메뉴인지 확인 (menuName이 있고 menuId < 0)
+        const isVoiceOrderAdditionalMenu = order.menuName && order.menuId < 0;
+
+        // 기존 메뉴 찾기 (일반 주문 또는 voice-order의 기존 메뉴)
+        const menu =
+          order.menuId > 0 && order.menuId <= 4
+            ? dinnerMenus.find((m) => m.id === order.menuId)
+            : null;
+        const menuName =
+          order.menuName || (menu ? menu.name : "알 수 없는 메뉴");
         const style = servingStyles[order.style];
 
-        if (!menu || !style) return null;
+        if (!style) return null;
 
-        const basePrice = calculatePriceWithStyle(menu.basePrice, order.style);
+        // voice-order에서 추가된 메뉴인 경우만 특별 처리
+        if (isVoiceOrderAdditionalMenu) {
+          const selectedItems = order.selectedItems || [];
+
+          // order.subtotal이 있으면 사용, 없으면 계산
+          const totalPrice = order.subtotal ?? calculateOrderItemPrice(order);
+
+          return (
+            <OrderItemCard key={order.id}>
+              <OrderHeader>
+                <div>
+                  <MenuName>{menuName}</MenuName>
+                  <StyleInfo>{style.name}</StyleInfo>
+                </div>
+                <PriceInfo>
+                  <QuantityBadge>× {order.quantity}</QuantityBadge>
+                  <Price>{formatPrice(totalPrice)}</Price>
+                </PriceInfo>
+              </OrderHeader>
+
+              <ItemsList>
+                {selectedItems.length > 0 ? (
+                  selectedItems
+                    .filter((item) => item.quantity > 0)
+                    .map((item) => (
+                      <ItemRow key={item.name}>
+                        <span>
+                          {item.name} × {item.quantity}
+                        </span>
+                      </ItemRow>
+                    ))
+                ) : (
+                  <ItemRow>
+                    <span style={{ color: "#888", fontStyle: "italic" }}>
+                      세부 메뉴 정보 없음
+                    </span>
+                  </ItemRow>
+                )}
+              </ItemsList>
+            </OrderItemCard>
+          );
+        }
+
+        if (!menu) return null;
+
         const availableItems = getItemsForMenu(order.menuId);
+        const allMenuItems = getAllMenuItems(); // 모든 메뉴 아이템 가격 정보
 
         const selectedItems =
           order.selectedItems ||
@@ -104,27 +158,15 @@ export default function OrderSummary({ orders }: OrderSummaryProps) {
             quantity: item.defaultQuantity || 1,
           }));
 
-        const itemsPrice = availableItems.reduce((total, itemData) => {
-          const selectedItem = selectedItems.find(
-            (si) => si.name === itemData.name
-          );
-          const quantity = selectedItem
-            ? selectedItem.quantity
-            : itemData.defaultQuantity || 1;
-          const defaultQty = itemData.defaultQuantity || 1;
-          return total + itemData.basePrice * (quantity - defaultQty);
-        }, 0);
-
-        const totalPrice = (basePrice + itemsPrice) * order.quantity;
+        // order.subtotal이 있으면 사용, 없으면 계산
+        const totalPrice = order.subtotal ?? calculateOrderItemPrice(order);
 
         return (
           <OrderItemCard key={order.id}>
             <OrderHeader>
               <div>
-                <MenuName>{menu.name}</MenuName>
-                <StyleInfo>
-                  {style.name} · {formatPrice(basePrice)}
-                </StyleInfo>
+                <MenuName>{menuName}</MenuName>
+                <StyleInfo>{style.name}</StyleInfo>
               </div>
               <PriceInfo>
                 <QuantityBadge>× {order.quantity}</QuantityBadge>
@@ -133,24 +175,45 @@ export default function OrderSummary({ orders }: OrderSummaryProps) {
             </OrderHeader>
 
             <ItemsList>
-              {availableItems.map((itemData) => {
-                const selectedItem = selectedItems.find(
-                  (si) => si.name === itemData.name
-                );
-                const quantity = selectedItem
-                  ? selectedItem.quantity
-                  : itemData.defaultQuantity || 1;
+              {selectedItems
+                .filter((item) => item.quantity > 0)
+                .map((selectedItem) => {
+                  // 먼저 availableItems에서 찾기
+                  let itemData = availableItems.find(
+                    (item) => item.name === selectedItem.name
+                  );
 
-                if (quantity === 0) return null;
+                  // 없으면 allMenuItems에서 찾기 (다른 디너의 세부 항목)
+                  if (!itemData) {
+                    itemData = allMenuItems.find(
+                      (item) => item.name === selectedItem.name
+                    );
+                  }
 
-                return (
-                  <ItemRow key={itemData.name}>
-                    <span>
-                      {itemData.name} × {quantity}
-                    </span>
-                  </ItemRow>
-                );
-              })}
+                  const isAdditionalItem = !availableItems.some(
+                    (item) => item.name === selectedItem.name
+                  );
+
+                  return (
+                    <ItemRow key={selectedItem.name}>
+                      <span>
+                        {selectedItem.name}
+                        {isAdditionalItem && (
+                          <span
+                            style={{
+                              fontSize: "0.75em",
+                              color: "#888",
+                              marginLeft: "4px",
+                            }}
+                          >
+                            (추가)
+                          </span>
+                        )}{" "}
+                        × {selectedItem.quantity}
+                      </span>
+                    </ItemRow>
+                  );
+                })}
             </ItemsList>
           </OrderItemCard>
         );
@@ -158,4 +221,3 @@ export default function OrderSummary({ orders }: OrderSummaryProps) {
     </OrderList>
   );
 }
-

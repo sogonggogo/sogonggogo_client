@@ -4,9 +4,11 @@ import type { SelectedItem } from "./menu";
 export interface OrderItem {
   id: string;
   menuId: number;
+  menuName?: string; // 음성 주문 등에서 추가된 메뉴의 이름 (기존 메뉴에 없을 경우)
   style: ServingStyleType;
   quantity: number;
   selectedItems: SelectedItem[];
+  subtotal?: number; // OrderSummary에서 계산한 가격
 }
 
 export type OrderStatusType =

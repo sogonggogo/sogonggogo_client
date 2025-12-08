@@ -95,7 +95,8 @@ const QuantityDisplay = styled.div`
 `;
 
 interface MenuItemOptionsProps {
-  items: MenuItemOption[];
+  items: MenuItemOption[]; // 기본 메뉴의 세부 항목
+  allItems?: MenuItemOption[]; // 모든 디너의 모든 세부 항목 (선택사항)
   selectedItems: SelectedItem[];
   onIncreaseItem: (itemName: string) => void;
   onDecreaseItem: (itemName: string) => void;
@@ -104,31 +105,77 @@ interface MenuItemOptionsProps {
 
 export default function MenuItemOptions({
   items,
+  allItems,
   selectedItems,
   onIncreaseItem,
   onDecreaseItem,
   onRemoveItem,
 }: MenuItemOptionsProps) {
+  // 기본 메뉴의 아이템 이름 Set 생성 (중복 체크용)
+  const defaultItemNames = new Set(items.map((item) => item.name));
+
   const getItemQuantity = (itemName: string): number => {
     const selectedItem = selectedItems.find((si) => si.name === itemName);
+    
+    // selectedItems에 있으면 그 수량 사용
     if (selectedItem) return selectedItem.quantity;
 
-    const itemData = items.find((i) => i.name === itemName);
-    return itemData?.defaultQuantity || 1;
+    // 기본 메뉴의 아이템인 경우에만 defaultQuantity 사용
+    const isDefaultItem = defaultItemNames.has(itemName);
+    if (isDefaultItem) {
+      const itemData = items.find((i) => i.name === itemName);
+      return itemData?.defaultQuantity || 1;
+    }
+
+    // 추가 항목은 기본값 0
+    return 0;
   };
+
+  const getItemPrice = (itemName: string): number => {
+    const itemData = items.find((i) => i.name === itemName);
+    if (itemData) return itemData.basePrice;
+
+    if (allItems) {
+      const allItemData = allItems.find((i) => i.name === itemName);
+      if (allItemData) return allItemData.basePrice;
+    }
+
+    return 10000; // 기본 가격
+  };
+
+  // 표시할 아이템 목록: 기본 메뉴 아이템 + 추가 아이템 (중복 제거)
+  const displayItems: MenuItemOption[] = [
+    ...items, // 기본 메뉴의 아이템 먼저
+    ...(allItems || []).filter((item) => !defaultItemNames.has(item.name)), // 추가 아이템 (중복 제거)
+  ];
 
   return (
     <MenuSection>
       <SectionTitle>세부 메뉴</SectionTitle>
       <OptionsList>
-        {items.map((item) => {
+        {displayItems.map((item) => {
           const quantity = getItemQuantity(item.name);
+          const price = getItemPrice(item.name);
+          const isDefaultItem = defaultItemNames.has(item.name);
 
           return (
             <OptionItem key={item.name}>
               <OptionInfo>
-                <OptionName>{item.name}</OptionName>
-                <OptionPrice>{formatPrice(item.basePrice)}</OptionPrice>
+                <OptionName>
+                  {item.name}
+                  {!isDefaultItem && (
+                    <span
+                      style={{
+                        fontSize: "0.75em",
+                        color: "#888",
+                        marginLeft: "8px",
+                      }}
+                    >
+                      (추가)
+                    </span>
+                  )}
+                </OptionName>
+                <OptionPrice>{formatPrice(price)}</OptionPrice>
               </OptionInfo>
               <QuantityControls>
                 <DeleteButton onClick={() => onRemoveItem(item.name)}>

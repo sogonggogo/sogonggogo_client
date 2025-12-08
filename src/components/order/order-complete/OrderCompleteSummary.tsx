@@ -209,22 +209,6 @@ export default function OrderCompleteSummary({
                 </div>
                 <Quantity>× {orderItem.quantity}</Quantity>
               </MenuInfo>
-              <ItemsList>
-                {selectedItems
-                  .filter((item) => item.quantity > 0)
-                  .map((item, idx) => {
-                    const itemData = availableItems.find(
-                      (i) => i.name === item.name
-                    );
-                    if (!itemData) return null;
-                    return (
-                      <ItemTag key={idx}>
-                        {item.name}
-                        {item.quantity > 1 && ` X${item.quantity}`}
-                      </ItemTag>
-                    );
-                  })}
-              </ItemsList>
             </OrderItem>
           );
         })}

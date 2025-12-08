@@ -1,7 +1,7 @@
 "use client";
 
 import styled from "@emotion/styled";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { dinnerMenus } from "@/constants/menus";
 import { servingStyles } from "@/constants/styles";
@@ -19,7 +19,7 @@ import {
   deleteOrder,
   OrderItem,
 } from "@/storage/order";
-import { getItemsForMenu } from "@/utils/menu";
+import { getItemsForMenu, getAllMenuItems } from "@/utils/menu";
 import { ServingStyleType } from "@/types/domain/style";
 
 const Container = styled.div`
@@ -112,8 +112,17 @@ export default function ChangeOptionPage() {
   const handleIncreaseItem = (itemName: string) => {
     if (!currentEditingOrderId) return;
 
-    const order = orders.find((o) => o.id === currentEditingOrderId);
+    // 최신 주문 정보를 로컬 스토리지에서 직접 가져옴
+    const allOrders = getOrders();
+    const order = allOrders.find((o) => o.id === currentEditingOrderId);
     if (!order) return;
+
+    const currentMenuItems = getItemsForMenu(order.menuId);
+    const allMenuItems = getAllMenuItems();
+    // 현재 메뉴의 기본 아이템인지 확인
+    const isDefaultItem = currentMenuItems.some(
+      (item) => item.name === itemName
+    );
 
     const currentItems = order.selectedItems || [];
     const existingItem = currentItems.find((item) => item.name === itemName);
@@ -124,17 +133,34 @@ export default function ChangeOptionPage() {
         item.name === itemName ? { ...item, quantity: item.quantity + 1 } : item
       );
     } else {
-      newSelectedItems = [...currentItems, { name: itemName, quantity: 2 }];
+      // 기본 메뉴 아이템인 경우 defaultQuantity + 1, 추가 항목인 경우 1 (0에서 +1)
+      if (isDefaultItem) {
+        const defaultItem = currentMenuItems.find(
+          (item) => item.name === itemName
+        );
+        const defaultQty = defaultItem?.defaultQuantity || 1;
+        newSelectedItems = [
+          ...currentItems,
+          { name: itemName, quantity: defaultQty + 1 },
+        ];
+      } else {
+        // 추가 항목은 0에서 시작하므로 +1하면 1
+        newSelectedItems = [...currentItems, { name: itemName, quantity: 1 }];
+      }
     }
 
     updateOrder(currentEditingOrderId, { selectedItems: newSelectedItems });
-    setOrders(getOrders());
+    // 상태를 즉시 업데이트하기 위해 로컬 스토리지에서 다시 읽어옴
+    const updatedOrders = getOrders();
+    setOrders(updatedOrders);
   };
 
   const handleDecreaseItem = (itemName: string) => {
     if (!currentEditingOrderId) return;
 
-    const order = orders.find((o) => o.id === currentEditingOrderId);
+    // 최신 주문 정보를 로컬 스토리지에서 직접 가져옴
+    const allOrders = getOrders();
+    const order = allOrders.find((o) => o.id === currentEditingOrderId);
     if (!order) return;
 
     const currentItems = order.selectedItems || [];
@@ -157,13 +183,17 @@ export default function ChangeOptionPage() {
     }
 
     updateOrder(currentEditingOrderId, { selectedItems: newSelectedItems });
-    setOrders(getOrders());
+    // 상태를 즉시 업데이트하기 위해 로컬 스토리지에서 다시 읽어옴
+    const updatedOrders = getOrders();
+    setOrders(updatedOrders);
   };
 
   const handleRemoveItem = (itemName: string) => {
     if (!currentEditingOrderId) return;
 
-    const order = orders.find((o) => o.id === currentEditingOrderId);
+    // 최신 주문 정보를 로컬 스토리지에서 직접 가져옴
+    const allOrders = getOrders();
+    const order = allOrders.find((o) => o.id === currentEditingOrderId);
     if (!order) return;
 
     const currentItems = order.selectedItems || [];
@@ -179,13 +209,17 @@ export default function ChangeOptionPage() {
     }
 
     updateOrder(currentEditingOrderId, { selectedItems: newSelectedItems });
-    setOrders(getOrders());
+    // 상태를 즉시 업데이트하기 위해 로컬 스토리지에서 다시 읽어옴
+    const updatedOrders = getOrders();
+    setOrders(updatedOrders);
   };
 
   const handleChangeStyle = (styleType: ServingStyleType) => {
     if (!currentEditingOrderId) return;
     updateOrder(currentEditingOrderId, { style: styleType });
-    setOrders(getOrders());
+    // 상태를 즉시 업데이트하기 위해 로컬 스토리지에서 다시 읽어옴
+    const updatedOrders = getOrders();
+    setOrders(updatedOrders);
   };
 
   const handleCloseModal = () => {
@@ -197,21 +231,40 @@ export default function ChangeOptionPage() {
     router.push("/delivery-info");
   };
 
-  if (orders.length === 0) {
-    return null;
-  }
-
-  const currentEditingOrder = currentEditingOrderId
-    ? orders.find((o) => o.id === currentEditingOrderId)
-    : null;
+  // currentEditingOrder를 useMemo로 메모이제이션하여 orders가 업데이트될 때마다 재계산
+  // Hooks는 early return 이전에 호출되어야 함
+  const currentEditingOrder = useMemo(() => {
+    return currentEditingOrderId
+      ? orders.find((o) => o.id === currentEditingOrderId) || null
+      : null;
+  }, [orders, currentEditingOrderId]);
 
   const currentMenuItems = currentEditingOrder
     ? getItemsForMenu(currentEditingOrder.menuId)
     : [];
 
+  // 모든 디너의 모든 세부 항목 가져오기
+  const allMenuItems = getAllMenuItems();
+
   const currentMenu = currentEditingOrder
     ? dinnerMenus.find((m) => m.id === currentEditingOrder.menuId)
     : null;
+
+  // selectedItems를 useMemo로 메모이제이션하여 currentEditingOrder가 업데이트될 때마다 재계산
+  const selectedItemsForModal = useMemo(() => {
+    if (!currentEditingOrder) return [];
+    return (
+      currentEditingOrder.selectedItems ||
+      currentMenuItems.map((item) => ({
+        name: item.name,
+        quantity: item.defaultQuantity || 1,
+      }))
+    );
+  }, [currentEditingOrder, currentMenuItems]);
+
+  if (orders.length === 0) {
+    return null;
+  }
 
   const grandTotal = orders.reduce((total, order) => {
     const menu = dinnerMenus.find((m) => m.id === order.menuId);
@@ -325,13 +378,8 @@ export default function ChangeOptionPage() {
             />
             <MenuItemOptions
               items={currentMenuItems}
-              selectedItems={
-                currentEditingOrder.selectedItems ||
-                currentMenuItems.map((item) => ({
-                  name: item.name,
-                  quantity: item.defaultQuantity || 1,
-                }))
-              }
+              allItems={allMenuItems}
+              selectedItems={selectedItemsForModal}
               onIncreaseItem={handleIncreaseItem}
               onDecreaseItem={handleDecreaseItem}
               onRemoveItem={handleRemoveItem}

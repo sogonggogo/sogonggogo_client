@@ -136,15 +136,15 @@ export default function UpdateInfoForm() {
         const userResponse = await userApi.getMe();
         if (userResponse) {
           // 로그인 상태인 경우
-          setFormData({
-            email: userResponse.email || "",
-            password: "",
-            confirmPassword: "",
-            name: userResponse.name || "",
-            phone: userResponse.phone || "",
-            address: userResponse.address || "",
-            cardNumber: userResponse.creditCardNumber || "",
-          });
+        setFormData({
+          email: userResponse.email || "",
+          password: "",
+          confirmPassword: "",
+          name: userResponse.name || "",
+          phone: userResponse.phone || "",
+          address: userResponse.address || "",
+          cardNumber: userResponse.creditCardNumber || "",
+        });
         } else {
           // 로그아웃 상태인 경우 로컬 스토리지에서 로드
           const userInfo = getUserInfo();

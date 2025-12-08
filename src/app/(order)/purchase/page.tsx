@@ -11,7 +11,9 @@ import { addOrderHistory } from "@/storage/orderHistory";
 import { dinnerMenus } from "@/constants/menus";
 import { formatPrice } from "@/utils/format";
 import { calculatePriceWithStyle } from "@/utils/calculations";
-import { getItemsForMenu } from "@/utils/menu";
+import { getItemsForMenu, getAllMenuItems } from "@/utils/menu";
+import { calculateOrderItemPrice } from "@/utils/orderPrice";
+import { updateOrder } from "@/storage/order";
 import OrderSummary from "@/components/order/purchase/OrderSummary";
 import DeliveryInfoDisplay from "@/components/order/purchase/DeliveryInfoDisplay";
 import PriceSummary from "@/components/order/purchase/PriceSummary";
@@ -162,32 +164,20 @@ export default function PurchasePage() {
     );
   }
 
-  // Calculate total price
+  // OrderSummary와 동일한 로직으로 각 order의 subtotal 계산 및 업데이트
+  useEffect(() => {
+    orders.forEach((order) => {
+      const calculatedSubtotal = calculateOrderItemPrice(order);
+      if (order.subtotal !== calculatedSubtotal) {
+        updateOrder(order.id, { subtotal: calculatedSubtotal });
+      }
+    });
+  }, [orders]);
+
+  // Calculate total price using order.subtotal (OrderSummary와 동기화)
   const subtotal = orders.reduce((total, order) => {
-    const menu = dinnerMenus.find((m) => m.id === order.menuId);
-    if (!menu) return total;
-
-    const basePrice = calculatePriceWithStyle(menu.basePrice, order.style);
-    const availableItems = getItemsForMenu(order.menuId);
-    const selectedItems =
-      order.selectedItems ||
-      availableItems.map((item) => ({
-        name: item.name,
-        quantity: item.defaultQuantity || 1,
-      }));
-
-    const itemsPrice = availableItems.reduce((sum, itemData) => {
-      const selectedItem = selectedItems.find(
-        (si) => si.name === itemData.name
-      );
-      const quantity = selectedItem
-        ? selectedItem.quantity
-        : itemData.defaultQuantity || 1;
-      const defaultQty = itemData.defaultQuantity || 1;
-      return sum + itemData.basePrice * (quantity - defaultQty);
-    }, 0);
-
-    return total + (basePrice + itemsPrice) * order.quantity;
+    const orderSubtotal = order.subtotal ?? calculateOrderItemPrice(order);
+    return total + orderSubtotal;
   }, 0);
 
   const discount = isRegular ? Math.floor(subtotal * 0.1) : 0;
@@ -212,7 +202,9 @@ export default function PurchasePage() {
           // 로그아웃 상태인 경우 로컬 스토리지에서 가져오기
           const localUser = getUserInfo();
           if (!localUser) {
-            alert("사용자 정보를 찾을 수 없습니다. 로그인 후 다시 시도해주세요.");
+            alert(
+              "사용자 정보를 찾을 수 없습니다. 로그인 후 다시 시도해주세요."
+            );
             setIsProcessing(false);
             return;
           }
@@ -241,11 +233,46 @@ export default function PurchasePage() {
 
       // 주문 아이템 변환
       const orderItems = orders.map((order) => {
-        const menu = dinnerMenus.find((m) => m.id === order.menuId);
-        if (!menu) throw new Error("메뉴를 찾을 수 없습니다.");
+        // voice-order에서 추가된 메뉴인지 확인 (menuName이 있고 menuId < 0)
+        const isVoiceOrderAdditionalMenu = order.menuName && order.menuId < 0;
+
+        const menu =
+          order.menuId > 0 && order.menuId <= 4
+            ? dinnerMenus.find((m) => m.id === order.menuId)
+            : null;
+        const menuName =
+          order.menuName || (menu ? menu.name : "알 수 없는 메뉴");
+
+        // voice-order에서 추가된 메뉴인 경우만 특별 처리
+        if (isVoiceOrderAdditionalMenu) {
+          // 추가 메뉴의 경우 selectedItems를 그대로 사용
+          const apiSelectedItems = (order.selectedItems || []).map((si) => ({
+            name: si.name,
+            quantity: si.quantity,
+            unitPrice: 0, // 실제로는 API에서 가격 정보를 받아야 함
+            defaultQuantity: 0,
+            additionalPrice: 0,
+          }));
+
+          return {
+            menuId: order.menuId,
+            menuName: menuName,
+            style: order.style,
+            quantity: order.quantity,
+            unitPrice: 0, // 실제로는 API에서 가격 정보를 받아야 함
+            totalPrice: 0, // 실제로는 API에서 가격 정보를 받아야 함
+            selectedItems: apiSelectedItems,
+          };
+        }
+
+        // 일반 주문이지만 메뉴를 찾을 수 없는 경우 (에러 처리)
+        if (!menu) {
+          throw new Error(`메뉴를 찾을 수 없습니다. menuId: ${order.menuId}`);
+        }
 
         const basePrice = calculatePriceWithStyle(menu.basePrice, order.style);
         const availableItems = getItemsForMenu(order.menuId);
+        const allMenuItems = getAllMenuItems(); // 모든 디너의 세부 항목
         const selectedItems =
           order.selectedItems ||
           availableItems.map((item) => ({
@@ -256,7 +283,14 @@ export default function PurchasePage() {
         // selectedItems를 API 형식으로 변환
         // 수량이 0인 아이템도 포함 (재주문 시 정확한 복원을 위해)
         const apiSelectedItems = selectedItems.map((si) => {
-          const itemData = availableItems.find((i) => i.name === si.name);
+          // 먼저 availableItems에서 찾기
+          let itemData = availableItems.find((i) => i.name === si.name);
+
+          // 없으면 allMenuItems에서 찾기 (다른 디너의 세부 항목)
+          if (!itemData) {
+            itemData = allMenuItems.find((i) => i.name === si.name);
+          }
+
           if (!itemData)
             throw new Error(`아이템을 찾을 수 없습니다: ${si.name}`);
 
@@ -285,7 +319,7 @@ export default function PurchasePage() {
 
         return {
           menuId: order.menuId,
-          menuName: menu.name,
+          menuName: menuName,
           style: order.style,
           quantity: order.quantity,
           unitPrice: unitPrice,

@@ -149,7 +149,7 @@ export default function DeliveryForm({
       try {
         // 1. 먼저 저장된 배달 정보 확인 (음성 주문에서 저장한 정보)
         const savedDeliveryInfo = getDeliveryInfo();
-        
+
         console.log("📦 DeliveryForm - 저장된 배달 정보:", savedDeliveryInfo);
         console.log("📅 DeliveryForm - 저장된 날짜 (원본):", savedDeliveryInfo?.date);
         console.log("📅 DeliveryForm - 저장된 날짜 타입:", typeof savedDeliveryInfo?.date);

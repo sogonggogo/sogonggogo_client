@@ -3,7 +3,11 @@
 import styled from "@emotion/styled";
 import Image from "next/image";
 import { formatPrice } from "@/utils/format";
-import type { MenuItem, MenuItemOption, SelectedItem } from "@/types/domain/menu";
+import type {
+  MenuItem,
+  MenuItemOption,
+  SelectedItem,
+} from "@/types/domain/menu";
 import type { ServingStyle } from "@/types/domain/style";
 import { Minus, Plus, Trash2 } from "lucide-react";
 
@@ -229,7 +233,6 @@ export default function OrderCard({
           <MenuInfo>
             <MenuTitle>{menu.name}</MenuTitle>
             <StyleBadge>{style.name}</StyleBadge>
-            <OptionsText>{itemsText}</OptionsText>
           </MenuInfo>
           <PriceDisplay>
             <TotalPrice>{formatPrice(totalPrice)}</TotalPrice>
