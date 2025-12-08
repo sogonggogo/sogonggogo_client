@@ -14,7 +14,7 @@ import type { ConversationMessage, OrderData } from "@/types/api/voice";
 import { dinnerMenus } from "@/constants/menus";
 import type { ServingStyleType } from "@/types/domain/style";
 import { getItemsForMenu, getAllMenuItems } from "@/utils/menu";
-import type { SelectedItem } from "@/types/domain/menu";
+import type { SelectedItem, MenuItemOption } from "@/types/domain/menu";
 import { saveOrders } from "@/storage/order";
 import { saveDeliveryInfo, getDeliveryInfo } from "@/storage/delivery";
 
