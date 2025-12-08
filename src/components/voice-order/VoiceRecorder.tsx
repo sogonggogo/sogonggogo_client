@@ -667,7 +667,7 @@ export default function VoiceRecorder() {
       console.log("=".repeat(50));
       console.log("📋 주문 상세 정보");
       console.log("=".repeat(50));
-      console.log("메뉴:", menu.name);
+      console.log("메뉴:", menuName);
       console.log("디너 타입:", orderData.dinner_type);
       console.log("서빙 스타일:", style, `(${orderData.serving_style})`);
       console.log("수량:", order.quantity);
