@@ -20,6 +20,7 @@ import {
   OrderItem,
 } from "@/storage/order";
 import { getItemsForMenu, getAllMenuItems } from "@/utils/menu";
+import { calculateOrderItemPrice } from "@/utils/orderPrice";
 import { ServingStyleType } from "@/types/domain/style";
 
 const Container = styled.div`
@@ -77,7 +78,12 @@ export default function ChangeOptionPage() {
   const handleIncrease = (orderId: string) => {
     const order = orders.find((o) => o.id === orderId);
     if (order) {
-      updateOrder(orderId, { quantity: order.quantity + 1 });
+      const updatedOrder = { ...order, quantity: order.quantity + 1 };
+      const calculatedSubtotal = calculateOrderItemPrice(updatedOrder);
+      updateOrder(orderId, {
+        quantity: order.quantity + 1,
+        subtotal: calculatedSubtotal,
+      });
       setOrders(getOrders());
     }
   };
@@ -85,7 +91,12 @@ export default function ChangeOptionPage() {
   const handleDecrease = (orderId: string) => {
     const order = orders.find((o) => o.id === orderId);
     if (order && order.quantity > 1) {
-      updateOrder(orderId, { quantity: order.quantity - 1 });
+      const updatedOrder = { ...order, quantity: order.quantity - 1 };
+      const calculatedSubtotal = calculateOrderItemPrice(updatedOrder);
+      updateOrder(orderId, {
+        quantity: order.quantity - 1,
+        subtotal: calculatedSubtotal,
+      });
       setOrders(getOrders());
     }
   };
@@ -149,7 +160,14 @@ export default function ChangeOptionPage() {
       }
     }
 
-    updateOrder(currentEditingOrderId, { selectedItems: newSelectedItems });
+    // subtotal 계산 및 업데이트
+    const updatedOrder = { ...order, selectedItems: newSelectedItems };
+    const calculatedSubtotal = calculateOrderItemPrice(updatedOrder);
+
+    updateOrder(currentEditingOrderId, {
+      selectedItems: newSelectedItems,
+      subtotal: calculatedSubtotal,
+    });
     // 상태를 즉시 업데이트하기 위해 로컬 스토리지에서 다시 읽어옴
     const updatedOrders = getOrders();
     setOrders(updatedOrders);
@@ -182,7 +200,14 @@ export default function ChangeOptionPage() {
       newSelectedItems = [...currentItems, { name: itemName, quantity: 0 }];
     }
 
-    updateOrder(currentEditingOrderId, { selectedItems: newSelectedItems });
+    // subtotal 계산 및 업데이트
+    const updatedOrder = { ...order, selectedItems: newSelectedItems };
+    const calculatedSubtotal = calculateOrderItemPrice(updatedOrder);
+
+    updateOrder(currentEditingOrderId, {
+      selectedItems: newSelectedItems,
+      subtotal: calculatedSubtotal,
+    });
     // 상태를 즉시 업데이트하기 위해 로컬 스토리지에서 다시 읽어옴
     const updatedOrders = getOrders();
     setOrders(updatedOrders);
@@ -208,7 +233,14 @@ export default function ChangeOptionPage() {
       newSelectedItems = [...currentItems, { name: itemName, quantity: 0 }];
     }
 
-    updateOrder(currentEditingOrderId, { selectedItems: newSelectedItems });
+    // subtotal 계산 및 업데이트
+    const updatedOrder = { ...order, selectedItems: newSelectedItems };
+    const calculatedSubtotal = calculateOrderItemPrice(updatedOrder);
+
+    updateOrder(currentEditingOrderId, {
+      selectedItems: newSelectedItems,
+      subtotal: calculatedSubtotal,
+    });
     // 상태를 즉시 업데이트하기 위해 로컬 스토리지에서 다시 읽어옴
     const updatedOrders = getOrders();
     setOrders(updatedOrders);
@@ -216,7 +248,20 @@ export default function ChangeOptionPage() {
 
   const handleChangeStyle = (styleType: ServingStyleType) => {
     if (!currentEditingOrderId) return;
-    updateOrder(currentEditingOrderId, { style: styleType });
+
+    // 최신 주문 정보를 로컬 스토리지에서 직접 가져옴
+    const allOrders = getOrders();
+    const order = allOrders.find((o) => o.id === currentEditingOrderId);
+    if (!order) return;
+
+    // subtotal 계산 및 업데이트
+    const updatedOrder = { ...order, style: styleType };
+    const calculatedSubtotal = calculateOrderItemPrice(updatedOrder);
+
+    updateOrder(currentEditingOrderId, {
+      style: styleType,
+      subtotal: calculatedSubtotal,
+    });
     // 상태를 즉시 업데이트하기 위해 로컬 스토리지에서 다시 읽어옴
     const updatedOrders = getOrders();
     setOrders(updatedOrders);
@@ -266,31 +311,10 @@ export default function ChangeOptionPage() {
     return null;
   }
 
+  // OrderSummary와 동일한 로직으로 가격 계산
   const grandTotal = orders.reduce((total, order) => {
-    const menu = dinnerMenus.find((m) => m.id === order.menuId);
-    if (!menu) return total;
-
-    const basePrice = calculatePriceWithStyle(menu.basePrice, order.style);
-    const availableItems = getItemsForMenu(order.menuId);
-    const selectedItems =
-      order.selectedItems ||
-      availableItems.map((item) => ({
-        name: item.name,
-        quantity: item.defaultQuantity || 1,
-      }));
-
-    const itemsPrice = availableItems.reduce((sum, itemData) => {
-      const selectedItem = selectedItems.find(
-        (si) => si.name === itemData.name
-      );
-      const quantity = selectedItem
-        ? selectedItem.quantity
-        : itemData.defaultQuantity || 1;
-      const defaultQty = itemData.defaultQuantity || 1;
-      return sum + itemData.basePrice * (quantity - defaultQty);
-    }, 0);
-
-    return total + (basePrice + itemsPrice) * order.quantity;
+    const orderSubtotal = order.subtotal ?? calculateOrderItemPrice(order);
+    return total + orderSubtotal;
   }, 0);
 
   return (
@@ -322,18 +346,9 @@ export default function ChangeOptionPage() {
                   quantity: item.defaultQuantity || 1,
                 }));
 
-              const itemsPrice = availableItems.reduce((total, itemData) => {
-                const selectedItem = selectedItems.find(
-                  (si) => si.name === itemData.name
-                );
-                const quantity = selectedItem
-                  ? selectedItem.quantity
-                  : itemData.defaultQuantity || 1;
-                const defaultQty = itemData.defaultQuantity || 1;
-                return total + itemData.basePrice * (quantity - defaultQty);
-              }, 0);
-
-              const totalPrice = (basePrice + itemsPrice) * order.quantity;
+              // OrderSummary와 동일한 로직으로 가격 계산
+              const totalPrice =
+                order.subtotal ?? calculateOrderItemPrice(order);
 
               return (
                 <OrderCard

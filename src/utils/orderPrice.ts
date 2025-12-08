@@ -2,6 +2,7 @@ import type { OrderItem } from "@/types/domain/order";
 import { dinnerMenus } from "@/constants/menus";
 import { calculatePriceWithStyle } from "@/utils/calculations";
 import { getItemsForMenu, getAllMenuItems } from "@/utils/menu";
+import { itemPrices, getItemPriceKey } from "@/constants/prices";
 
 /**
  * OrderSummary에서 사용하는 것과 동일한 로직으로 주문 항목의 가격을 계산
@@ -50,11 +51,37 @@ export const calculateOrderItemPrice = (order: OrderItem): number => {
       itemData = allMenuItems.find((item) => item.name === selectedItem.name);
     }
 
-    // 여전히 없으면 기본 가격 사용
-    const baseItemPrice = itemData?.basePrice || 10000;
-    const defaultQty = itemData?.defaultQuantity || 1;
-    const quantity = selectedItem.quantity;
+    // constants/prices.ts에서 실제 가격 데이터 참고
+    let baseItemPrice: number;
+    let defaultQty: number;
 
+    if (itemData) {
+      // itemData가 있으면 그 가격 사용
+      baseItemPrice = itemData.basePrice;
+      defaultQty = itemData.defaultQuantity;
+    } else {
+      // itemData가 없으면 constants/prices.ts에서 직접 찾기
+      // 모든 메뉴를 순회하며 해당 아이템의 가격 찾기
+      let foundPrice = false;
+      for (const menu of dinnerMenus) {
+        const priceKey = getItemPriceKey(menu.id, selectedItem.name);
+        const config = itemPrices[priceKey];
+        if (config) {
+          baseItemPrice = config.unitPrice;
+          defaultQty = config.defaultQuantity;
+          foundPrice = true;
+          break;
+        }
+      }
+
+      // 여전히 없으면 기본값 사용
+      if (!foundPrice) {
+        baseItemPrice = 10000;
+        defaultQty = 1;
+      }
+    }
+
+    const quantity = selectedItem.quantity;
     return total + baseItemPrice * (quantity - defaultQty);
   }, 0);
 
