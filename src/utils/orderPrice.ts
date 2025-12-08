@@ -58,7 +58,7 @@ export const calculateOrderItemPrice = (order: OrderItem): number => {
     if (itemData) {
       // itemData가 있으면 그 가격 사용
       baseItemPrice = itemData.basePrice;
-      defaultQty = itemData.defaultQuantity;
+      defaultQty = itemData.defaultQuantity || 1;
     } else {
       // itemData가 없으면 constants/prices.ts에서 직접 찾기
       // 모든 메뉴를 순회하며 해당 아이템의 가격 찾기
